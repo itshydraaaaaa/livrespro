@@ -14,6 +14,15 @@ export function createExpressApp(): Express {
   // Neutralized storage proxy for legacy assets
   registerStorageProxy(app);
 
+  // Restore path if rewritten by Vercel serverless gateway
+  app.use((req, _res, next) => {
+    const rawUrl = req.headers["x-matched-path"] || req.headers["x-vercel-matched-path"];
+    if (typeof rawUrl === "string" && (rawUrl.startsWith("/api/") || rawUrl.startsWith("/manus-storage/"))) {
+      req.url = rawUrl;
+    }
+    next();
+  });
+
   // Health check endpoint
   app.get(["/api/health", "/health"], (_req, res) => {
     res.json({ status: "ok", app: "livrespro", timestamp: new Date().toISOString() });
