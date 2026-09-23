@@ -1,24 +1,28 @@
-// server/app.ts
-import express from "express";
-import { createExpressMiddleware } from "@trpc/server/adapters/express";
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
 
-// server/routers.ts
-import { z as z5 } from "zod";
-import { TRPCError as TRPCError3 } from "@trpc/server";
+// shared/const.ts
+var COOKIE_NAME, ONE_YEAR_MS, UNAUTHED_ERR_MSG, NOT_ADMIN_ERR_MSG;
+var init_const = __esm({
+  "shared/const.ts"() {
+    "use strict";
+    COOKIE_NAME = "app_session_id";
+    ONE_YEAR_MS = 1e3 * 60 * 60 * 24 * 365;
+    UNAUTHED_ERR_MSG = "Please login (10001)";
+    NOT_ADMIN_ERR_MSG = "You do not have required permission (10002)";
+  }
+});
 
 // server/_core/auth.ts
 import crypto from "node:crypto";
 import { SignJWT, jwtVerify } from "jose";
-
-// shared/const.ts
-var COOKIE_NAME = "app_session_id";
-var ONE_YEAR_MS = 1e3 * 60 * 60 * 24 * 365;
-var UNAUTHED_ERR_MSG = "Please login (10001)";
-var NOT_ADMIN_ERR_MSG = "You do not have required permission (10002)";
-
-// server/_core/auth.ts
-var JWT_SECRET = process.env.JWT_SECRET || "livrespro-development-secret-key-at-least-32-chars";
-var secretKey = new TextEncoder().encode(JWT_SECRET);
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString("hex");
   const derivedKey = crypto.scryptSync(password, salt, 64);
@@ -73,10 +77,15 @@ function clearSessionCookie(res) {
     path: "/"
   });
 }
-
-// server/db.ts
-import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
-import { drizzle } from "drizzle-orm/mysql2";
+var JWT_SECRET, secretKey;
+var init_auth = __esm({
+  "server/_core/auth.ts"() {
+    "use strict";
+    init_const();
+    JWT_SECRET = process.env.JWT_SECRET || "livrespro-development-secret-key-at-least-32-chars";
+    secretKey = new TextEncoder().encode(JWT_SECRET);
+  }
+});
 
 // drizzle/schema.ts
 import {
@@ -88,174 +97,181 @@ import {
   timestamp,
   varchar
 } from "drizzle-orm/mysql-core";
-var users = mysqlTable("users", {
-  id: int("id").autoincrement().primaryKey(),
-  email: varchar("email", { length: 320 }).notNull().unique(),
-  passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
-  name: varchar("name", { length: 180 }),
-  role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
-  lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull()
-});
-var categories = mysqlTable("categories", {
-  id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 120 }).notNull(),
-  slug: varchar("slug", { length: 120 }).notNull().unique(),
-  description: text("description"),
-  image: text("image"),
-  parentId: int("parentId"),
-  sortOrder: int("sortOrder").default(0).notNull(),
-  seoTitle: varchar("seoTitle", { length: 180 }),
-  seoDescription: varchar("seoDescription", { length: 320 }),
-  status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-var authors = mysqlTable("authors", {
-  id: int("id").autoincrement().primaryKey(),
-  name: varchar("name", { length: 180 }).notNull(),
-  slug: varchar("slug", { length: 180 }).notNull().unique(),
-  biography: text("biography"),
-  photo: text("photo"),
-  website: varchar("website", { length: 300 }),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-var products = mysqlTable("products", {
-  id: int("id").autoincrement().primaryKey(),
-  title: varchar("title", { length: 300 }).notNull(),
-  slug: varchar("slug", { length: 180 }).notNull().unique(),
-  sku: varchar("sku", { length: 80 }),
-  shortDescription: text("shortDescription"),
-  description: text("description").notNull(),
-  descriptionHtml: text("descriptionHtml"),
-  productType: varchar("productType", { length: 80 }).default("Livre").notNull(),
-  format: mysqlEnum("format", [
-    "PHYSICAL_BOOK",
-    "DIGITAL_BOOK",
-    "EBOOK",
-    "AUDIOBOOK",
-    "OTHER"
-  ]).default("PHYSICAL_BOOK").notNull(),
-  price: varchar("price", { length: 32 }).notNull(),
-  // e.g. "65.00"
-  compareAtPrice: varchar("compareAtPrice", { length: 32 }),
-  currency: varchar("currency", { length: 10 }).default("TND").notNull(),
-  stockQuantity: int("stockQuantity").default(100).notNull(),
-  availabilityStatus: mysqlEnum("availabilityStatus", [
-    "in_stock",
-    "out_of_stock",
-    "preorder"
-  ]).default("in_stock").notNull(),
-  isbn: varchar("isbn", { length: 40 }),
-  publisher: varchar("publisher", { length: 180 }),
-  publicationDate: varchar("publicationDate", { length: 40 }),
-  language: varchar("language", { length: 40 }).default("Fran\xE7ais").notNull(),
-  pageCount: int("pageCount"),
-  coverImage: text("coverImage"),
-  categoryId: int("categoryId"),
-  featured: int("featured").default(0).notNull(),
-  // 0 = false, 1 = true
-  status: mysqlEnum("status", ["draft", "published", "archived"]).default("published").notNull(),
-  seoTitle: varchar("seoTitle", { length: 180 }),
-  seoDescription: varchar("seoDescription", { length: 320 }),
-  metadata: json("metadata"),
-  // e.g. case studies, educator companions, tags
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-var productAuthors = mysqlTable("product_authors", {
-  id: int("id").autoincrement().primaryKey(),
-  productId: int("productId").notNull(),
-  authorId: int("authorId").notNull(),
-  role: varchar("role", { length: 64 }).default("Auteur").notNull(),
-  sortOrder: int("sortOrder").default(0).notNull()
-});
-var productImages = mysqlTable("product_images", {
-  id: int("id").autoincrement().primaryKey(),
-  productId: int("productId").notNull(),
-  url: text("url").notNull(),
-  alt: varchar("alt", { length: 255 }),
-  sortOrder: int("sortOrder").default(0).notNull(),
-  isPrimary: int("isPrimary").default(0).notNull()
-});
-var orders = mysqlTable("orders", {
-  id: int("id").autoincrement().primaryKey(),
-  orderNumber: varchar("orderNumber", { length: 64 }).notNull().unique(),
-  customerFirstName: varchar("customerFirstName", { length: 120 }).notNull(),
-  customerLastName: varchar("customerLastName", { length: 120 }).notNull(),
-  customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
-  customerPhone: varchar("customerPhone", { length: 80 }).notNull(),
-  deliveryAddress: text("deliveryAddress").notNull(),
-  city: varchar("city", { length: 120 }),
-  governorate: varchar("governorate", { length: 120 }),
-  postalCode: varchar("postalCode", { length: 20 }),
-  orderNotes: text("orderNotes"),
-  isEducator: int("isEducator").default(0).notNull(),
-  subtotal: varchar("subtotal", { length: 32 }).default("0.00").notNull(),
-  shippingCost: varchar("shippingCost", { length: 32 }).default("7.00").notNull(),
-  discountAmount: varchar("discountAmount", { length: 32 }).default("0.00").notNull(),
-  totalAmount: varchar("totalAmount", { length: 32 }).default("0.00").notNull(),
-  currency: varchar("currency", { length: 10 }).default("TND").notNull(),
-  paymentMethod: varchar("paymentMethod", { length: 64 }).default("cash_on_delivery").notNull(),
-  paymentStatus: mysqlEnum("paymentStatus", ["pending", "paid", "failed", "refunded"]).default("pending").notNull(),
-  status: mysqlEnum("status", ["new", "confirmed", "processing", "shipped", "delivered", "cancelled"]).default("new").notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-var orderItems = mysqlTable("order_items", {
-  id: int("id").autoincrement().primaryKey(),
-  orderId: int("orderId").notNull(),
-  productId: int("productId"),
-  productSlug: varchar("productSlug", { length: 180 }).notNull(),
-  productTitle: varchar("productTitle", { length: 300 }).notNull(),
-  format: varchar("format", { length: 80 }).default("Livre physique").notNull(),
-  unitPrice: varchar("unitPrice", { length: 32 }).notNull(),
-  quantity: int("quantity").default(1).notNull(),
-  subtotal: varchar("subtotal", { length: 32 }).notNull(),
-  createdAt: timestamp("createdAt").defaultNow().notNull()
-});
-var contentSections = mysqlTable("content_sections", {
-  id: int("id").autoincrement().primaryKey(),
-  key: varchar("key", { length: 80 }).notNull().unique(),
-  eyebrow: varchar("eyebrow", { length: 120 }),
-  title: varchar("title", { length: 240 }).notNull(),
-  body: text("body"),
-  ctaLabel: varchar("ctaLabel", { length: 80 }),
-  ctaHref: varchar("ctaHref", { length: 500 }),
-  imageUrl: text("imageUrl"),
-  status: mysqlEnum("status", ["draft", "published"]).default("draft").notNull(),
-  updatedBy: int("updatedBy"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-var seoPages = mysqlTable("seo_pages", {
-  id: int("id").autoincrement().primaryKey(),
-  path: varchar("path", { length: 500 }).notNull().unique(),
-  title: varchar("title", { length: 160 }).notNull(),
-  description: varchar("description", { length: 320 }).notNull(),
-  ogTitle: varchar("ogTitle", { length: 160 }),
-  ogDescription: varchar("ogDescription", { length: 320 }),
-  canonicalUrl: varchar("canonicalUrl", { length: 500 }),
-  robots: mysqlEnum("robots", ["index", "noindex"]).default("index").notNull(),
-  updatedBy: int("updatedBy"),
-  createdAt: timestamp("createdAt").defaultNow().notNull(),
-  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
-});
-var analyticsEvents = mysqlTable("analytics_events", {
-  id: int("id").autoincrement().primaryKey(),
-  visitorId: varchar("visitorId", { length: 64 }).notNull(),
-  sessionId: varchar("sessionId", { length: 64 }).notNull(),
-  eventType: varchar("eventType", { length: 64 }).notNull(),
-  path: varchar("path", { length: 500 }).notNull(),
-  referrer: varchar("referrer", { length: 500 }),
-  metadata: json("metadata"),
-  createdAt: timestamp("createdAt").defaultNow().notNull()
+var users, categories, authors, products, productAuthors, productImages, orders, orderItems, contentSections, seoPages, analyticsEvents;
+var init_schema = __esm({
+  "drizzle/schema.ts"() {
+    "use strict";
+    users = mysqlTable("users", {
+      id: int("id").autoincrement().primaryKey(),
+      email: varchar("email", { length: 320 }).notNull().unique(),
+      passwordHash: varchar("passwordHash", { length: 255 }).notNull(),
+      name: varchar("name", { length: 180 }),
+      role: mysqlEnum("role", ["user", "admin"]).default("user").notNull(),
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+      lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull()
+    });
+    categories = mysqlTable("categories", {
+      id: int("id").autoincrement().primaryKey(),
+      name: varchar("name", { length: 120 }).notNull(),
+      slug: varchar("slug", { length: 120 }).notNull().unique(),
+      description: text("description"),
+      image: text("image"),
+      parentId: int("parentId"),
+      sortOrder: int("sortOrder").default(0).notNull(),
+      seoTitle: varchar("seoTitle", { length: 180 }),
+      seoDescription: varchar("seoDescription", { length: 320 }),
+      status: mysqlEnum("status", ["active", "inactive"]).default("active").notNull(),
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+    });
+    authors = mysqlTable("authors", {
+      id: int("id").autoincrement().primaryKey(),
+      name: varchar("name", { length: 180 }).notNull(),
+      slug: varchar("slug", { length: 180 }).notNull().unique(),
+      biography: text("biography"),
+      photo: text("photo"),
+      website: varchar("website", { length: 300 }),
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+    });
+    products = mysqlTable("products", {
+      id: int("id").autoincrement().primaryKey(),
+      title: varchar("title", { length: 300 }).notNull(),
+      slug: varchar("slug", { length: 180 }).notNull().unique(),
+      sku: varchar("sku", { length: 80 }),
+      shortDescription: text("shortDescription"),
+      description: text("description").notNull(),
+      descriptionHtml: text("descriptionHtml"),
+      productType: varchar("productType", { length: 80 }).default("Livre").notNull(),
+      format: mysqlEnum("format", [
+        "PHYSICAL_BOOK",
+        "DIGITAL_BOOK",
+        "EBOOK",
+        "AUDIOBOOK",
+        "OTHER"
+      ]).default("PHYSICAL_BOOK").notNull(),
+      price: varchar("price", { length: 32 }).notNull(),
+      // e.g. "65.00"
+      compareAtPrice: varchar("compareAtPrice", { length: 32 }),
+      currency: varchar("currency", { length: 10 }).default("TND").notNull(),
+      stockQuantity: int("stockQuantity").default(100).notNull(),
+      availabilityStatus: mysqlEnum("availabilityStatus", [
+        "in_stock",
+        "out_of_stock",
+        "preorder"
+      ]).default("in_stock").notNull(),
+      isbn: varchar("isbn", { length: 40 }),
+      publisher: varchar("publisher", { length: 180 }),
+      publicationDate: varchar("publicationDate", { length: 40 }),
+      language: varchar("language", { length: 40 }).default("Fran\xE7ais").notNull(),
+      pageCount: int("pageCount"),
+      coverImage: text("coverImage"),
+      categoryId: int("categoryId"),
+      featured: int("featured").default(0).notNull(),
+      // 0 = false, 1 = true
+      status: mysqlEnum("status", ["draft", "published", "archived"]).default("published").notNull(),
+      seoTitle: varchar("seoTitle", { length: 180 }),
+      seoDescription: varchar("seoDescription", { length: 320 }),
+      metadata: json("metadata"),
+      // e.g. case studies, educator companions, tags
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+    });
+    productAuthors = mysqlTable("product_authors", {
+      id: int("id").autoincrement().primaryKey(),
+      productId: int("productId").notNull(),
+      authorId: int("authorId").notNull(),
+      role: varchar("role", { length: 64 }).default("Auteur").notNull(),
+      sortOrder: int("sortOrder").default(0).notNull()
+    });
+    productImages = mysqlTable("product_images", {
+      id: int("id").autoincrement().primaryKey(),
+      productId: int("productId").notNull(),
+      url: text("url").notNull(),
+      alt: varchar("alt", { length: 255 }),
+      sortOrder: int("sortOrder").default(0).notNull(),
+      isPrimary: int("isPrimary").default(0).notNull()
+    });
+    orders = mysqlTable("orders", {
+      id: int("id").autoincrement().primaryKey(),
+      orderNumber: varchar("orderNumber", { length: 64 }).notNull().unique(),
+      customerFirstName: varchar("customerFirstName", { length: 120 }).notNull(),
+      customerLastName: varchar("customerLastName", { length: 120 }).notNull(),
+      customerEmail: varchar("customerEmail", { length: 320 }).notNull(),
+      customerPhone: varchar("customerPhone", { length: 80 }).notNull(),
+      deliveryAddress: text("deliveryAddress").notNull(),
+      city: varchar("city", { length: 120 }),
+      governorate: varchar("governorate", { length: 120 }),
+      postalCode: varchar("postalCode", { length: 20 }),
+      orderNotes: text("orderNotes"),
+      isEducator: int("isEducator").default(0).notNull(),
+      subtotal: varchar("subtotal", { length: 32 }).default("0.00").notNull(),
+      shippingCost: varchar("shippingCost", { length: 32 }).default("7.00").notNull(),
+      discountAmount: varchar("discountAmount", { length: 32 }).default("0.00").notNull(),
+      totalAmount: varchar("totalAmount", { length: 32 }).default("0.00").notNull(),
+      currency: varchar("currency", { length: 10 }).default("TND").notNull(),
+      paymentMethod: varchar("paymentMethod", { length: 64 }).default("cash_on_delivery").notNull(),
+      paymentStatus: mysqlEnum("paymentStatus", ["pending", "paid", "failed", "refunded"]).default("pending").notNull(),
+      status: mysqlEnum("status", ["new", "confirmed", "processing", "shipped", "delivered", "cancelled"]).default("new").notNull(),
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+    });
+    orderItems = mysqlTable("order_items", {
+      id: int("id").autoincrement().primaryKey(),
+      orderId: int("orderId").notNull(),
+      productId: int("productId"),
+      productSlug: varchar("productSlug", { length: 180 }).notNull(),
+      productTitle: varchar("productTitle", { length: 300 }).notNull(),
+      format: varchar("format", { length: 80 }).default("Livre physique").notNull(),
+      unitPrice: varchar("unitPrice", { length: 32 }).notNull(),
+      quantity: int("quantity").default(1).notNull(),
+      subtotal: varchar("subtotal", { length: 32 }).notNull(),
+      createdAt: timestamp("createdAt").defaultNow().notNull()
+    });
+    contentSections = mysqlTable("content_sections", {
+      id: int("id").autoincrement().primaryKey(),
+      key: varchar("key", { length: 80 }).notNull().unique(),
+      eyebrow: varchar("eyebrow", { length: 120 }),
+      title: varchar("title", { length: 240 }).notNull(),
+      body: text("body"),
+      ctaLabel: varchar("ctaLabel", { length: 80 }),
+      ctaHref: varchar("ctaHref", { length: 500 }),
+      imageUrl: text("imageUrl"),
+      status: mysqlEnum("status", ["draft", "published"]).default("draft").notNull(),
+      updatedBy: int("updatedBy"),
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+    });
+    seoPages = mysqlTable("seo_pages", {
+      id: int("id").autoincrement().primaryKey(),
+      path: varchar("path", { length: 500 }).notNull().unique(),
+      title: varchar("title", { length: 160 }).notNull(),
+      description: varchar("description", { length: 320 }).notNull(),
+      ogTitle: varchar("ogTitle", { length: 160 }),
+      ogDescription: varchar("ogDescription", { length: 320 }),
+      canonicalUrl: varchar("canonicalUrl", { length: 500 }),
+      robots: mysqlEnum("robots", ["index", "noindex"]).default("index").notNull(),
+      updatedBy: int("updatedBy"),
+      createdAt: timestamp("createdAt").defaultNow().notNull(),
+      updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull()
+    });
+    analyticsEvents = mysqlTable("analytics_events", {
+      id: int("id").autoincrement().primaryKey(),
+      visitorId: varchar("visitorId", { length: 64 }).notNull(),
+      sessionId: varchar("sessionId", { length: 64 }).notNull(),
+      eventType: varchar("eventType", { length: 64 }).notNull(),
+      path: varchar("path", { length: 500 }).notNull(),
+      referrer: varchar("referrer", { length: 500 }),
+      metadata: json("metadata"),
+      createdAt: timestamp("createdAt").defaultNow().notNull()
+    });
+  }
 });
 
 // server/db.ts
-var _db = null;
+import { and, desc, eq, gte, inArray, sql } from "drizzle-orm";
+import { drizzle } from "drizzle-orm/mysql2";
 async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -629,274 +645,284 @@ async function getAdminOverview(days) {
     analytics
   };
 }
-
-// server/routers/admin.ts
-import { z } from "zod";
+var _db;
+var init_db = __esm({
+  "server/db.ts"() {
+    "use strict";
+    init_schema();
+    _db = null;
+  }
+});
 
 // server/_core/trpc.ts
 import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
-var t = initTRPC.context().create({
-  transformer: superjson
-});
-var router = t.router;
-var publicProcedure = t.procedure;
-var requireUser = t.middleware(async (opts) => {
-  const { ctx, next } = opts;
-  if (!ctx.user) {
-    throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
-  }
-  return next({
-    ctx: {
-      ...ctx,
-      user: ctx.user
-    }
-  });
-});
-var protectedProcedure = t.procedure.use(requireUser);
-var adminProcedure = t.procedure.use(
-  t.middleware(async (opts) => {
-    const { ctx, next } = opts;
-    if (!ctx.user || ctx.user.role !== "admin") {
-      throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
-    }
-    return next({
-      ctx: {
-        ...ctx,
-        user: ctx.user
-      }
+var t, router, publicProcedure, requireUser, protectedProcedure, adminProcedure;
+var init_trpc = __esm({
+  "server/_core/trpc.ts"() {
+    "use strict";
+    init_const();
+    t = initTRPC.context().create({
+      transformer: superjson
     });
-  })
-);
+    router = t.router;
+    publicProcedure = t.procedure;
+    requireUser = t.middleware(async (opts) => {
+      const { ctx, next } = opts;
+      if (!ctx.user) {
+        throw new TRPCError({ code: "UNAUTHORIZED", message: UNAUTHED_ERR_MSG });
+      }
+      return next({
+        ctx: {
+          ...ctx,
+          user: ctx.user
+        }
+      });
+    });
+    protectedProcedure = t.procedure.use(requireUser);
+    adminProcedure = t.procedure.use(
+      t.middleware(async (opts) => {
+        const { ctx, next } = opts;
+        if (!ctx.user || ctx.user.role !== "admin") {
+          throw new TRPCError({ code: "FORBIDDEN", message: NOT_ADMIN_ERR_MSG });
+        }
+        return next({
+          ctx: {
+            ...ctx,
+            user: ctx.user
+          }
+        });
+      })
+    );
+  }
+});
 
 // server/routers/admin.ts
-var blankToNull = (max) => z.string().trim().max(max).optional().transform((value) => value || null);
-var contentInput = z.object({
-  id: z.number().int().positive().optional(),
-  key: z.string().trim().min(2).max(80).regex(/^[a-z0-9-]+$/, "Utilisez uniquement des minuscules, chiffres et tirets."),
-  eyebrow: blankToNull(120),
-  title: z.string().trim().min(3).max(240),
-  body: blankToNull(12e3),
-  ctaLabel: blankToNull(80),
-  ctaHref: blankToNull(500),
-  imageUrl: blankToNull(2e3),
-  status: z.enum(["draft", "published"])
-});
-var seoInput = z.object({
-  id: z.number().int().positive().optional(),
-  path: z.string().trim().min(1).max(500).startsWith("/"),
-  title: z.string().trim().min(10).max(160),
-  description: z.string().trim().min(50).max(320),
-  ogTitle: blankToNull(160),
-  ogDescription: blankToNull(320),
-  canonicalUrl: blankToNull(500),
-  robots: z.enum(["index", "noindex"])
-});
-var productInput = z.object({
-  id: z.number().int().positive().optional(),
-  title: z.string().trim().min(2).max(300),
-  slug: z.string().trim().min(2).max(180),
-  sku: blankToNull(80),
-  shortDescription: blankToNull(500),
-  description: z.string().trim().min(10),
-  productType: z.string().trim().default("Livre"),
-  format: z.enum(["PHYSICAL_BOOK", "DIGITAL_BOOK", "EBOOK", "AUDIOBOOK", "OTHER"]).default("PHYSICAL_BOOK"),
-  price: z.string().trim().regex(/^\d+(\.\d{1,2})?$/),
-  compareAtPrice: blankToNull(32),
-  currency: z.string().default("TND"),
-  stockQuantity: z.number().int().min(0).default(100),
-  availabilityStatus: z.enum(["in_stock", "out_of_stock", "preorder"]).default("in_stock"),
-  isbn: blankToNull(40),
-  publisher: blankToNull(180),
-  language: z.string().default("Fran\xE7ais"),
-  pageCount: z.number().int().positive().optional().nullable(),
-  coverImage: blankToNull(1e3),
-  categoryId: z.number().int().positive().optional().nullable(),
-  featured: z.boolean().default(false),
-  status: z.enum(["draft", "published", "archived"]).default("published"),
-  authorIds: z.array(z.number().int().positive()).optional(),
-  galleryUrls: z.array(z.string().url()).optional()
-});
-var categoryInput = z.object({
-  id: z.number().int().positive().optional(),
-  name: z.string().trim().min(2).max(120),
-  slug: z.string().trim().min(2).max(120),
-  description: blankToNull(1e3),
-  sortOrder: z.number().int().default(0),
-  status: z.enum(["active", "inactive"]).default("active")
-});
-var authorInput = z.object({
-  id: z.number().int().positive().optional(),
-  name: z.string().trim().min(2).max(180),
-  slug: z.string().trim().min(2).max(180),
-  biography: blankToNull(3e3),
-  photo: blankToNull(1e3),
-  website: blankToNull(300)
-});
-var adminRouter = router({
-  overview: adminProcedure.input(z.object({ days: z.number().int().min(1).max(90).default(30) }).optional()).query(async ({ input }) => {
-    try {
-      return await getAdminOverview(input?.days ?? 30);
-    } catch {
-      return {
-        contentSections: 0,
-        publishedSections: 0,
-        seoPages: 1,
-        totalProducts: 1,
-        totalOrders: 0,
-        analytics: {
-          days: input?.days ?? 30,
-          totalEvents: 42,
-          uniqueVisitors: 18,
-          pageViews: 35,
-          bookViews: 24,
-          cartAdds: 8,
-          cartRate: 33.3,
-          topPages: [{ path: "/", total: 20 }, { path: "/librairie", total: 15 }],
-          eventMix: [{ eventType: "page_view", total: 35 }, { eventType: "view_book", total: 24 }]
+import { z } from "zod";
+var blankToNull, contentInput, seoInput, productInput, categoryInput, authorInput, adminRouter;
+var init_admin = __esm({
+  "server/routers/admin.ts"() {
+    "use strict";
+    init_db();
+    init_trpc();
+    blankToNull = (max) => z.string().trim().max(max).optional().transform((value) => value || null);
+    contentInput = z.object({
+      id: z.number().int().positive().optional(),
+      key: z.string().trim().min(2).max(80).regex(/^[a-z0-9-]+$/, "Utilisez uniquement des minuscules, chiffres et tirets."),
+      eyebrow: blankToNull(120),
+      title: z.string().trim().min(3).max(240),
+      body: blankToNull(12e3),
+      ctaLabel: blankToNull(80),
+      ctaHref: blankToNull(500),
+      imageUrl: blankToNull(2e3),
+      status: z.enum(["draft", "published"])
+    });
+    seoInput = z.object({
+      id: z.number().int().positive().optional(),
+      path: z.string().trim().min(1).max(500).startsWith("/"),
+      title: z.string().trim().min(10).max(160),
+      description: z.string().trim().min(50).max(320),
+      ogTitle: blankToNull(160),
+      ogDescription: blankToNull(320),
+      canonicalUrl: blankToNull(500),
+      robots: z.enum(["index", "noindex"])
+    });
+    productInput = z.object({
+      id: z.number().int().positive().optional(),
+      title: z.string().trim().min(2).max(300),
+      slug: z.string().trim().min(2).max(180),
+      sku: blankToNull(80),
+      shortDescription: blankToNull(500),
+      description: z.string().trim().min(10),
+      productType: z.string().trim().default("Livre"),
+      format: z.enum(["PHYSICAL_BOOK", "DIGITAL_BOOK", "EBOOK", "AUDIOBOOK", "OTHER"]).default("PHYSICAL_BOOK"),
+      price: z.string().trim().regex(/^\d+(\.\d{1,2})?$/),
+      compareAtPrice: blankToNull(32),
+      currency: z.string().default("TND"),
+      stockQuantity: z.number().int().min(0).default(100),
+      availabilityStatus: z.enum(["in_stock", "out_of_stock", "preorder"]).default("in_stock"),
+      isbn: blankToNull(40),
+      publisher: blankToNull(180),
+      language: z.string().default("Fran\xE7ais"),
+      pageCount: z.number().int().positive().optional().nullable(),
+      coverImage: blankToNull(1e3),
+      categoryId: z.number().int().positive().optional().nullable(),
+      featured: z.boolean().default(false),
+      status: z.enum(["draft", "published", "archived"]).default("published"),
+      authorIds: z.array(z.number().int().positive()).optional(),
+      galleryUrls: z.array(z.string().url()).optional()
+    });
+    categoryInput = z.object({
+      id: z.number().int().positive().optional(),
+      name: z.string().trim().min(2).max(120),
+      slug: z.string().trim().min(2).max(120),
+      description: blankToNull(1e3),
+      sortOrder: z.number().int().default(0),
+      status: z.enum(["active", "inactive"]).default("active")
+    });
+    authorInput = z.object({
+      id: z.number().int().positive().optional(),
+      name: z.string().trim().min(2).max(180),
+      slug: z.string().trim().min(2).max(180),
+      biography: blankToNull(3e3),
+      photo: blankToNull(1e3),
+      website: blankToNull(300)
+    });
+    adminRouter = router({
+      overview: adminProcedure.input(z.object({ days: z.number().int().min(1).max(90).default(30) }).optional()).query(async ({ input }) => {
+        try {
+          return await getAdminOverview(input?.days ?? 30);
+        } catch {
+          return {
+            contentSections: 0,
+            publishedSections: 0,
+            seoPages: 1,
+            totalProducts: 1,
+            totalOrders: 0,
+            analytics: {
+              days: input?.days ?? 30,
+              totalEvents: 42,
+              uniqueVisitors: 18,
+              pageViews: 35,
+              bookViews: 24,
+              cartAdds: 8,
+              cartRate: 33.3,
+              topPages: [{ path: "/", total: 20 }, { path: "/librairie", total: 15 }],
+              eventMix: [{ eventType: "page_view", total: 35 }, { eventType: "view_book", total: 24 }]
+            }
+          };
         }
-      };
-    }
-  }),
-  orders: router({
-    list: adminProcedure.query(async () => {
-      try {
-        return await listOrders();
-      } catch {
-        return [];
-      }
-    }),
-    updateStatus: adminProcedure.input(
-      z.object({
-        orderId: z.number().int().positive(),
-        status: z.enum(["new", "confirmed", "processing", "shipped", "delivered", "cancelled"])
+      }),
+      orders: router({
+        list: adminProcedure.query(async () => {
+          try {
+            return await listOrders();
+          } catch {
+            return [];
+          }
+        }),
+        updateStatus: adminProcedure.input(
+          z.object({
+            orderId: z.number().int().positive(),
+            status: z.enum(["new", "confirmed", "processing", "shipped", "delivered", "cancelled"])
+          })
+        ).mutation(async ({ input }) => {
+          try {
+            await updateOrderStatus(input.orderId, input.status);
+          } catch {
+          }
+          return { success: true };
+        })
+      }),
+      products: router({
+        list: adminProcedure.query(async () => {
+          try {
+            return await listProducts({ status: "all" });
+          } catch {
+            return [];
+          }
+        }),
+        save: adminProcedure.input(productInput).mutation(async ({ input }) => {
+          const { id, authorIds, galleryUrls, featured, ...data } = input;
+          const images = galleryUrls?.map((url) => ({ url })) ?? [];
+          try {
+            if (id) {
+              await updateProduct(
+                id,
+                {
+                  ...data,
+                  featured: featured ? 1 : 0,
+                  categoryId: data.categoryId ?? null,
+                  pageCount: data.pageCount ?? null
+                },
+                authorIds,
+                images
+              );
+              return { id };
+            }
+            const newId = await createProduct(
+              {
+                ...data,
+                featured: featured ? 1 : 0,
+                categoryId: data.categoryId ?? null,
+                pageCount: data.pageCount ?? null
+              },
+              authorIds,
+              images
+            );
+            return { id: newId };
+          } catch {
+            return { id: id ?? 1 };
+          }
+        })
+      }),
+      categories: router({
+        list: adminProcedure.query(async () => {
+          try {
+            return await listCategories();
+          } catch {
+            return [];
+          }
+        }),
+        save: adminProcedure.input(categoryInput).mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          try {
+            if (id) {
+              await updateCategory(id, data);
+              return { id };
+            }
+            const newId = await createCategory(data);
+            return { id: newId };
+          } catch {
+            return { id: id ?? 1 };
+          }
+        })
+      }),
+      authors: router({
+        list: adminProcedure.query(async () => {
+          try {
+            return await listAuthors();
+          } catch {
+            return [];
+          }
+        }),
+        save: adminProcedure.input(authorInput).mutation(async ({ input }) => {
+          const { id, ...data } = input;
+          try {
+            if (id) {
+              await updateAuthor(id, data);
+              return { id };
+            }
+            const newId = await createAuthor(data);
+            return { id: newId };
+          } catch {
+            return { id: id ?? 1 };
+          }
+        })
+      }),
+      content: router({
+        list: adminProcedure.query(() => listContentSections(true)),
+        save: adminProcedure.input(contentInput).mutation(async ({ ctx, input }) => {
+          const id = await saveContentSection({ ...input, updatedBy: ctx.user.id });
+          return { id };
+        })
+      }),
+      seo: router({
+        list: adminProcedure.query(() => listSeoPages()),
+        save: adminProcedure.input(seoInput).mutation(async ({ ctx, input }) => {
+          const id = await saveSeoPage({ ...input, updatedBy: ctx.user.id });
+          return { id };
+        })
+      }),
+      audience: router({
+        summary: adminProcedure.input(z.object({ days: z.number().int().min(1).max(90).default(30) }).optional()).query(({ input }) => getAnalyticsSummary(input?.days ?? 30))
       })
-    ).mutation(async ({ input }) => {
-      try {
-        await updateOrderStatus(input.orderId, input.status);
-      } catch {
-      }
-      return { success: true };
-    })
-  }),
-  products: router({
-    list: adminProcedure.query(async () => {
-      try {
-        return await listProducts({ status: "all" });
-      } catch {
-        return [];
-      }
-    }),
-    save: adminProcedure.input(productInput).mutation(async ({ input }) => {
-      const { id, authorIds, galleryUrls, featured, ...data } = input;
-      const images = galleryUrls?.map((url) => ({ url })) ?? [];
-      try {
-        if (id) {
-          await updateProduct(
-            id,
-            {
-              ...data,
-              featured: featured ? 1 : 0,
-              categoryId: data.categoryId ?? null,
-              pageCount: data.pageCount ?? null
-            },
-            authorIds,
-            images
-          );
-          return { id };
-        }
-        const newId = await createProduct(
-          {
-            ...data,
-            featured: featured ? 1 : 0,
-            categoryId: data.categoryId ?? null,
-            pageCount: data.pageCount ?? null
-          },
-          authorIds,
-          images
-        );
-        return { id: newId };
-      } catch {
-        return { id: id ?? 1 };
-      }
-    })
-  }),
-  categories: router({
-    list: adminProcedure.query(async () => {
-      try {
-        return await listCategories();
-      } catch {
-        return [];
-      }
-    }),
-    save: adminProcedure.input(categoryInput).mutation(async ({ input }) => {
-      const { id, ...data } = input;
-      try {
-        if (id) {
-          await updateCategory(id, data);
-          return { id };
-        }
-        const newId = await createCategory(data);
-        return { id: newId };
-      } catch {
-        return { id: id ?? 1 };
-      }
-    })
-  }),
-  authors: router({
-    list: adminProcedure.query(async () => {
-      try {
-        return await listAuthors();
-      } catch {
-        return [];
-      }
-    }),
-    save: adminProcedure.input(authorInput).mutation(async ({ input }) => {
-      const { id, ...data } = input;
-      try {
-        if (id) {
-          await updateAuthor(id, data);
-          return { id };
-        }
-        const newId = await createAuthor(data);
-        return { id: newId };
-      } catch {
-        return { id: id ?? 1 };
-      }
-    })
-  }),
-  content: router({
-    list: adminProcedure.query(() => listContentSections(true)),
-    save: adminProcedure.input(contentInput).mutation(async ({ ctx, input }) => {
-      const id = await saveContentSection({ ...input, updatedBy: ctx.user.id });
-      return { id };
-    })
-  }),
-  seo: router({
-    list: adminProcedure.query(() => listSeoPages()),
-    save: adminProcedure.input(seoInput).mutation(async ({ ctx, input }) => {
-      const id = await saveSeoPage({ ...input, updatedBy: ctx.user.id });
-      return { id };
-    })
-  }),
-  audience: router({
-    summary: adminProcedure.input(z.object({ days: z.number().int().min(1).max(90).default(30) }).optional()).query(({ input }) => getAnalyticsSummary(input?.days ?? 30))
-  })
+    });
+  }
 });
-
-// server/routers/commerce.ts
-import { z as z2 } from "zod";
 
 // server/services/supabase.ts
 import { createClient } from "@supabase/supabase-js";
-var supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
-var supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
-var supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || "";
-var isSupabaseConfigured = Boolean(
-  supabaseUrl && (supabasePublishableKey || supabaseSecretKey) && !supabaseUrl.includes("YOUR_PROJECT_REF")
-);
-var _supabaseAdmin = null;
-var _supabaseClient = null;
 function getSupabaseAdmin() {
   if (!isSupabaseConfigured) return null;
   if (!_supabaseAdmin) {
@@ -955,62 +981,22 @@ async function fetchProductsFromSupabase() {
     return null;
   }
 }
+var supabaseUrl, supabasePublishableKey, supabaseSecretKey, isSupabaseConfigured, _supabaseAdmin, _supabaseClient;
+var init_supabase = __esm({
+  "server/services/supabase.ts"() {
+    "use strict";
+    supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "";
+    supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
+    supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || "";
+    isSupabaseConfigured = Boolean(
+      supabaseUrl && (supabasePublishableKey || supabaseSecretKey) && !supabaseUrl.includes("YOUR_PROJECT_REF")
+    );
+    _supabaseAdmin = null;
+    _supabaseClient = null;
+  }
+});
 
 // server/services/bookstoreService.ts
-var FALLBACK_B2B_PRODUCT = {
-  id: "1",
-  handle: "b2b-brand-management-tunisia",
-  title: "B2B Brand Management \u2014 \xC9dition Tunisie",
-  description: "L'ouvrage de r\xE9f\xE9rence internationale de Philip Kotler & Waldemar Pfoertsch, adapt\xE9 au contexte \xE9conomique et manag\xE9rial tunisien par Walid Kallel. Inclus 7 cas r\xE9els d'entreprises tunisiennes (BIAT, Wallyscar, MSB, ARVEA, Gourmandise, MPBS, CHO Group).",
-  descriptionHtml: "<p>L'ouvrage de r\xE9f\xE9rence internationale de <strong>Philip Kotler & Waldemar Pfoertsch</strong>, adapt\xE9 au contexte \xE9conomique et manag\xE9rial tunisien par <strong>Walid Kallel</strong>.</p><p>Comprend 7 \xE9tudes de cas approfondies d'entreprises tunisiennes leaders dans leur secteur.</p>",
-  productType: "Livre reli\xE9",
-  vendor: "Philip Kotler \xB7 Waldemar Pfoertsch \xB7 Walid Kallel",
-  tags: ["B2B", "Strat\xE9gie", "Marketing B2B", "Cas Tunisiens", "Livre physique"],
-  images: [
-    {
-      url: "/business-success-logo.png",
-      altText: "B2B Brand Management \u2014 Tunisia Edition"
-    }
-  ],
-  priceRange: {
-    min: { amount: "65.00", currencyCode: "TND" },
-    max: { amount: "65.00", currencyCode: "TND" }
-  },
-  options: [{ name: "Format", values: ["Livre reli\xE9"] }],
-  variants: [
-    {
-      id: "var-1",
-      title: "Livre reli\xE9",
-      price: { amount: "65.00", currencyCode: "TND" },
-      compareAtPrice: { amount: "85.00", currencyCode: "TND" },
-      availableForSale: true,
-      selectedOptions: [{ name: "Format", value: "Livre reli\xE9" }]
-    }
-  ]
-};
-var FALLBACK_COLLECTIONS = [
-  {
-    id: "1",
-    handle: "strategie-b2b",
-    title: "Strat\xE9gie & B2B",
-    description: "Ouvrages de r\xE9f\xE9rence en strat\xE9gie industrielle et marketing B2B.",
-    image: null
-  },
-  {
-    id: "2",
-    handle: "marketing-vente",
-    title: "Marketing & Vente",
-    description: "M\xE9thodes de croissance, distribution et performance commerciale.",
-    image: null
-  },
-  {
-    id: "3",
-    handle: "entrepreneuriat",
-    title: "Entrepreneuriat & Leadership",
-    description: "Guides pratiques pour fondateurs, dirigeants et managers.",
-    image: null
-  }
-];
 function normalizeDbProduct(p) {
   const authorNames = p.authors.map((a) => a.name).join(" \xB7 ");
   const vendor = authorNames || p.publisher || "L\u2019Atelier des Pages";
@@ -1199,265 +1185,306 @@ async function getStorefrontCollectionByHandle(handle) {
     return FALLBACK_COLLECTIONS.find((col) => col.handle === handle) ?? null;
   }
 }
+var FALLBACK_B2B_PRODUCT, FALLBACK_COLLECTIONS;
+var init_bookstoreService = __esm({
+  "server/services/bookstoreService.ts"() {
+    "use strict";
+    init_db();
+    init_supabase();
+    FALLBACK_B2B_PRODUCT = {
+      id: "1",
+      handle: "b2b-brand-management-tunisia",
+      title: "B2B Brand Management \u2014 \xC9dition Tunisie",
+      description: "L'ouvrage de r\xE9f\xE9rence internationale de Philip Kotler & Waldemar Pfoertsch, adapt\xE9 au contexte \xE9conomique et manag\xE9rial tunisien par Walid Kallel. Inclus 7 cas r\xE9els d'entreprises tunisiennes (BIAT, Wallyscar, MSB, ARVEA, Gourmandise, MPBS, CHO Group).",
+      descriptionHtml: "<p>L'ouvrage de r\xE9f\xE9rence internationale de <strong>Philip Kotler & Waldemar Pfoertsch</strong>, adapt\xE9 au contexte \xE9conomique et manag\xE9rial tunisien par <strong>Walid Kallel</strong>.</p><p>Comprend 7 \xE9tudes de cas approfondies d'entreprises tunisiennes leaders dans leur secteur.</p>",
+      productType: "Livre reli\xE9",
+      vendor: "Philip Kotler \xB7 Waldemar Pfoertsch \xB7 Walid Kallel",
+      tags: ["B2B", "Strat\xE9gie", "Marketing B2B", "Cas Tunisiens", "Livre physique"],
+      images: [
+        {
+          url: "/business-success-logo.png",
+          altText: "B2B Brand Management \u2014 Tunisia Edition"
+        }
+      ],
+      priceRange: {
+        min: { amount: "65.00", currencyCode: "TND" },
+        max: { amount: "65.00", currencyCode: "TND" }
+      },
+      options: [{ name: "Format", values: ["Livre reli\xE9"] }],
+      variants: [
+        {
+          id: "var-1",
+          title: "Livre reli\xE9",
+          price: { amount: "65.00", currencyCode: "TND" },
+          compareAtPrice: { amount: "85.00", currencyCode: "TND" },
+          availableForSale: true,
+          selectedOptions: [{ name: "Format", value: "Livre reli\xE9" }]
+        }
+      ]
+    };
+    FALLBACK_COLLECTIONS = [
+      {
+        id: "1",
+        handle: "strategie-b2b",
+        title: "Strat\xE9gie & B2B",
+        description: "Ouvrages de r\xE9f\xE9rence en strat\xE9gie industrielle et marketing B2B.",
+        image: null
+      },
+      {
+        id: "2",
+        handle: "marketing-vente",
+        title: "Marketing & Vente",
+        description: "M\xE9thodes de croissance, distribution et performance commerciale.",
+        image: null
+      },
+      {
+        id: "3",
+        handle: "entrepreneuriat",
+        title: "Entrepreneuriat & Leadership",
+        description: "Guides pratiques pour fondateurs, dirigeants et managers.",
+        image: null
+      }
+    ];
+  }
+});
 
 // server/routers/commerce.ts
-var commerceRouter = router({
-  products: router({
-    list: publicProcedure.input(
-      z2.object({
-        first: z2.number().int().min(1).max(100).optional(),
-        collectionHandle: z2.string().min(1).optional()
-      }).optional()
-    ).query(async ({ input }) => {
-      return listStorefrontProducts(input ?? {});
-    }),
-    byHandle: publicProcedure.input(z2.object({ handle: z2.string().min(1) })).query(async ({ input }) => {
-      return getStorefrontProductByHandle(input.handle);
-    })
-  }),
-  collections: router({
-    list: publicProcedure.input(z2.object({ first: z2.number().int().min(1).max(50).optional() }).optional()).query(async () => {
-      return listStorefrontCollections();
-    }),
-    byHandle: publicProcedure.input(z2.object({ handle: z2.string().min(1) })).query(async ({ input }) => {
-      return getStorefrontCollectionByHandle(input.handle);
-    })
-  })
+import { z as z2 } from "zod";
+var commerceRouter;
+var init_commerce = __esm({
+  "server/routers/commerce.ts"() {
+    "use strict";
+    init_bookstoreService();
+    init_trpc();
+    commerceRouter = router({
+      products: router({
+        list: publicProcedure.input(
+          z2.object({
+            first: z2.number().int().min(1).max(100).optional(),
+            collectionHandle: z2.string().min(1).optional()
+          }).optional()
+        ).query(async ({ input }) => {
+          return listStorefrontProducts(input ?? {});
+        }),
+        byHandle: publicProcedure.input(z2.object({ handle: z2.string().min(1) })).query(async ({ input }) => {
+          return getStorefrontProductByHandle(input.handle);
+        })
+      }),
+      collections: router({
+        list: publicProcedure.input(z2.object({ first: z2.number().int().min(1).max(50).optional() }).optional()).query(async () => {
+          return listStorefrontCollections();
+        }),
+        byHandle: publicProcedure.input(z2.object({ handle: z2.string().min(1) })).query(async ({ input }) => {
+          return getStorefrontCollectionByHandle(input.handle);
+        })
+      })
+    });
+  }
 });
 
 // server/routers/site.ts
 import { z as z3 } from "zod";
-var analyticsInput = z3.object({
-  visitorId: z3.string().uuid(),
-  sessionId: z3.string().uuid(),
-  eventType: z3.enum(["page_view", "view_book", "add_to_cart", "initiate_checkout"]),
-  path: z3.string().min(1).max(500).refine((val) => !val.includes("?"), {
-    message: "Les URL d'analyse ne doivent pas comporter de param\xE8tres d'interrogation"
-  }),
-  referrer: z3.string().url().max(500).nullable().optional(),
-  metadata: z3.object({
-    productHandle: z3.string().min(1).max(180).optional()
-  }).nullable().optional()
-});
-var orderItemInput = z3.object({
-  productId: z3.number().int().positive().optional(),
-  productSlug: z3.string().trim().min(1).max(180),
-  productTitle: z3.string().trim().min(1).max(300),
-  format: z3.string().trim().max(80).optional().default("Livre physique"),
-  unitPrice: z3.string().trim().regex(/^\d+(\.\d{1,2})?$/, "Format de prix invalide").default("65.00"),
-  quantity: z3.number().int().min(1).max(99).default(1)
-});
-var multiOrderInput = z3.object({
-  customerFirstName: z3.string().trim().min(2).max(120),
-  customerLastName: z3.string().trim().min(2).max(120),
-  customerEmail: z3.string().email().max(320),
-  customerPhone: z3.string().trim().min(6).max(80),
-  deliveryAddress: z3.string().trim().min(6).max(1200),
-  city: z3.string().trim().max(120).optional().nullable(),
-  governorate: z3.string().trim().max(120).optional().nullable(),
-  postalCode: z3.string().trim().max(20).optional().nullable(),
-  orderNotes: z3.string().trim().max(1e3).optional().nullable(),
-  isEducator: z3.boolean().default(false),
-  shippingCost: z3.string().default("7.00"),
-  items: z3.array(orderItemInput).min(1, "Votre panier est vide")
-});
-var unifiedOrderInput = z3.union([
-  multiOrderInput,
-  z3.object({
-    firstName: z3.string().trim().min(2).max(120),
-    lastName: z3.string().trim().min(2).max(120),
-    email: z3.string().email().max(320),
-    phone: z3.string().trim().min(6).max(80),
-    deliveryAddress: z3.string().trim().min(6).max(1200),
-    quantity: z3.number().int().min(1).max(50).default(1),
-    educator: z3.boolean().default(false),
-    productHandle: z3.string().trim().min(1).max(180).default("b2b-brand-management"),
-    productTitle: z3.string().trim().min(1).max(300).default("B2B Brand Management \u2014 Tunisia Edition"),
-    unitPrice: z3.string().default("65.00")
-  })
-]);
-var siteRouter = router({
-  orders: router({
-    create: publicProcedure.input(unifiedOrderInput).mutation(async ({ input }) => {
-      let createdOrder = null;
-      let orderPayload = null;
-      let orderItems2 = [];
-      if ("items" in input) {
-        orderPayload = {
-          customer_first_name: input.customerFirstName,
-          customer_last_name: input.customerLastName,
-          customer_email: input.customerEmail,
-          customer_phone: input.customerPhone,
-          delivery_address: input.deliveryAddress,
-          city: input.city ?? null,
-          governorate: input.governorate ?? null,
-          is_educator: input.isEducator ? 1 : 0,
-          shipping_cost: input.shippingCost ?? "7.00",
-          payment_method: "cash_on_delivery",
-          payment_status: "pending",
-          status: "new"
-        };
-        orderItems2 = input.items.map((it) => ({
-          product_slug: it.productSlug,
-          product_title: it.productTitle,
-          format: it.format ?? "Livre physique",
-          unit_price: it.unitPrice,
-          quantity: it.quantity,
-          subtotal: (parseFloat(it.unitPrice) * it.quantity).toFixed(2)
-        }));
-        try {
-          createdOrder = await createMultiItemOrder(input);
-        } catch (err) {
-          console.warn("[Orders] Local DB unavailable, checking Supabase fallback:", err);
-        }
-      } else {
-        const itemSubtotal = (parseFloat(input.unitPrice ?? "65.00") * input.quantity).toFixed(2);
-        orderPayload = {
-          customer_first_name: input.firstName,
-          customer_last_name: input.lastName,
-          customer_email: input.email,
-          customer_phone: input.phone,
-          delivery_address: input.deliveryAddress,
-          is_educator: input.educator ? 1 : 0,
-          shipping_cost: "7.00",
-          payment_method: "cash_on_delivery",
-          payment_status: "pending",
-          status: "new"
-        };
-        orderItems2 = [
-          {
-            product_slug: input.productHandle,
-            product_title: input.productTitle,
-            format: "Livre physique",
-            unit_price: input.unitPrice ?? "65.00",
-            quantity: input.quantity,
-            subtotal: itemSubtotal
-          }
-        ];
-        try {
-          createdOrder = await createMultiItemOrder({
-            customerFirstName: input.firstName,
-            customerLastName: input.lastName,
-            customerEmail: input.email,
-            customerPhone: input.phone,
-            deliveryAddress: input.deliveryAddress,
-            isEducator: input.educator,
-            items: [
+var analyticsInput, orderItemInput, multiOrderInput, unifiedOrderInput, siteRouter;
+var init_site = __esm({
+  "server/routers/site.ts"() {
+    "use strict";
+    init_db();
+    init_trpc();
+    init_supabase();
+    analyticsInput = z3.object({
+      visitorId: z3.string().uuid(),
+      sessionId: z3.string().uuid(),
+      eventType: z3.enum(["page_view", "view_book", "add_to_cart", "initiate_checkout"]),
+      path: z3.string().min(1).max(500).refine((val) => !val.includes("?"), {
+        message: "Les URL d'analyse ne doivent pas comporter de param\xE8tres d'interrogation"
+      }),
+      referrer: z3.string().url().max(500).nullable().optional(),
+      metadata: z3.object({
+        productHandle: z3.string().min(1).max(180).optional()
+      }).nullable().optional()
+    });
+    orderItemInput = z3.object({
+      productId: z3.number().int().positive().optional(),
+      productSlug: z3.string().trim().min(1).max(180),
+      productTitle: z3.string().trim().min(1).max(300),
+      format: z3.string().trim().max(80).optional().default("Livre physique"),
+      unitPrice: z3.string().trim().regex(/^\d+(\.\d{1,2})?$/, "Format de prix invalide").default("65.00"),
+      quantity: z3.number().int().min(1).max(99).default(1)
+    });
+    multiOrderInput = z3.object({
+      customerFirstName: z3.string().trim().min(2).max(120),
+      customerLastName: z3.string().trim().min(2).max(120),
+      customerEmail: z3.string().email().max(320),
+      customerPhone: z3.string().trim().min(6).max(80),
+      deliveryAddress: z3.string().trim().min(6).max(1200),
+      city: z3.string().trim().max(120).optional().nullable(),
+      governorate: z3.string().trim().max(120).optional().nullable(),
+      postalCode: z3.string().trim().max(20).optional().nullable(),
+      orderNotes: z3.string().trim().max(1e3).optional().nullable(),
+      isEducator: z3.boolean().default(false),
+      shippingCost: z3.string().default("7.00"),
+      items: z3.array(orderItemInput).min(1, "Votre panier est vide")
+    });
+    unifiedOrderInput = z3.union([
+      multiOrderInput,
+      z3.object({
+        firstName: z3.string().trim().min(2).max(120),
+        lastName: z3.string().trim().min(2).max(120),
+        email: z3.string().email().max(320),
+        phone: z3.string().trim().min(6).max(80),
+        deliveryAddress: z3.string().trim().min(6).max(1200),
+        quantity: z3.number().int().min(1).max(50).default(1),
+        educator: z3.boolean().default(false),
+        productHandle: z3.string().trim().min(1).max(180).default("b2b-brand-management"),
+        productTitle: z3.string().trim().min(1).max(300).default("B2B Brand Management \u2014 Tunisia Edition"),
+        unitPrice: z3.string().default("65.00")
+      })
+    ]);
+    siteRouter = router({
+      orders: router({
+        create: publicProcedure.input(unifiedOrderInput).mutation(async ({ input }) => {
+          let createdOrder = null;
+          let orderPayload = null;
+          let orderItems2 = [];
+          if ("items" in input) {
+            orderPayload = {
+              customer_first_name: input.customerFirstName,
+              customer_last_name: input.customerLastName,
+              customer_email: input.customerEmail,
+              customer_phone: input.customerPhone,
+              delivery_address: input.deliveryAddress,
+              city: input.city ?? null,
+              governorate: input.governorate ?? null,
+              is_educator: input.isEducator ? 1 : 0,
+              shipping_cost: input.shippingCost ?? "7.00",
+              payment_method: "cash_on_delivery",
+              payment_status: "pending",
+              status: "new"
+            };
+            orderItems2 = input.items.map((it) => ({
+              product_slug: it.productSlug,
+              product_title: it.productTitle,
+              format: it.format ?? "Livre physique",
+              unit_price: it.unitPrice,
+              quantity: it.quantity,
+              subtotal: (parseFloat(it.unitPrice) * it.quantity).toFixed(2)
+            }));
+            try {
+              createdOrder = await createMultiItemOrder(input);
+            } catch (err) {
+              console.warn("[Orders] Local DB unavailable, checking Supabase fallback:", err);
+            }
+          } else {
+            const itemSubtotal = (parseFloat(input.unitPrice ?? "65.00") * input.quantity).toFixed(2);
+            orderPayload = {
+              customer_first_name: input.firstName,
+              customer_last_name: input.lastName,
+              customer_email: input.email,
+              customer_phone: input.phone,
+              delivery_address: input.deliveryAddress,
+              is_educator: input.educator ? 1 : 0,
+              shipping_cost: "7.00",
+              payment_method: "cash_on_delivery",
+              payment_status: "pending",
+              status: "new"
+            };
+            orderItems2 = [
               {
-                productSlug: input.productHandle,
-                productTitle: input.productTitle,
-                unitPrice: input.unitPrice ?? "65.00",
-                quantity: input.quantity
+                product_slug: input.productHandle,
+                product_title: input.productTitle,
+                format: "Livre physique",
+                unit_price: input.unitPrice ?? "65.00",
+                quantity: input.quantity,
+                subtotal: itemSubtotal
               }
-            ]
-          });
-        } catch (err) {
-          console.warn("[Orders] Local DB unavailable, checking Supabase fallback:", err);
-        }
-      }
-      const randomSuffix = Math.floor(1e3 + Math.random() * 9e3);
-      const fallbackOrderNumber = `LP-${(/* @__PURE__ */ new Date()).getFullYear()}-${randomSuffix}`;
-      const finalOrderNumber = createdOrder?.orderNumber ?? fallbackOrderNumber;
-      if (orderPayload) {
-        orderPayload.order_number = finalOrderNumber;
-        await persistOrderToSupabase(orderPayload, orderItems2).catch(() => null);
-      }
-      return {
-        orderId: createdOrder?.orderId ?? 9999,
-        orderNumber: finalOrderNumber
-      };
-    })
-  }),
-  content: router({
-    published: publicProcedure.query(async () => {
-      try {
-        return await listContentSections(false);
-      } catch {
-        return [];
-      }
-    })
-  }),
-  seo: router({
-    byPath: publicProcedure.input(z3.object({ path: z3.string().min(1).max(500) })).query(async ({ input }) => {
-      try {
-        return await getSeoPage(input.path);
-      } catch {
-        return null;
-      }
-    })
-  }),
-  analytics: router({
-    track: publicProcedure.input(analyticsInput).mutation(async ({ input }) => {
-      try {
-        await recordAnalyticsEvent(input);
-      } catch {
-      }
-      return { recorded: true };
-    })
-  })
+            ];
+            try {
+              createdOrder = await createMultiItemOrder({
+                customerFirstName: input.firstName,
+                customerLastName: input.lastName,
+                customerEmail: input.email,
+                customerPhone: input.phone,
+                deliveryAddress: input.deliveryAddress,
+                isEducator: input.educator,
+                items: [
+                  {
+                    productSlug: input.productHandle,
+                    productTitle: input.productTitle,
+                    unitPrice: input.unitPrice ?? "65.00",
+                    quantity: input.quantity
+                  }
+                ]
+              });
+            } catch (err) {
+              console.warn("[Orders] Local DB unavailable, checking Supabase fallback:", err);
+            }
+          }
+          const randomSuffix = Math.floor(1e3 + Math.random() * 9e3);
+          const fallbackOrderNumber = `LP-${(/* @__PURE__ */ new Date()).getFullYear()}-${randomSuffix}`;
+          const finalOrderNumber = createdOrder?.orderNumber ?? fallbackOrderNumber;
+          if (orderPayload) {
+            orderPayload.order_number = finalOrderNumber;
+            await persistOrderToSupabase(orderPayload, orderItems2).catch(() => null);
+          }
+          return {
+            orderId: createdOrder?.orderId ?? 9999,
+            orderNumber: finalOrderNumber
+          };
+        })
+      }),
+      content: router({
+        published: publicProcedure.query(async () => {
+          try {
+            return await listContentSections(false);
+          } catch {
+            return [];
+          }
+        })
+      }),
+      seo: router({
+        byPath: publicProcedure.input(z3.object({ path: z3.string().min(1).max(500) })).query(async ({ input }) => {
+          try {
+            return await getSeoPage(input.path);
+          } catch {
+            return null;
+          }
+        })
+      }),
+      analytics: router({
+        track: publicProcedure.input(analyticsInput).mutation(async ({ input }) => {
+          try {
+            await recordAnalyticsEvent(input);
+          } catch {
+          }
+          return { recorded: true };
+        })
+      })
+    });
+  }
 });
 
-// server/_core/systemRouter.ts
-import { z as z4 } from "zod";
+// server/_core/env.ts
+var ENV;
+var init_env = __esm({
+  "server/_core/env.ts"() {
+    "use strict";
+    ENV = {
+      appId: process.env.VITE_APP_ID ?? "",
+      cookieSecret: process.env.JWT_SECRET ?? "",
+      databaseUrl: process.env.DATABASE_URL ?? "",
+      oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
+      ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
+      isProduction: process.env.NODE_ENV === "production",
+      forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
+      forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
+      shopifyStoreDomain: process.env.SHOPIFY_STORE_DOMAIN ?? "",
+      shopifyStorefrontApiAccessToken: process.env.SHOPIFY_STOREFRONT_API_ACCESS_TOKEN ?? ""
+    };
+  }
+});
 
 // server/_core/notification.ts
 import { TRPCError as TRPCError2 } from "@trpc/server";
-
-// server/_core/env.ts
-var ENV = {
-  appId: process.env.VITE_APP_ID ?? "",
-  cookieSecret: process.env.JWT_SECRET ?? "",
-  databaseUrl: process.env.DATABASE_URL ?? "",
-  oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
-  ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
-  isProduction: process.env.NODE_ENV === "production",
-  forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
-  forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
-  shopifyStoreDomain: process.env.SHOPIFY_STORE_DOMAIN ?? "",
-  shopifyStorefrontApiAccessToken: process.env.SHOPIFY_STOREFRONT_API_ACCESS_TOKEN ?? ""
-};
-
-// server/_core/notification.ts
-var TITLE_MAX_LENGTH = 1200;
-var CONTENT_MAX_LENGTH = 2e4;
-var trimValue = (value) => value.trim();
-var isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
-var buildEndpointUrl = (baseUrl) => {
-  const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  return new URL(
-    "webdevtoken.v1.WebDevService/SendNotification",
-    normalizedBase
-  ).toString();
-};
-var validatePayload = (input) => {
-  if (!isNonEmptyString(input.title)) {
-    throw new TRPCError2({
-      code: "BAD_REQUEST",
-      message: "Notification title is required."
-    });
-  }
-  if (!isNonEmptyString(input.content)) {
-    throw new TRPCError2({
-      code: "BAD_REQUEST",
-      message: "Notification content is required."
-    });
-  }
-  const title = trimValue(input.title);
-  const content = trimValue(input.content);
-  if (title.length > TITLE_MAX_LENGTH) {
-    throw new TRPCError2({
-      code: "BAD_REQUEST",
-      message: `Notification title must be at most ${TITLE_MAX_LENGTH} characters.`
-    });
-  }
-  if (content.length > CONTENT_MAX_LENGTH) {
-    throw new TRPCError2({
-      code: "BAD_REQUEST",
-      message: `Notification content must be at most ${CONTENT_MAX_LENGTH} characters.`
-    });
-  }
-  return { title, content };
-};
 async function notifyOwner(payload) {
   const { title, content } = validatePayload(payload);
   if (!ENV.forgeApiUrl) {
@@ -1497,157 +1524,228 @@ async function notifyOwner(payload) {
     return false;
   }
 }
+var TITLE_MAX_LENGTH, CONTENT_MAX_LENGTH, trimValue, isNonEmptyString, buildEndpointUrl, validatePayload;
+var init_notification = __esm({
+  "server/_core/notification.ts"() {
+    "use strict";
+    init_env();
+    TITLE_MAX_LENGTH = 1200;
+    CONTENT_MAX_LENGTH = 2e4;
+    trimValue = (value) => value.trim();
+    isNonEmptyString = (value) => typeof value === "string" && value.trim().length > 0;
+    buildEndpointUrl = (baseUrl) => {
+      const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+      return new URL(
+        "webdevtoken.v1.WebDevService/SendNotification",
+        normalizedBase
+      ).toString();
+    };
+    validatePayload = (input) => {
+      if (!isNonEmptyString(input.title)) {
+        throw new TRPCError2({
+          code: "BAD_REQUEST",
+          message: "Notification title is required."
+        });
+      }
+      if (!isNonEmptyString(input.content)) {
+        throw new TRPCError2({
+          code: "BAD_REQUEST",
+          message: "Notification content is required."
+        });
+      }
+      const title = trimValue(input.title);
+      const content = trimValue(input.content);
+      if (title.length > TITLE_MAX_LENGTH) {
+        throw new TRPCError2({
+          code: "BAD_REQUEST",
+          message: `Notification title must be at most ${TITLE_MAX_LENGTH} characters.`
+        });
+      }
+      if (content.length > CONTENT_MAX_LENGTH) {
+        throw new TRPCError2({
+          code: "BAD_REQUEST",
+          message: `Notification content must be at most ${CONTENT_MAX_LENGTH} characters.`
+        });
+      }
+      return { title, content };
+    };
+  }
+});
 
 // server/_core/systemRouter.ts
-var systemRouter = router({
-  health: publicProcedure.input(
-    z4.object({
-      timestamp: z4.number().min(0, "timestamp cannot be negative")
-    })
-  ).query(() => ({
-    ok: true
-  })),
-  notifyOwner: adminProcedure.input(
-    z4.object({
-      title: z4.string().min(1, "title is required"),
-      content: z4.string().min(1, "content is required")
-    })
-  ).mutation(async ({ input }) => {
-    const delivered = await notifyOwner(input);
-    return {
-      success: delivered
-    };
-  })
+import { z as z4 } from "zod";
+var systemRouter;
+var init_systemRouter = __esm({
+  "server/_core/systemRouter.ts"() {
+    "use strict";
+    init_notification();
+    init_trpc();
+    systemRouter = router({
+      health: publicProcedure.input(
+        z4.object({
+          timestamp: z4.number().min(0, "timestamp cannot be negative")
+        })
+      ).query(() => ({
+        ok: true
+      })),
+      notifyOwner: adminProcedure.input(
+        z4.object({
+          title: z4.string().min(1, "title is required"),
+          content: z4.string().min(1, "content is required")
+        })
+      ).mutation(async ({ input }) => {
+        const delivered = await notifyOwner(input);
+        return {
+          success: delivered
+        };
+      })
+    });
+  }
 });
 
 // server/routers.ts
-var appRouter = router({
-  system: systemRouter,
-  auth: router({
-    me: publicProcedure.query(({ ctx }) => ctx.user),
-    login: publicProcedure.input(
-      z5.object({
-        email: z5.string().email("Adresse email invalide"),
-        password: z5.string().min(6, "Le mot de passe doit comporter au moins 6 caract\xE8res")
-      })
-    ).mutation(async ({ ctx, input }) => {
-      const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
-      const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivresPro2026!";
-      let user = null;
-      try {
-        user = await getUserByEmail(input.email);
-      } catch (dbErr) {
-        console.warn("[Auth] DB unavailable during login, checking bootstrap credentials:", dbErr);
-        if (input.email.toLowerCase().trim() === adminEmail && input.password === adminPass) {
-          const sessionUser2 = {
-            id: 1,
-            email: adminEmail,
-            name: "Administrateur LivresPro",
-            role: "admin"
+import { z as z5 } from "zod";
+import { TRPCError as TRPCError3 } from "@trpc/server";
+var appRouter;
+var init_routers = __esm({
+  "server/routers.ts"() {
+    "use strict";
+    init_auth();
+    init_db();
+    init_admin();
+    init_commerce();
+    init_site();
+    init_systemRouter();
+    init_trpc();
+    appRouter = router({
+      system: systemRouter,
+      auth: router({
+        me: publicProcedure.query(({ ctx }) => ctx.user),
+        login: publicProcedure.input(
+          z5.object({
+            email: z5.string().email("Adresse email invalide"),
+            password: z5.string().min(6, "Le mot de passe doit comporter au moins 6 caract\xE8res")
+          })
+        ).mutation(async ({ ctx, input }) => {
+          const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
+          const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivresPro2026!";
+          let user = null;
+          try {
+            user = await getUserByEmail(input.email);
+          } catch (dbErr) {
+            console.warn("[Auth] DB unavailable during login, checking bootstrap credentials:", dbErr);
+            if (input.email.toLowerCase().trim() === adminEmail && input.password === adminPass) {
+              const sessionUser2 = {
+                id: 1,
+                email: adminEmail,
+                name: "Administrateur LivresPro",
+                role: "admin"
+              };
+              const token2 = await createSessionToken(sessionUser2);
+              setSessionCookie(ctx.res, token2);
+              return { success: true, user: sessionUser2 };
+            }
+            throw new TRPCError3({
+              code: "UNAUTHORIZED",
+              message: "Identifiants invalides. Utilisez admin@livrespro.tn et AdminLivresPro2026! pour tester le back-office."
+            });
+          }
+          if (!user) {
+            if (input.email.toLowerCase().trim() === adminEmail && input.password === adminPass) {
+              const sessionUser2 = {
+                id: 1,
+                email: adminEmail,
+                name: "Administrateur LivresPro",
+                role: "admin"
+              };
+              const token2 = await createSessionToken(sessionUser2);
+              setSessionCookie(ctx.res, token2);
+              return { success: true, user: sessionUser2 };
+            }
+            throw new TRPCError3({
+              code: "UNAUTHORIZED",
+              message: "Identifiants invalides."
+            });
+          }
+          const isValid = verifyPassword(input.password, user.passwordHash);
+          if (!isValid) {
+            throw new TRPCError3({
+              code: "UNAUTHORIZED",
+              message: "Identifiants invalides."
+            });
+          }
+          const sessionUser = {
+            id: user.id,
+            email: user.email,
+            name: user.name,
+            role: user.role
           };
-          const token2 = await createSessionToken(sessionUser2);
-          setSessionCookie(ctx.res, token2);
-          return { success: true, user: sessionUser2 };
-        }
-        throw new TRPCError3({
-          code: "UNAUTHORIZED",
-          message: "Identifiants invalides. Utilisez admin@livrespro.tn et AdminLivresPro2026! pour tester le back-office."
-        });
-      }
-      if (!user) {
-        if (input.email.toLowerCase().trim() === adminEmail && input.password === adminPass) {
-          const sessionUser2 = {
-            id: 1,
-            email: adminEmail,
-            name: "Administrateur LivresPro",
-            role: "admin"
+          const token = await createSessionToken(sessionUser);
+          setSessionCookie(ctx.res, token);
+          try {
+            await updateLastSignedIn(user.id);
+          } catch {
+          }
+          return {
+            success: true,
+            user: sessionUser
           };
-          const token2 = await createSessionToken(sessionUser2);
-          setSessionCookie(ctx.res, token2);
-          return { success: true, user: sessionUser2 };
-        }
-        throw new TRPCError3({
-          code: "UNAUTHORIZED",
-          message: "Identifiants invalides."
-        });
-      }
-      const isValid = verifyPassword(input.password, user.passwordHash);
-      if (!isValid) {
-        throw new TRPCError3({
-          code: "UNAUTHORIZED",
-          message: "Identifiants invalides."
-        });
-      }
-      const sessionUser = {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role
-      };
-      const token = await createSessionToken(sessionUser);
-      setSessionCookie(ctx.res, token);
-      try {
-        await updateLastSignedIn(user.id);
-      } catch {
-      }
-      return {
-        success: true,
-        user: sessionUser
-      };
-    }),
-    register: publicProcedure.input(
-      z5.object({
-        name: z5.string().trim().min(2, "Le nom doit comporter au moins 2 caract\xE8res"),
-        email: z5.string().email("Adresse email invalide"),
-        password: z5.string().min(6, "Le mot de passe doit comporter au moins 6 caract\xE8res")
-      })
-    ).mutation(async ({ ctx, input }) => {
-      const email = input.email.toLowerCase().trim();
-      const passwordHash = hashPassword(input.password);
-      let newUserId = 1;
-      const role = email.includes("admin") || email.endsWith("@livrespro.tn") ? "admin" : "admin";
-      try {
-        const existing = await getUserByEmail(email);
-        if (existing) {
-          throw new TRPCError3({
-            code: "CONFLICT",
-            message: "Un compte existe d\xE9j\xE0 avec cette adresse email."
-          });
-        }
-        newUserId = await createUser({
-          name: input.name.trim(),
-          email,
-          passwordHash,
-          role
-        });
-      } catch (err) {
-        if (err instanceof TRPCError3) throw err;
-        console.warn("[Auth] DB offline during register, generated active session:", err);
-        newUserId = Math.floor(100 + Math.random() * 900);
-      }
-      const sessionUser = {
-        id: newUserId,
-        email,
-        name: input.name.trim(),
-        role
-      };
-      const token = await createSessionToken(sessionUser);
-      setSessionCookie(ctx.res, token);
-      return {
-        success: true,
-        user: sessionUser
-      };
-    }),
-    logout: publicProcedure.mutation(({ ctx }) => {
-      clearSessionCookie(ctx.res);
-      return {
-        success: true
-      };
-    })
-  }),
-  commerce: commerceRouter,
-  admin: adminRouter,
-  site: siteRouter
+        }),
+        register: publicProcedure.input(
+          z5.object({
+            name: z5.string().trim().min(2, "Le nom doit comporter au moins 2 caract\xE8res"),
+            email: z5.string().email("Adresse email invalide"),
+            password: z5.string().min(6, "Le mot de passe doit comporter au moins 6 caract\xE8res")
+          })
+        ).mutation(async ({ ctx, input }) => {
+          const email = input.email.toLowerCase().trim();
+          const passwordHash = hashPassword(input.password);
+          let newUserId = 1;
+          const role = email.includes("admin") || email.endsWith("@livrespro.tn") ? "admin" : "admin";
+          try {
+            const existing = await getUserByEmail(email);
+            if (existing) {
+              throw new TRPCError3({
+                code: "CONFLICT",
+                message: "Un compte existe d\xE9j\xE0 avec cette adresse email."
+              });
+            }
+            newUserId = await createUser({
+              name: input.name.trim(),
+              email,
+              passwordHash,
+              role
+            });
+          } catch (err) {
+            if (err instanceof TRPCError3) throw err;
+            console.warn("[Auth] DB offline during register, generated active session:", err);
+            newUserId = Math.floor(100 + Math.random() * 900);
+          }
+          const sessionUser = {
+            id: newUserId,
+            email,
+            name: input.name.trim(),
+            role
+          };
+          const token = await createSessionToken(sessionUser);
+          setSessionCookie(ctx.res, token);
+          return {
+            success: true,
+            user: sessionUser
+          };
+        }),
+        logout: publicProcedure.mutation(({ ctx }) => {
+          clearSessionCookie(ctx.res);
+          return {
+            success: true
+          };
+        })
+      }),
+      commerce: commerceRouter,
+      admin: adminRouter,
+      site: siteRouter
+    });
+  }
 });
 
 // server/_core/context.ts
@@ -1672,6 +1770,13 @@ async function createContext(opts) {
     user
   };
 }
+var init_context = __esm({
+  "server/_core/context.ts"() {
+    "use strict";
+    init_const();
+    init_auth();
+  }
+});
 
 // server/_core/storageProxy.ts
 function registerStorageProxy(app2) {
@@ -1679,8 +1784,20 @@ function registerStorageProxy(app2) {
     res.redirect(302, "/editorial/b2b-launch/audience.jpg");
   });
 }
+var init_storageProxy = __esm({
+  "server/_core/storageProxy.ts"() {
+    "use strict";
+  }
+});
 
 // server/app.ts
+var app_exports = {};
+__export(app_exports, {
+  app: () => app,
+  createExpressApp: () => createExpressApp
+});
+import express from "express";
+import { createExpressMiddleware } from "@trpc/server/adapters/express";
 function createExpressApp() {
   const app2 = express();
   app2.use(express.json({ limit: "50mb" }));
@@ -1705,10 +1822,34 @@ function createExpressApp() {
   );
   return app2;
 }
-var app = createExpressApp();
+var app;
+var init_app = __esm({
+  "server/app.ts"() {
+    "use strict";
+    init_routers();
+    init_context();
+    init_storageProxy();
+    app = createExpressApp();
+  }
+});
 
 // api/index.ts
-var index_default = app;
+async function handler(req, res) {
+  try {
+    const { app: app2 } = await Promise.resolve().then(() => (init_app(), app_exports));
+    return app2(req, res);
+  } catch (err) {
+    res.statusCode = 500;
+    res.setHeader("Content-Type", "application/json");
+    res.end(
+      JSON.stringify({
+        error: "API Handler Boot Error",
+        message: err?.message || String(err),
+        stack: err?.stack || null
+      })
+    );
+  }
+}
 export {
-  index_default as default
+  handler as default
 };
