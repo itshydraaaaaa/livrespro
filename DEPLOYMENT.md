@@ -165,8 +165,15 @@ LivresPro.tn is fully configured for deployment on Vercel:
 
 3. **Environment Variables on Vercel Dashboard**:
    Add the following in **Project Settings > Environment Variables**:
-   * `DATABASE_URL`: `mysql://USER:PASS@HOST:PORT/DB` (e.g. from PlanetScale, Aiven, Railway, or AWS RDS MySQL)
-   * `JWT_SECRET`: A secure 32+ character random key.
+   * `SUPABASE_URL`: `https://<YOUR-PROJECT-REF>.supabase.co` (from Supabase Dashboard > Project Settings > API)
+   * `SUPABASE_PUBLISHABLE_KEY`: Your Supabase Publishable Key
+   * `SUPABASE_SECRET_KEY`: Your Supabase Secret Key
+   * `JWT_SECRET`: A secure 32+ character random key
    * `ADMIN_EMAIL`: `admin@livrespro.tn`
-   * `ADMIN_INITIAL_PASSWORD`: `YourChosenPassword`
+   * `ADMIN_INITIAL_PASSWORD`: `AdminLivresPro2026!`
+   * `NODE_ENV`: `production`
+
+4. **Supabase Database Setup**:
+   * Execute `supabase/migrations/20260923_livrespro_schema.sql` in your Supabase SQL Editor.
+   * This generates all tables (`products`, `orders`, `order_items`, `customers`, `leads`, `downloads`, `coupons`, `settings`, `audit_logs`, `reviews`) and seeds the initial book.
 
