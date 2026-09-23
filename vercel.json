@@ -7,10 +7,6 @@
       "destination": "/api/index.js"
     },
     {
-      "source": "/api/ping",
-      "destination": "/api/ping.ts"
-    },
-    {
       "source": "/api",
       "destination": "/api/index.js"
     },
