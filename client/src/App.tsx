@@ -1,5 +1,6 @@
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { CheckoutModal } from "@/components/storefront/CheckoutModal";
+import { AiBookAdvisor } from "@/components/storefront/AiBookAdvisor";
 import { AnalyticsManager } from "@/components/AnalyticsManager";
 import { SeoManager } from "@/components/SeoManager";
 import { Toaster } from "@/components/ui/sonner";
@@ -56,6 +57,7 @@ function App() {
             <Router />
             <CartDrawer />
             <CheckoutModal />
+            <AiBookAdvisor />
           </CartProvider>
         </TooltipProvider>
       </ThemeProvider>

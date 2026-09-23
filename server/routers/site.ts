@@ -7,6 +7,7 @@ import {
 } from "../db";
 import { publicProcedure, router } from "../_core/trpc";
 import { persistOrderToSupabase } from "../services/supabase";
+import { askAiAdvisor } from "../services/aiGatewayService";
 
 const analyticsInput = z.object({
   visitorId: z.string().uuid(),
@@ -195,6 +196,26 @@ export const siteRouter = router({
       } catch {}
       return { recorded: true };
     }),
+  }),
+  ai: router({
+    ask: publicProcedure
+      .input(
+        z.object({
+          message: z.string().trim().min(1).max(1000),
+          history: z
+            .array(
+              z.object({
+                role: z.enum(["system", "user", "assistant"]),
+                content: z.string().min(1).max(2000),
+              })
+            )
+            .optional()
+            .default([]),
+        })
+      )
+      .mutation(async ({ input }) => {
+        return askAiAdvisor(input.message, input.history);
+      }),
   }),
 });
 
