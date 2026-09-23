@@ -1,5 +1,5 @@
 import { trpc } from "@/lib/trpc";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect } from "react";
 import { useLocation } from "wouter";
 
 type UseAuthOptions = {
@@ -24,6 +24,13 @@ export function useAuth(options?: UseAuthOptions) {
     },
   });
 
+  const registerMutation = trpc.auth.register.useMutation({
+    onSuccess: async (data) => {
+      utils.auth.me.setData(undefined, data.user);
+      await utils.auth.me.invalidate();
+    },
+  });
+
   const logoutMutation = trpc.auth.logout.useMutation({
     onSuccess: async () => {
       utils.auth.me.setData(undefined, null);
@@ -38,29 +45,54 @@ export function useAuth(options?: UseAuthOptions) {
     [loginMutation]
   );
 
+  const register = useCallback(
+    async (input: { name: string; email: string; password: string }) => {
+      return registerMutation.mutateAsync(input);
+    },
+    [registerMutation]
+  );
+
   const logout = useCallback(async () => {
     await logoutMutation.mutateAsync();
     setLocation("/login");
   }, [logoutMutation, setLocation]);
 
   const user = meQuery.data ?? null;
-  const loading = meQuery.isLoading || loginMutation.isPending || logoutMutation.isPending;
+  const loading =
+    meQuery.isLoading ||
+    loginMutation.isPending ||
+    registerMutation.isPending ||
+    logoutMutation.isPending;
 
   useEffect(() => {
     if (!redirectOnUnauthenticated) return;
-    if (meQuery.isLoading || loginMutation.isPending) return;
+    if (meQuery.isLoading || loginMutation.isPending || registerMutation.isPending) return;
     if (!user && window.location.pathname !== redirectPath) {
       setLocation(redirectPath);
     }
-  }, [redirectOnUnauthenticated, redirectPath, meQuery.isLoading, loginMutation.isPending, user, setLocation]);
+  }, [
+    redirectOnUnauthenticated,
+    redirectPath,
+    meQuery.isLoading,
+    loginMutation.isPending,
+    registerMutation.isPending,
+    user,
+    setLocation,
+  ]);
 
   return {
     user,
     loading,
-    error: meQuery.error || loginMutation.error || logoutMutation.error || null,
+    error:
+      meQuery.error ||
+      loginMutation.error ||
+      registerMutation.error ||
+      logoutMutation.error ||
+      null,
     isAuthenticated: Boolean(user),
     isAdmin: user?.role === "admin",
     login,
+    register,
     logout,
     refresh: () => meQuery.refetch(),
   };
