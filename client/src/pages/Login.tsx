@@ -34,12 +34,6 @@ export default function Login() {
     return null;
   }
 
-  const handleFillDemo = () => {
-    setLoginEmail("admin@livrespro.tn");
-    setLoginPassword("AdminLivresPro2026!");
-    setError(null);
-  };
-
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -49,10 +43,7 @@ export default function Login() {
       await login(loginEmail, loginPassword);
       setLocation("/admin");
     } catch (err: any) {
-      setError(
-        err?.message ||
-          "Identifiants invalides. Utilisez 'admin@livrespro.tn' et 'AdminLivresPro2026!'."
-      );
+      setError(err?.message || "Identifiants invalides.");
     } finally {
       setLoading(false);
     }
@@ -223,16 +214,7 @@ export default function Login() {
                 </div>
               </div>
 
-              <div className="pt-2 flex items-center justify-between">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleFillDemo}
-                  className="border-dashed border-[#172C41]/30 text-[11px] font-bold text-[#172C41] hover:bg-[#E9E2D7]"
-                >
-                  ⚡ Remplir identifiants Admin Démo
-                </Button>
-              </div>
+
 
               <Button
                 type="submit"
@@ -327,15 +309,7 @@ export default function Login() {
             </form>
           )}
 
-          {/* Quick Notice */}
-          <div className="mt-8 border-t border-[#172C41]/10 pt-4 text-center">
-            <p className="text-[11px] text-[#52606B]">
-              Identifiants de démonstration pour le Back-Office :
-            </p>
-            <p className="mt-1 text-[11px] font-mono font-semibold text-[#172C41]">
-              admin@livrespro.tn · AdminLivresPro2026!
-            </p>
-          </div>
+
         </div>
       </main>
     </div>
