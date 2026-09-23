@@ -6,6 +6,7 @@ import {
   recordAnalyticsEvent,
 } from "../db";
 import { publicProcedure, router } from "../_core/trpc";
+import { persistOrderToSupabase } from "../services/supabase";
 
 const analyticsInput = z.object({
   visitorId: z.string().uuid(),
@@ -71,36 +72,100 @@ const unifiedOrderInput = z.union([
 export const siteRouter = router({
   orders: router({
     create: publicProcedure.input(unifiedOrderInput).mutation(async ({ input }) => {
-      try {
-        if ("items" in input) {
-          return await createMultiItemOrder(input);
-        }
+      let createdOrder: { orderId: number; orderNumber: string } | null = null;
+      let orderPayload: any = null;
+      let orderItems: any[] = [];
 
-        // Transform legacy flat order to multi-item structure
-        return await createMultiItemOrder({
-          customerFirstName: input.firstName,
-          customerLastName: input.lastName,
-          customerEmail: input.email,
-          customerPhone: input.phone,
-          deliveryAddress: input.deliveryAddress,
-          isEducator: input.educator,
-          items: [
-            {
-              productSlug: input.productHandle,
-              productTitle: input.productTitle,
-              unitPrice: input.unitPrice ?? "65.00",
-              quantity: input.quantity,
-            },
-          ],
-        });
-      } catch (err) {
-        console.warn("[Orders] Database unavailable, generated demo order confirmation:", err);
-        const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-        return {
-          orderId: 9999,
-          orderNumber: `LP-${new Date().getFullYear()}-${randomSuffix}`,
+      if ("items" in input) {
+        orderPayload = {
+          customer_first_name: input.customerFirstName,
+          customer_last_name: input.customerLastName,
+          customer_email: input.customerEmail,
+          customer_phone: input.customerPhone,
+          delivery_address: input.deliveryAddress,
+          city: input.city ?? null,
+          governorate: input.governorate ?? null,
+          is_educator: input.isEducator ? 1 : 0,
+          shipping_cost: input.shippingCost ?? "7.00",
+          payment_method: "cash_on_delivery",
+          payment_status: "pending",
+          status: "new",
         };
+        orderItems = input.items.map((it) => ({
+          product_slug: it.productSlug,
+          product_title: it.productTitle,
+          format: it.format ?? "Livre physique",
+          unit_price: it.unitPrice,
+          quantity: it.quantity,
+          subtotal: (parseFloat(it.unitPrice) * it.quantity).toFixed(2),
+        }));
+
+        try {
+          createdOrder = await createMultiItemOrder(input);
+        } catch (err) {
+          console.warn("[Orders] Local DB unavailable, checking Supabase fallback:", err);
+        }
+      } else {
+        const itemSubtotal = (parseFloat(input.unitPrice ?? "65.00") * input.quantity).toFixed(2);
+        orderPayload = {
+          customer_first_name: input.firstName,
+          customer_last_name: input.lastName,
+          customer_email: input.email,
+          customer_phone: input.phone,
+          delivery_address: input.deliveryAddress,
+          is_educator: input.educator ? 1 : 0,
+          shipping_cost: "7.00",
+          payment_method: "cash_on_delivery",
+          payment_status: "pending",
+          status: "new",
+        };
+        orderItems = [
+          {
+            product_slug: input.productHandle,
+            product_title: input.productTitle,
+            format: "Livre physique",
+            unit_price: input.unitPrice ?? "65.00",
+            quantity: input.quantity,
+            subtotal: itemSubtotal,
+          },
+        ];
+
+        try {
+          createdOrder = await createMultiItemOrder({
+            customerFirstName: input.firstName,
+            customerLastName: input.lastName,
+            customerEmail: input.email,
+            customerPhone: input.phone,
+            deliveryAddress: input.deliveryAddress,
+            isEducator: input.educator,
+            items: [
+              {
+                productSlug: input.productHandle,
+                productTitle: input.productTitle,
+                unitPrice: input.unitPrice ?? "65.00",
+                quantity: input.quantity,
+              },
+            ],
+          });
+        } catch (err) {
+          console.warn("[Orders] Local DB unavailable, checking Supabase fallback:", err);
+        }
       }
+
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const fallbackOrderNumber = `LP-${new Date().getFullYear()}-${randomSuffix}`;
+      const finalOrderNumber = createdOrder?.orderNumber ?? fallbackOrderNumber;
+
+      // Persist to Supabase if configured
+      if (orderPayload) {
+        orderPayload.order_number = finalOrderNumber;
+        await persistOrderToSupabase(orderPayload, orderItems).catch(() => null);
+      }
+
+      return {
+        orderId: createdOrder?.orderId ?? 9999,
+        orderNumber: finalOrderNumber,
+      };
     }),
   }),
   content: router({

@@ -1,5 +1,6 @@
 import type { Collection, Product } from "@shared/commerce/types";
 import * as db from "../db";
+import { fetchProductsFromSupabase } from "./supabase";
 
 const FALLBACK_B2B_PRODUCT: Product = {
   id: "1",
@@ -154,13 +155,71 @@ export async function listStorefrontProducts(options?: {
       limit: options?.first ?? 50,
     });
 
-    if (rawProducts.length === 0) {
-      return [FALLBACK_B2B_PRODUCT];
+    if (rawProducts.length > 0) {
+      return rawProducts.map(normalizeDbProduct);
     }
 
-    return rawProducts.map(normalizeDbProduct);
+    const sbProducts = await fetchProductsFromSupabase().catch(() => null);
+    if (sbProducts && sbProducts.length > 0) {
+      return sbProducts.map((p: any) => ({
+        id: String(p.id),
+        handle: p.slug,
+        title: p.title,
+        description: p.description,
+        descriptionHtml: p.description_html || `<p>${p.description}</p>`,
+        productType: p.product_type || "Livre relié",
+        vendor: p.publisher || "L’Atelier des Pages",
+        tags: [p.categories?.name, "Livre physique"].filter(Boolean),
+        images: [{ url: p.cover_image || "/business-success-logo.png", altText: p.title }],
+        priceRange: {
+          min: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
+          max: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
+        },
+        options: [{ name: "Format", values: ["Livre relié"] }],
+        variants: [
+          {
+            id: `var-${p.id}`,
+            title: "Livre relié",
+            price: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
+            compareAtPrice: p.compare_at_price ? { amount: p.compare_at_price, currencyCode: p.currency || "TND" } : null,
+            availableForSale: p.availability_status === "in_stock",
+            selectedOptions: [{ name: "Format", value: "Livre relié" }],
+          },
+        ],
+      }));
+    }
+
+    return [FALLBACK_B2B_PRODUCT];
   } catch {
-    // If DB is offline or initializing, return flagship book
+    const sbProducts = await fetchProductsFromSupabase().catch(() => null);
+    if (sbProducts && sbProducts.length > 0) {
+      return sbProducts.map((p: any) => ({
+        id: String(p.id),
+        handle: p.slug,
+        title: p.title,
+        description: p.description,
+        descriptionHtml: p.description_html || `<p>${p.description}</p>`,
+        productType: p.product_type || "Livre relié",
+        vendor: p.publisher || "L’Atelier des Pages",
+        tags: [p.categories?.name, "Livre physique"].filter(Boolean),
+        images: [{ url: p.cover_image || "/business-success-logo.png", altText: p.title }],
+        priceRange: {
+          min: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
+          max: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
+        },
+        options: [{ name: "Format", values: ["Livre relié"] }],
+        variants: [
+          {
+            id: `var-${p.id}`,
+            title: "Livre relié",
+            price: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
+            compareAtPrice: p.compare_at_price ? { amount: p.compare_at_price, currencyCode: p.currency || "TND" } : null,
+            availableForSale: p.availability_status === "in_stock",
+            selectedOptions: [{ name: "Format", value: "Livre relié" }],
+          },
+        ],
+      }));
+    }
     return [FALLBACK_B2B_PRODUCT];
   }
 }
