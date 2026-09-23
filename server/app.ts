@@ -24,7 +24,7 @@ export function createExpressApp(): Express {
   });
 
   // Health check endpoint
-  app.get(["/api/health", "/health"], (_req, res) => {
+  app.get(["/api", "/api/health", "/health"], (_req, res) => {
     res.json({ status: "ok", app: "livrespro", timestamp: new Date().toISOString() });
   });
 
