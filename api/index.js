@@ -1708,9 +1708,7 @@ function createExpressApp() {
 var app = createExpressApp();
 
 // api/index.ts
-function handler(req, res) {
-  return app(req, res);
-}
+var index_default = app;
 export {
-  handler as default
+  index_default as default
 };
