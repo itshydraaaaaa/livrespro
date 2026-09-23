@@ -3,12 +3,20 @@
   "outputDirectory": "dist/public",
   "rewrites": [
     {
-      "source": "/api/(.*)",
+      "source": "/health",
+      "destination": "/api/health"
+    },
+    {
+      "source": "/api",
       "destination": "/api"
     },
     {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
+    {
       "source": "/manus-storage/(.*)",
-      "destination": "/api"
+      "destination": "/api/manus-storage/$1"
     },
     {
       "source": "/(.*)",
