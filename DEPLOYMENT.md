@@ -146,3 +146,27 @@ pnpm install
 pnpm run build
 pm2 restart livrespro
 ```
+
+---
+
+## 8. Vercel Deployment (Cloud Serverless)
+
+LivresPro.tn is fully configured for deployment on Vercel:
+
+1. **Automatic Detection**:
+   * `vercel.json` configures the static web root to `dist/public`.
+   * Serverless functions in `api/index.ts` handle `/api/trpc/*` and backend logic.
+   * Single-Page Application (SPA) client-side routing is handled via rewrite rules to `/index.html`.
+
+2. **Vercel Project Settings**:
+   * **Framework Preset**: Vite
+   * **Build Command**: `pnpm run build`
+   * **Output Directory**: `dist/public`
+
+3. **Environment Variables on Vercel Dashboard**:
+   Add the following in **Project Settings > Environment Variables**:
+   * `DATABASE_URL`: `mysql://USER:PASS@HOST:PORT/DB` (e.g. from PlanetScale, Aiven, Railway, or AWS RDS MySQL)
+   * `JWT_SECRET`: A secure 32+ character random key.
+   * `ADMIN_EMAIL`: `admin@livrespro.tn`
+   * `ADMIN_INITIAL_PASSWORD`: `YourChosenPassword`
+
