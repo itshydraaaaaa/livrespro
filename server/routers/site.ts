@@ -78,6 +78,22 @@ export const siteRouter = router({
       let orderItems: any[] = [];
 
       if ("items" in input) {
+        orderItems = input.items.map((it) => {
+          const itemSubtotal = (parseFloat(it.unitPrice) * it.quantity).toFixed(2);
+          return {
+            product_slug: it.productSlug,
+            product_title: it.productTitle,
+            format: it.format ?? "Livre physique",
+            unit_price: it.unitPrice,
+            quantity: it.quantity,
+            subtotal: itemSubtotal,
+          };
+        });
+
+        const subtotalSum = orderItems.reduce((acc, it) => acc + parseFloat(it.subtotal), 0);
+        const shippingVal = parseFloat(input.shippingCost ?? "7.00");
+        const totalVal = subtotalSum + shippingVal;
+
         orderPayload = {
           customer_first_name: input.customerFirstName,
           customer_last_name: input.customerLastName,
@@ -87,19 +103,15 @@ export const siteRouter = router({
           city: input.city ?? null,
           governorate: input.governorate ?? null,
           is_educator: input.isEducator ? 1 : 0,
-          shipping_cost: input.shippingCost ?? "7.00",
+          subtotal: subtotalSum.toFixed(2),
+          shipping_cost: shippingVal.toFixed(2),
+          discount_amount: "0.00",
+          total_amount: totalVal.toFixed(2),
+          currency: "TND",
           payment_method: "cash_on_delivery",
           payment_status: "pending",
           status: "new",
         };
-        orderItems = input.items.map((it) => ({
-          product_slug: it.productSlug,
-          product_title: it.productTitle,
-          format: it.format ?? "Livre physique",
-          unit_price: it.unitPrice,
-          quantity: it.quantity,
-          subtotal: (parseFloat(it.unitPrice) * it.quantity).toFixed(2),
-        }));
 
         try {
           createdOrder = await createMultiItemOrder(input);
@@ -108,6 +120,10 @@ export const siteRouter = router({
         }
       } else {
         const itemSubtotal = (parseFloat(input.unitPrice ?? "65.00") * input.quantity).toFixed(2);
+        const subtotalSum = parseFloat(itemSubtotal);
+        const shippingVal = 7.00;
+        const totalVal = subtotalSum + shippingVal;
+
         orderPayload = {
           customer_first_name: input.firstName,
           customer_last_name: input.lastName,
@@ -115,7 +131,11 @@ export const siteRouter = router({
           customer_phone: input.phone,
           delivery_address: input.deliveryAddress,
           is_educator: input.educator ? 1 : 0,
+          subtotal: subtotalSum.toFixed(2),
           shipping_cost: "7.00",
+          discount_amount: "0.00",
+          total_amount: totalVal.toFixed(2),
+          currency: "TND",
           payment_method: "cash_on_delivery",
           payment_status: "pending",
           status: "new",

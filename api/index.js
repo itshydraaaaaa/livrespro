@@ -170,6 +170,62 @@ function mapUser(row) {
     lastSignedIn: row.last_signed_in ? new Date(row.last_signed_in) : /* @__PURE__ */ new Date()
   };
 }
+function mapOrder(raw) {
+  if (!raw) return null;
+  const items = (raw.order_items || []).map((it) => ({
+    id: it.id,
+    orderId: it.order_id,
+    productId: it.product_id,
+    productSlug: it.product_slug,
+    productTitle: it.product_title || "Livre",
+    format: it.format || "Livre physique",
+    unitPrice: it.unit_price || "65.00",
+    quantity: it.quantity || 1,
+    subtotal: it.subtotal || "65.00",
+    product_slug: it.product_slug,
+    product_title: it.product_title || "Livre",
+    unit_price: it.unit_price || "65.00"
+  }));
+  const firstName = raw.customer_first_name || raw.customerFirstName || "";
+  const lastName = raw.customer_last_name || raw.customerLastName || "";
+  const orderNum = raw.order_number || raw.orderNumber || `#${raw.id}`;
+  const total = raw.total_amount && raw.total_amount !== "0.00" ? raw.total_amount : "72.00";
+  return {
+    id: raw.id,
+    orderNumber: orderNum,
+    customerFirstName: firstName,
+    customerLastName: lastName,
+    customerEmail: raw.customer_email || raw.customerEmail || "",
+    customerPhone: raw.customer_phone || raw.customerPhone || "",
+    deliveryAddress: raw.delivery_address || raw.deliveryAddress || "",
+    city: raw.city || "Tunis",
+    governorate: raw.governorate || "Tunis",
+    postalCode: raw.postal_code || raw.postalCode || null,
+    orderNotes: raw.order_notes || raw.orderNotes || null,
+    isEducator: raw.is_educator ?? raw.isEducator ?? 0,
+    subtotal: raw.subtotal || "65.00",
+    shippingCost: raw.shipping_cost || raw.shippingCost || "7.00",
+    discountAmount: raw.discount_amount || raw.discountAmount || "0.00",
+    totalAmount: total,
+    currency: raw.currency || "TND",
+    paymentMethod: raw.payment_method || raw.paymentMethod || "cash_on_delivery",
+    paymentStatus: raw.payment_status || raw.paymentStatus || "pending",
+    status: raw.status || "new",
+    createdAt: raw.created_at || raw.createdAt || (/* @__PURE__ */ new Date()).toISOString(),
+    updatedAt: raw.updated_at || raw.updatedAt || (/* @__PURE__ */ new Date()).toISOString(),
+    items,
+    // snake_case mirrors for full compatibility:
+    order_number: orderNum,
+    customer_first_name: firstName,
+    customer_last_name: lastName,
+    customer_email: raw.customer_email || raw.customerEmail || "",
+    customer_phone: raw.customer_phone || raw.customerPhone || "",
+    delivery_address: raw.delivery_address || raw.deliveryAddress || "",
+    total_amount: total,
+    created_at: raw.created_at || raw.createdAt || (/* @__PURE__ */ new Date()).toISOString(),
+    order_items: raw.order_items || []
+  };
+}
 async function getUserByEmail(email) {
   try {
     const { data, error } = await sb().from("users").select("*").eq("email", email.toLowerCase().trim()).maybeSingle();
@@ -210,7 +266,7 @@ async function updateUserProfile(userId, name) {
 async function listOrdersByCustomerEmail(email) {
   try {
     const { data } = await sb().from("orders").select("*, order_items(*)").eq("customer_email", email.toLowerCase().trim()).order("created_at", { ascending: false });
-    return data ?? [];
+    return (data ?? []).map(mapOrder).filter(Boolean);
   } catch {
     return [];
   }
@@ -318,7 +374,7 @@ async function createMultiItemOrder(input) {
 async function listOrders() {
   try {
     const { data } = await sb().from("orders").select("*, order_items(*)").order("created_at", { ascending: false });
-    return data ?? [];
+    return (data ?? []).map(mapOrder).filter(Boolean);
   } catch {
     return [];
   }
@@ -1033,6 +1089,20 @@ var siteRouter = router({
       let orderPayload = null;
       let orderItems = [];
       if ("items" in input) {
+        orderItems = input.items.map((it) => {
+          const itemSubtotal = (parseFloat(it.unitPrice) * it.quantity).toFixed(2);
+          return {
+            product_slug: it.productSlug,
+            product_title: it.productTitle,
+            format: it.format ?? "Livre physique",
+            unit_price: it.unitPrice,
+            quantity: it.quantity,
+            subtotal: itemSubtotal
+          };
+        });
+        const subtotalSum = orderItems.reduce((acc, it) => acc + parseFloat(it.subtotal), 0);
+        const shippingVal = parseFloat(input.shippingCost ?? "7.00");
+        const totalVal = subtotalSum + shippingVal;
         orderPayload = {
           customer_first_name: input.customerFirstName,
           customer_last_name: input.customerLastName,
@@ -1042,19 +1112,15 @@ var siteRouter = router({
           city: input.city ?? null,
           governorate: input.governorate ?? null,
           is_educator: input.isEducator ? 1 : 0,
-          shipping_cost: input.shippingCost ?? "7.00",
+          subtotal: subtotalSum.toFixed(2),
+          shipping_cost: shippingVal.toFixed(2),
+          discount_amount: "0.00",
+          total_amount: totalVal.toFixed(2),
+          currency: "TND",
           payment_method: "cash_on_delivery",
           payment_status: "pending",
           status: "new"
         };
-        orderItems = input.items.map((it) => ({
-          product_slug: it.productSlug,
-          product_title: it.productTitle,
-          format: it.format ?? "Livre physique",
-          unit_price: it.unitPrice,
-          quantity: it.quantity,
-          subtotal: (parseFloat(it.unitPrice) * it.quantity).toFixed(2)
-        }));
         try {
           createdOrder = await createMultiItemOrder(input);
         } catch (err) {
@@ -1062,6 +1128,9 @@ var siteRouter = router({
         }
       } else {
         const itemSubtotal = (parseFloat(input.unitPrice ?? "65.00") * input.quantity).toFixed(2);
+        const subtotalSum = parseFloat(itemSubtotal);
+        const shippingVal = 7;
+        const totalVal = subtotalSum + shippingVal;
         orderPayload = {
           customer_first_name: input.firstName,
           customer_last_name: input.lastName,
@@ -1069,7 +1138,11 @@ var siteRouter = router({
           customer_phone: input.phone,
           delivery_address: input.deliveryAddress,
           is_educator: input.educator ? 1 : 0,
+          subtotal: subtotalSum.toFixed(2),
           shipping_cost: "7.00",
+          discount_amount: "0.00",
+          total_amount: totalVal.toFixed(2),
+          currency: "TND",
           payment_method: "cash_on_delivery",
           payment_status: "pending",
           status: "new"

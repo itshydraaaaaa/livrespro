@@ -137,8 +137,8 @@ export default function Account() {
         .toUpperCase()
     : user.email.slice(0, 2).toUpperCase();
 
-  const latestDeliveryAddress = myOrders[0]?.delivery_address || null;
-  const latestPhone = myOrders[0]?.customer_phone || null;
+  const latestDeliveryAddress = myOrders[0]?.deliveryAddress || myOrders[0]?.delivery_address || null;
+  const latestPhone = myOrders[0]?.customerPhone || myOrders[0]?.customer_phone || null;
 
   return (
     <div className="flex min-h-screen flex-col bg-[#F8F5EE] text-[#172C41]">
@@ -283,10 +283,10 @@ export default function Account() {
             ) : (
               <div className="space-y-4">
                 {myOrders.map((order: any) => {
-                  const items = order.order_items || [];
-                  const total = order.total_amount || "65.00";
-                  const dateStr = order.created_at
-                    ? new Date(order.created_at).toLocaleDateString("fr-FR", {
+                  const items = order.items || order.order_items || [];
+                  const total = order.totalAmount || order.total_amount || "72.00";
+                  const dateStr = (order.createdAt || order.created_at)
+                    ? new Date(order.createdAt || order.created_at).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
                         year: "numeric",
@@ -330,7 +330,7 @@ export default function Account() {
                       <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#172C41]/10 bg-[#F8F5EE]/40 px-6 py-4">
                         <div className="flex items-center gap-3">
                           <span className="font-mono text-sm font-bold text-[#172C41]">
-                            {order.order_number}
+                            {order.orderNumber || order.order_number || `#${order.id}`}
                           </span>
                           <span className="text-xs text-[#52606B]">|</span>
                           <span className="flex items-center gap-1.5 text-xs text-[#52606B]">
@@ -352,21 +352,21 @@ export default function Account() {
                       {/* Order Items */}
                       <div className="divide-y divide-[#172C41]/5 p-6">
                         {items.length > 0 ? (
-                          items.map((item: any) => (
-                            <div key={item.id} className="flex items-center justify-between py-3">
+                          items.map((item: any, idx: number) => (
+                            <div key={item.id || idx} className="flex items-center justify-between py-3">
                               <div className="flex items-center gap-3">
                                 <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-[#E9E2D7] text-[#172C41]">
                                   <BookOpen className="h-5 w-5" />
                                 </div>
                                 <div>
-                                  <h4 className="text-sm font-bold text-[#172C41]">{item.product_title}</h4>
+                                  <h4 className="text-sm font-bold text-[#172C41]">{item.productTitle || item.product_title || "Livre"}</h4>
                                   <p className="text-xs text-[#52606B]">
-                                    Format : {item.format || "Livre physique"} — Quantité : {item.quantity}
+                                    Format : {item.format || "Livre physique"} — Quantité : {item.quantity || 1}
                                   </p>
                                 </div>
                               </div>
                               <span className="font-mono text-sm font-bold text-[#172C41]">
-                                {item.subtotal || item.unit_price} TND
+                                {item.subtotal || item.unitPrice || item.unit_price || "65.00"} TND
                               </span>
                             </div>
                           ))

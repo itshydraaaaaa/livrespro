@@ -167,17 +167,17 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
 
     const rows = data.map((o: any) => [
       o.id,
-      o.orderNumber,
-      new Date(o.createdAt).toLocaleDateString("fr-TN"),
-      `"${o.customerFirstName} ${o.customerLastName}"`,
-      `"${o.customerPhone}"`,
-      `"${o.customerEmail}"`,
-      `"${(o.deliveryAddress || "").replace(/"/g, '""')}"`,
-      `"${o.governorate || ""}"`,
-      `"${(o.items || []).map((i: any) => `${i.productTitle} (x${i.quantity})`).join("; ")}"`,
-      o.totalAmount,
+      o.orderNumber || o.order_number || `#${o.id}`,
+      new Date(o.createdAt || o.created_at || Date.now()).toLocaleDateString("fr-TN"),
+      `"${((o.customerFirstName || o.customer_first_name || "") + " " + (o.customerLastName || o.customer_last_name || "")).trim()}"`,
+      `"${o.customerPhone || o.customer_phone || ""}"`,
+      `"${o.customerEmail || o.customer_email || ""}"`,
+      `"${(o.deliveryAddress || o.delivery_address || "").replace(/"/g, '""')}"`,
+      `"${o.governorate || o.city || ""}"`,
+      `"${(o.items || o.order_items || []).map((i: any) => `${i.productTitle || i.product_title || "Livre"} (x${i.quantity || 1})`).join("; ")}"`,
+      o.totalAmount || o.total_amount || "0.00",
       o.status,
-      o.isEducator ? "Oui" : "Non",
+      (o.isEducator || o.is_educator) ? "Oui" : "Non",
     ]);
 
     const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
@@ -226,29 +226,29 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
             <tbody className="divide-y divide-[#172C41]/10">
               {(orders.data ?? []).map((o: any) => (
                 <tr key={o.id} className="hover:bg-[#F8F5EE]/40">
-                  <td className="p-3 font-bold text-[#C94E36]">{o.orderNumber || `#${o.id}`}</td>
+                  <td className="p-3 font-bold text-[#C94E36]">{o.orderNumber || o.order_number || `#${o.id}`}</td>
                   <td className="p-3 font-semibold">
-                    {o.customerFirstName} {o.customerLastName}
-                    {o.isEducator === 1 && (
+                    {(o.customerFirstName || o.customer_first_name || "") + " " + (o.customerLastName || o.customer_last_name || "")}
+                    {Boolean(o.isEducator === 1 || o.is_educator === 1) && (
                       <span className="ml-1 inline-flex items-center rounded-full bg-[#B71922]/10 px-2 py-0.5 text-[9px] font-bold text-[#B71922]">
                         Educator
                       </span>
                     )}
                   </td>
-                  <td className="p-3 font-medium text-[#172C41]">{o.customerPhone}</td>
+                  <td className="p-3 font-medium text-[#172C41]">{o.customerPhone || o.customer_phone || "-"}</td>
                   <td className="max-w-xs p-3 text-xs text-[#52606B]">
-                    <p className="font-semibold text-[#172C41]">{o.governorate || "Tunis"}</p>
-                    <p className="truncate">{o.deliveryAddress}</p>
+                    <p className="font-semibold text-[#172C41]">{o.governorate || o.city || "Tunisie"}</p>
+                    <p className="truncate">{o.deliveryAddress || o.delivery_address || "-"}</p>
                   </td>
                   <td className="p-3 text-xs">
-                    {(o.items || []).map((it: any, idx: number) => (
+                    {(o.items || o.order_items || []).map((it: any, idx: number) => (
                       <div key={idx} className="font-medium text-[#172C41]">
-                        {it.productTitle} <span className="text-[#C94E36]">× {it.quantity}</span>
+                        {it.productTitle || it.product_title || "Livre"} <span className="text-[#C94E36]">× {it.quantity || 1}</span>
                       </div>
                     ))}
                   </td>
                   <td className="p-3 font-display text-base font-bold text-[#172C41]">
-                    {o.totalAmount} DT
+                    {o.totalAmount || o.total_amount || "0.00"} DT
                   </td>
                   <td className="p-3">
                     <select
@@ -271,7 +271,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
                     </select>
                   </td>
                   <td className="p-3 text-xs text-[#52606B]">
-                    {new Date(o.createdAt).toLocaleDateString("fr-TN")}
+                    {new Date(o.createdAt || o.created_at || Date.now()).toLocaleDateString("fr-TN")}
                   </td>
                 </tr>
               ))}

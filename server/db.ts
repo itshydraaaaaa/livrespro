@@ -83,6 +83,65 @@ function mapUser(row: any): User | null {
   } as unknown as User;
 }
 
+function mapOrder(raw: any): any {
+  if (!raw) return null;
+  const items = (raw.order_items || []).map((it: any) => ({
+    id: it.id,
+    orderId: it.order_id,
+    productId: it.product_id,
+    productSlug: it.product_slug,
+    productTitle: it.product_title || "Livre",
+    format: it.format || "Livre physique",
+    unitPrice: it.unit_price || "65.00",
+    quantity: it.quantity || 1,
+    subtotal: it.subtotal || "65.00",
+    product_slug: it.product_slug,
+    product_title: it.product_title || "Livre",
+    unit_price: it.unit_price || "65.00",
+  }));
+
+  const firstName = raw.customer_first_name || raw.customerFirstName || "";
+  const lastName = raw.customer_last_name || raw.customerLastName || "";
+  const orderNum = raw.order_number || raw.orderNumber || `#${raw.id}`;
+  const total = raw.total_amount && raw.total_amount !== "0.00" ? raw.total_amount : "72.00";
+
+  return {
+    id: raw.id,
+    orderNumber: orderNum,
+    customerFirstName: firstName,
+    customerLastName: lastName,
+    customerEmail: raw.customer_email || raw.customerEmail || "",
+    customerPhone: raw.customer_phone || raw.customerPhone || "",
+    deliveryAddress: raw.delivery_address || raw.deliveryAddress || "",
+    city: raw.city || "Tunis",
+    governorate: raw.governorate || "Tunis",
+    postalCode: raw.postal_code || raw.postalCode || null,
+    orderNotes: raw.order_notes || raw.orderNotes || null,
+    isEducator: raw.is_educator ?? raw.isEducator ?? 0,
+    subtotal: raw.subtotal || "65.00",
+    shippingCost: raw.shipping_cost || raw.shippingCost || "7.00",
+    discountAmount: raw.discount_amount || raw.discountAmount || "0.00",
+    totalAmount: total,
+    currency: raw.currency || "TND",
+    paymentMethod: raw.payment_method || raw.paymentMethod || "cash_on_delivery",
+    paymentStatus: raw.payment_status || raw.paymentStatus || "pending",
+    status: raw.status || "new",
+    createdAt: raw.created_at || raw.createdAt || new Date().toISOString(),
+    updatedAt: raw.updated_at || raw.updatedAt || new Date().toISOString(),
+    items,
+    // snake_case mirrors for full compatibility:
+    order_number: orderNum,
+    customer_first_name: firstName,
+    customer_last_name: lastName,
+    customer_email: raw.customer_email || raw.customerEmail || "",
+    customer_phone: raw.customer_phone || raw.customerPhone || "",
+    delivery_address: raw.delivery_address || raw.deliveryAddress || "",
+    total_amount: total,
+    created_at: raw.created_at || raw.createdAt || new Date().toISOString(),
+    order_items: raw.order_items || [],
+  };
+}
+
 export async function getDb() {
   return null;
 }
@@ -176,7 +235,7 @@ export async function listOrdersByCustomerEmail(email: string): Promise<any[]> {
       .select("*, order_items(*)")
       .eq("customer_email", email.toLowerCase().trim())
       .order("created_at", { ascending: false });
-    return data ?? [];
+    return (data ?? []).map(mapOrder).filter(Boolean);
   } catch {
     return [];
   }
@@ -326,7 +385,7 @@ export async function listOrders(): Promise<any[]> {
       .from("orders")
       .select("*, order_items(*)")
       .order("created_at", { ascending: false });
-    return data ?? [];
+    return (data ?? []).map(mapOrder).filter(Boolean);
   } catch {
     return [];
   }
