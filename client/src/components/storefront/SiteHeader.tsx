@@ -24,10 +24,10 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Login / Sign Up or Admin Dashboard Button */}
+          {/* Login / Sign Up or Mon Compte / Admin */}
           {user ? (
             <div className="flex items-center gap-1.5">
-              {user.role === "admin" ? (
+              {user.role === "admin" && (
                 <Link
                   href="/admin"
                   className="flex h-10 items-center gap-2 rounded-full bg-[#172C41] px-4 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#F8F5EE] transition hover:bg-[#B71922]"
@@ -36,11 +36,18 @@ export function SiteHeader() {
                   <LayoutDashboard className="h-3.5 w-3.5" />
                   <span>Admin</span>
                 </Link>
-              ) : (
-                <span className="hidden text-xs font-semibold text-[#172C41] md:inline">
-                  {user.name || user.email}
-                </span>
               )}
+              <Link
+                href="/mon-compte"
+                className="flex h-10 items-center gap-2 rounded-full border border-[#172C41]/20 bg-white/70 px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#172C41] transition hover:bg-[#172C41] hover:text-[#F8F5EE]"
+                title="Consulter mon profil et mes commandes"
+              >
+                <User className="h-3.5 w-3.5 text-[#B71922]" />
+                <span className="hidden sm:inline">
+                  {user.name ? user.name.split(" ")[0] : "Mon Compte"}
+                </span>
+                <span className="sm:hidden">Compte</span>
+              </Link>
             </div>
           ) : (
             <Link

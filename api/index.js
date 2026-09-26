@@ -201,6 +201,20 @@ async function updateLastSignedIn(userId) {
   } catch {
   }
 }
+async function updateUserProfile(userId, name) {
+  try {
+    await sb().from("users").update({ name, updated_at: (/* @__PURE__ */ new Date()).toISOString() }).eq("id", userId);
+  } catch {
+  }
+}
+async function listOrdersByCustomerEmail(email) {
+  try {
+    const { data } = await sb().from("orders").select("*, order_items(*)").eq("customer_email", email.toLowerCase().trim()).order("created_at", { ascending: false });
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
 async function listCategories() {
   try {
     const { data } = await sb().from("categories").select("*").order("sort_order");
@@ -1102,6 +1116,14 @@ var siteRouter = router({
         orderId: createdOrder?.orderId ?? 9999,
         orderNumber: finalOrderNumber
       };
+    }),
+    myOrders: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.email) return [];
+      try {
+        return await listOrdersByCustomerEmail(ctx.user.email);
+      } catch {
+        return [];
+      }
     })
   }),
   content: router({
@@ -1341,7 +1363,8 @@ var appRouter = router({
       const email = input.email.toLowerCase().trim();
       const passwordHash = hashPassword(input.password);
       let newUserId = 1;
-      const role = email.includes("admin") || email.endsWith("@livrespro.tn") ? "admin" : "admin";
+      const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
+      const role = email === adminEmail ? "admin" : "user";
       try {
         const existing = await getUserByEmail(email);
         if (existing) {
@@ -1372,6 +1395,30 @@ var appRouter = router({
       return {
         success: true,
         user: sessionUser
+      };
+    }),
+    updateProfile: publicProcedure.input(
+      z5.object({
+        name: z5.string().trim().min(2, "Le nom doit comporter au moins 2 caract\xE8res")
+      })
+    ).mutation(async ({ ctx, input }) => {
+      if (!ctx.user) {
+        throw new TRPCError3({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+      }
+      try {
+        await updateUserProfile(ctx.user.id, input.name.trim());
+      } catch (err) {
+        console.warn("[Auth] Failed to update user profile in DB:", err);
+      }
+      const updatedUser = {
+        ...ctx.user,
+        name: input.name.trim()
+      };
+      const token = await createSessionToken(updatedUser);
+      setSessionCookie(ctx.res, token);
+      return {
+        success: true,
+        user: updatedUser
       };
     }),
     logout: publicProcedure.mutation(({ ctx }) => {

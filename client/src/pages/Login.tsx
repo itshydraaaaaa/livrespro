@@ -28,9 +28,13 @@ export default function Login() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // If already authenticated and admin, redirect to admin dashboard
-  if (isAuthenticated && user?.role === "admin") {
-    setLocation("/admin");
+  // If already authenticated, redirect to appropriate area
+  if (isAuthenticated && user) {
+    if (user.role === "admin") {
+      setLocation("/admin");
+    } else {
+      setLocation("/mon-compte");
+    }
     return null;
   }
 
@@ -40,8 +44,12 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await login(loginEmail, loginPassword);
-      setLocation("/admin");
+      const res = await login(loginEmail, loginPassword);
+      if (res?.user?.role === "admin") {
+        setLocation("/admin");
+      } else {
+        setLocation("/mon-compte");
+      }
     } catch (err: any) {
       setError(err?.message || "Identifiants invalides.");
     } finally {
@@ -66,15 +74,20 @@ export default function Login() {
     setLoading(true);
 
     try {
-      await register({
+      const res = await register({
         name: registerName,
         email: registerEmail,
         password: registerPassword,
       });
-      setSuccessMsg("Compte créé avec succès ! Redirection vers l'espace d'administration...");
+      const isAdmin = res?.user?.role === "admin";
+      setSuccessMsg(
+        isAdmin
+          ? "Compte administrateur créé ! Redirection vers le tableau de bord..."
+          : "Compte client créé avec succès ! Bienvenue sur LivresPro.tn..."
+      );
       setTimeout(() => {
-        setLocation("/admin");
-      }, 1000);
+        setLocation(isAdmin ? "/admin" : "/mon-compte");
+      }, 800);
     } catch (err: any) {
       setError(err?.message || "Impossible de créer le compte avec cette adresse email.");
     } finally {

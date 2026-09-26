@@ -3,6 +3,7 @@ import {
   createMultiItemOrder,
   getSeoPage,
   listContentSections,
+  listOrdersByCustomerEmail,
   recordAnalyticsEvent,
 } from "../db";
 import { publicProcedure, router } from "../_core/trpc";
@@ -166,6 +167,14 @@ export const siteRouter = router({
         orderId: createdOrder?.orderId ?? 9999,
         orderNumber: finalOrderNumber,
       };
+    }),
+    myOrders: publicProcedure.query(async ({ ctx }) => {
+      if (!ctx.user?.email) return [];
+      try {
+        return await listOrdersByCustomerEmail(ctx.user.email);
+      } catch {
+        return [];
+      }
     }),
   }),
   content: router({

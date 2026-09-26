@@ -7,7 +7,7 @@ import {
   setSessionCookie,
   verifyPassword,
 } from "./_core/auth";
-import { createUser, getUserByEmail, updateLastSignedIn } from "./db";
+import { createUser, getUserByEmail, updateLastSignedIn, updateUserProfile } from "./db";
 import { adminRouter } from "./routers/admin";
 import { commerceRouter } from "./routers/commerce";
 import { siteRouter } from "./routers/site";
@@ -112,9 +112,9 @@ export const appRouter = router({
         const passwordHash = hashPassword(input.password);
 
         let newUserId = 1;
-        // Grant admin privileges if registering the designated admin email or domain
-        const role: "admin" | "user" =
-          email.includes("admin") || email.endsWith("@livrespro.tn") ? "admin" : "admin";
+        const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
+        // Client accounts receive "user" role. Only the designated admin account is granted "admin".
+        const role: "admin" | "user" = email === adminEmail ? "admin" : "user";
 
         try {
           const existing = await getUserByEmail(email);
@@ -150,6 +150,37 @@ export const appRouter = router({
         return {
           success: true,
           user: sessionUser,
+        };
+      }),
+
+    updateProfile: publicProcedure
+      .input(
+        z.object({
+          name: z.string().trim().min(2, "Le nom doit comporter au moins 2 caractères"),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+        }
+
+        try {
+          await updateUserProfile(ctx.user.id, input.name.trim());
+        } catch (err) {
+          console.warn("[Auth] Failed to update user profile in DB:", err);
+        }
+
+        const updatedUser = {
+          ...ctx.user,
+          name: input.name.trim(),
+        };
+
+        const token = await createSessionToken(updatedUser);
+        setSessionCookie(ctx.res, token);
+
+        return {
+          success: true,
+          user: updatedUser,
         };
       }),
 

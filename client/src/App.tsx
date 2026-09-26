@@ -16,6 +16,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Shop from "./pages/Shop";
 import Educators from "./pages/Educators";
 import B2BBook from "./pages/B2BBook";
+import Account from "./pages/Account";
 
 function Router() {
   return (
@@ -24,6 +25,9 @@ function Router() {
       <Route path="/librairie" component={Shop} />
       <Route path="/educators" component={Educators} />
       <Route path="/login" component={Login} />
+      <Route path="/connexion" component={Login} />
+      <Route path="/mon-compte" component={Account} />
+      <Route path="/profil" component={Account} />
       <Route path="/livres/b2b-brand-management" component={B2BBook} />
       <Route path="/livres/:handle" component={ProductDetail} />
       

@@ -160,6 +160,28 @@ export async function updateLastSignedIn(userId: number): Promise<void> {
   } catch {}
 }
 
+export async function updateUserProfile(userId: number, name: string): Promise<void> {
+  try {
+    await sb()
+      .from("users")
+      .update({ name, updated_at: new Date().toISOString() })
+      .eq("id", userId);
+  } catch {}
+}
+
+export async function listOrdersByCustomerEmail(email: string): Promise<any[]> {
+  try {
+    const { data } = await sb()
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("customer_email", email.toLowerCase().trim())
+      .order("created_at", { ascending: false });
+    return data ?? [];
+  } catch {
+    return [];
+  }
+}
+
 // ─── Categories ───────────────────────────────────────────────────────────────
 
 export async function listCategories(): Promise<Category[]> {
