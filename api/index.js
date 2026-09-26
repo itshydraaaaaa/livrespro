@@ -17311,7 +17311,7 @@ var require_finalhandler = __commonJS({
     module.exports = finalhandler;
     function finalhandler(req, res, options) {
       var opts = options || {};
-      var env = opts.env || "production";
+      var env = opts.env || process.env.NODE_ENV || "development";
       var onerror = opts.onerror;
       return function(err) {
         var headers;
@@ -20505,7 +20505,7 @@ var require_application = __commonJS({
       this.defaultConfiguration();
     };
     app2.defaultConfiguration = function defaultConfiguration() {
-      var env = "production";
+      var env = process.env.NODE_ENV || "development";
       this.enable("x-powered-by");
       this.set("etag", "weak");
       this.set("env", env);
@@ -54669,7 +54669,7 @@ async function verifySessionToken(token) {
   }
 }
 function setSessionCookie(res, token) {
-  const isProd = true;
+  const isProd = process.env.NODE_ENV === "production";
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProd,
@@ -63908,7 +63908,7 @@ var ENV = {
   databaseUrl: process.env.DATABASE_URL ?? "",
   oAuthServerUrl: process.env.OAUTH_SERVER_URL ?? "",
   ownerOpenId: process.env.OWNER_OPEN_ID ?? "",
-  isProduction: true,
+  isProduction: process.env.NODE_ENV === "production",
   forgeApiUrl: process.env.BUILT_IN_FORGE_API_URL ?? "",
   forgeApiKey: process.env.BUILT_IN_FORGE_API_KEY ?? "",
   shopifyStoreDomain: process.env.SHOPIFY_STORE_DOMAIN ?? "",
@@ -64205,7 +64205,7 @@ function createExpressApp() {
 }
 var app = createExpressApp();
 
-// api/index.ts
+// serverless_entry.mjs
 function handler(req, res) {
   return app(req, res);
 }
