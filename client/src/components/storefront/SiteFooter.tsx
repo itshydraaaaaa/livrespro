@@ -3,17 +3,17 @@ import { BrandMark } from "./BrandMark";
 
 export function SiteFooter() {
   return (
-    <footer className="border-t border-white/10 bg-[#171717] text-[#F7F4EE]">
+    <footer className="border-t border-white/10 bg-[#10151F] text-[#F6F1E7]">
       <div className="container grid gap-10 py-12 md:grid-cols-[1.25fr_.8fr_1fr] md:py-16">
         <div>
           <BrandMark />
-          <p className="mt-5 max-w-sm text-sm leading-6 text-white/65">
+          <p className="mt-5 max-w-sm text-sm leading-6 text-white/70">
             Une sélection éditoriale business conçue pour transformer les idées en décisions, puis les décisions en impact.
           </p>
           <div className="mt-6">
             <Link
               href="/login"
-              className="inline-flex items-center gap-2 text-xs font-bold text-[#DDA39B] transition hover:text-white underline underline-offset-4"
+              className="inline-flex items-center gap-2 text-xs font-bold text-[#E9DFCF] transition hover:text-[#BC3B2C] underline underline-offset-4"
             >
               🔐 Espace Administration & Connexion
             </Link>
@@ -21,30 +21,30 @@ export function SiteFooter() {
         </div>
 
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#DDA39B]">
+          <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#BC3B2C]">
             Navigation & Rayons
           </p>
           <div className="mt-4 space-y-3 text-sm text-white/70">
-            <Link href="/librairie" className="block hover:text-white">
+            <Link href="/librairie" className="block transition-colors hover:text-white">
               La Librairie en ligne
             </Link>
-            <a href="/#livre" className="block hover:text-white">
+            <a href="/#livre" className="block transition-colors hover:text-white">
               B2B Brand Management
             </a>
-            <a href="/#cas" className="block hover:text-white">
+            <a href="/#cas" className="block transition-colors hover:text-white">
               Études de cas réels
             </a>
-            <a href="/#educator" className="block hover:text-white">
+            <a href="/#educator" className="block transition-colors hover:text-white">
               Offre Enseignants & Formateurs
             </a>
-            <Link href="/admin" className="block hover:text-white">
+            <Link href="/admin" className="block transition-colors hover:text-white">
               Tableau de bord Back-Office
             </Link>
           </div>
         </div>
 
         <div>
-          <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#DDA39B]">
+          <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#BC3B2C]">
             Une marque de
           </p>
           <img
@@ -52,7 +52,7 @@ export function SiteFooter() {
             alt="BUSINESS SUCCESS"
             className="mt-4 h-20 w-auto max-w-full object-contain object-left"
           />
-          <p className="mt-3 text-xs leading-5 text-white/55">
+          <p className="mt-3 text-xs leading-5 text-white/60">
             LivresPro.tn — L’Atelier des Pages est une marque de la société BUSINESS SUCCESS.
           </p>
         </div>

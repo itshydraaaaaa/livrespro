@@ -1,17 +1,497 @@
+import { AnimatedCounter } from "@/components/storefront/AnimatedCounter";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
-import { ArrowRight, BookOpen, Building2, GraduationCap, ShieldCheck } from "lucide-react";
+import { ArrowRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
+import { motion, type Variants } from "framer-motion";
 import { Link } from "wouter";
 
-const A='/editorial/b2b-launch/';
-const proof=[['100+','participants au lancement'],['50','dirigeants & décideurs'],['10–11','médias présents'],['30+','publications'],['10K+','vues, réactions & partages'],['95%+','satisfaction']];
-export default function Home(){return <div className="min-h-screen bg-[#F7F4EE] text-[#171717]"><SiteHeader/><main>
-<section id="livre" className="overflow-hidden border-b border-black/10 bg-[#F7F4EE]"><div className="container grid min-h-[720px] items-center gap-12 py-14 lg:grid-cols-[1.05fr_.95fr] lg:py-20"><div className="max-w-3xl"><p className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#B71922]">Tunisia Edition · B2B Brand Management</p><h1 className="mt-6 font-display text-[clamp(3.8rem,7vw,7.4rem)] leading-[.86] tracking-[-.055em]">Construire une marque B2B qui crée de la <span className="text-[#B71922]">préférence.</span></h1><p className="mt-7 text-xl font-semibold">Philip Kotler · Waldemar Pfoertsch · Walid Kallel</p><p className="mt-5 max-w-2xl text-base leading-7 text-black/65">Une édition tunisienne qui relie les fondamentaux internationaux du B2B Brand Management à des études de cas et à la réalité des organisations tunisiennes.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="/livres/b2b-brand-management" className="inline-flex items-center gap-3 bg-[#B71922] px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white">Commander le livre <ArrowRight className="h-4 w-4"/></Link><a href="#decouvrir" className="inline-flex items-center border border-black/20 px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em]">Découvrir le livre</a></div><div className="mt-8 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold text-black/55"><span>Édition tunisienne</span><span>Études de cas tunisiennes</span><span>Disponible maintenant</span></div></div><div className="relative mx-auto w-full max-w-[560px]"><div className="absolute -inset-5 -z-10 translate-x-6 translate-y-6 bg-[#E8E3DB]"/><img src={`${A}book-angle.jpg`} alt="B2B Brand Management Tunisia Edition" className="h-[610px] w-full object-cover object-center shadow-2xl"/></div></div></section>
-<section className="bg-[#171717] py-7 text-white"><div className="container flex flex-wrap items-center justify-between gap-5"><p className="text-sm font-semibold">Une édition portée par trois regards complémentaires sur le marketing, la marque B2B et son application.</p><div className="flex flex-wrap gap-6 text-xs font-extrabold uppercase tracking-[.14em] text-white/70"><span>Philip Kotler</span><span>Waldemar Pfoertsch</span><span>Walid Kallel</span></div></div></section>
-<section id="decouvrir" className="container py-20 md:py-28"><div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr]"><div><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#B71922]">Pourquoi ce livre</p><h2 className="mt-4 font-display text-5xl leading-[.92] tracking-[-.04em] md:text-6xl">Le branding B2B ne se résume pas à un logo.</h2><p className="mt-6 max-w-xl text-base leading-7 text-black/60">Quand les offres deviennent comparables et que plusieurs décideurs participent à l’achat, la marque aide à construire confiance, préférence et valeur.</p></div><div className="grid gap-px bg-black/10 sm:grid-cols-2">{[['Être préféré','Dépasser une comparaison fondée uniquement sur le prix et les caractéristiques.'],['Construire la confiance','Réduire le risque perçu dans les décisions B2B.'],['Créer de la valeur','Faire de la marque un actif stratégique.'],['Aligner l’organisation','Relier stratégie, culture, expérience client et promesse.']].map(([t,b])=><div className="bg-[#FCFAF5] p-7" key={t}><h3 className="font-display text-3xl">{t}</h3><p className="mt-3 text-sm leading-6 text-black/60">{b}</p></div>)}</div></div></section>
-<section className="bg-[#E8E3DB] py-20"><div className="container"><div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-end"><div><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#B71922]">Le lancement</p><h2 className="mt-4 max-w-3xl font-display text-5xl leading-[.92] md:text-6xl">Une édition présentée à l’écosystème business tunisien.</h2></div><p className="text-sm leading-7 text-black/60">Des chiffres de la cérémonie de lancement, présentés comme repères d’activité et de mobilisation autour de cette première édition.</p></div><img src={`${A}audience.jpg`} alt="Cérémonie de lancement B2B Brand Management" className="mt-10 aspect-[16/7] w-full object-cover"/><div className="mt-1 grid grid-cols-2 gap-px bg-black/10 md:grid-cols-3 lg:grid-cols-6">{proof.map(([n,l])=><div className="bg-[#F7F4EE] p-5" key={l}><p className="font-display text-4xl text-[#B71922]">{n}</p><p className="mt-2 text-xs leading-5 text-black/55">{l}</p></div>)}</div></div></section>
-<section className="container py-20 md:py-28"><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#B71922]">Ce que vous allez travailler</p><h2 className="mt-4 max-w-4xl font-display text-5xl leading-[.92] md:text-6xl">Passer du produit à la marque. De la notoriété à la préférence.</h2><div className="mt-10 grid gap-4 md:grid-cols-3">{['Produit → Marque','Notoriété → Préférence','Communication → Stratégie','Promesse → Expérience','Identité → Architecture de marque','Marketing isolé → Alignement'].map(x=><div key={x} className="border-t-2 border-[#B71922] bg-[#FCFAF5] p-6 font-display text-2xl">{x}</div>)}</div></section>
-<section className="bg-[#171717] py-20 text-white"><div className="container grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center"><div><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#DDA39B]">International thinking. Tunisian reality.</p><h2 className="mt-4 font-display text-5xl leading-[.92]">Des principes internationaux confrontés aux décisions d’entreprises tunisiennes.</h2><p className="mt-6 text-sm leading-7 text-white/65">Une édition qui rapproche les cadres du B2B Brand Management de cas et contextes locaux, pour rendre l’analyse plus concrète et directement discutable.</p></div><img src={`${A}recognition.jpg`} alt="Lancement et reconnaissance autour du livre" className="aspect-[4/3] w-full object-cover"/></div></section>
-<section id="cas" className="border-y border-black/10 bg-white py-18 md:py-22"><div className="container"><div className="max-w-3xl"><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#B71922]">Case Studies · Tunisia Edition</p><h2 className="mt-4 font-display text-5xl leading-[.95]">Des entreprises tunisiennes au cœur du livre.</h2><p className="mt-5 text-base leading-7 text-black/60">L’édition tunisienne relie les principes du B2B Brand Management à des études de cas issues d’entreprises et d’organisations du marché tunisien. Une preuve de terrain qui donne au lecteur des situations concrètes à analyser.</p></div><div className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">{[{name:"BIAT",logo:"biat.jpg"},{name:"Wallyscar",logo:"wallyscar.jpg"},{name:"MSB",logo:"msb.jpg"},{name:"ARVEA",logo:"arvea.jpg"},{name:"Gourmandise",logo:"gourmandise.jpg"},{name:"MPBS",logo:"mpbs.jpg"},{name:"CHO Group",logo:"cho-group.jpg"}].map(x=><div key={x.name} className="flex min-h-32 flex-col items-center justify-center gap-3 border border-black/10 bg-[#F7F4EE] px-4 py-5 text-center"><img src={`/editorial/case-study-logos/${x.logo}`} alt={`Logo ${x.name}`} className="h-14 w-full object-contain mix-blend-multiply"/><span className="text-[10px] font-extrabold uppercase tracking-[.12em] text-black/50">{x.name}</span></div>)}</div><p className="mt-5 text-xs text-black/45">Entreprises et organisations présentées dans les études de cas de l’édition tunisienne.</p></div></section><section id="educator" className="container py-20 md:py-28"><div className="grid overflow-hidden border border-[#B71922]/20 bg-[#FFFDFC] lg:grid-cols-[.9fr_1.1fr]"><div className="p-8 md:p-12"><div className="inline-flex items-center gap-2 bg-[#B71922] px-3 py-2 text-[10px] font-extrabold uppercase tracking-[.16em] text-white"><GraduationCap className="h-4 w-4"/> Offre Educator</div><h2 className="mt-6 font-display text-5xl leading-[.92]">Vous enseignez ou formez au marketing ?</h2><p className="mt-5 text-base leading-7 text-black/65">À l’achat de <strong>B2B Brand Management — Tunisia Edition</strong>, les enseignants et formateurs éligibles bénéficient de <strong>50 % de remise</strong> sur la version numérique de l’<em>Educator’s Guide & Case Study Companion — Tunisia Edition 2026</em>.</p><div className="mt-7 flex flex-wrap gap-3"><Link href="/educators" className="inline-flex items-center gap-2 bg-[#171717] px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white">Découvrir l’offre Educator <ArrowRight className="h-4 w-4"/></Link></div><div className="mt-6 flex items-start gap-3 text-xs leading-5 text-black/55"><ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#B71922]"/>Avantage réservé aux enseignants et formateurs, conditionné à l’achat du livre.</div></div><div className="grid min-h-[460px] grid-cols-2 bg-[#E8E3DB] p-8"><img src={`${A}book-front.jpg`} alt="B2B Brand Management" className="h-full w-full object-cover shadow-xl"/><div className="flex flex-col justify-center bg-[#171717] p-7 text-white"><GraduationCap className="h-8 w-8 text-[#DDA39B]"/><p className="mt-7 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#DDA39B]">Digital companion</p><h3 className="mt-3 font-display text-3xl">Educator’s Guide & Case Study Companion</h3><p className="mt-4 text-sm text-white/60">Tunisia Edition 2026</p><p className="mt-8 font-display text-5xl text-[#DDA39B]">−50%</p><p className="mt-2 text-xs text-white/60">avec achat du livre + statut Educator éligible</p></div></div></div></section>
-<section id="lancement" className="container pb-24"><div className="grid gap-3 md:grid-cols-3"><img src={`${A}speaker.jpg`} className="aspect-[4/5] w-full object-cover" alt="Prise de parole au lancement"/><img src={`${A}community.jpg`} className="aspect-[4/5] w-full object-cover" alt="Communauté autour du lancement"/><img src={`${A}media.jpg`} className="aspect-[4/5] w-full object-cover" alt="Interview média lors du lancement"/></div><div className="mt-10 flex flex-col items-start justify-between gap-6 border-t border-black/15 pt-8 md:flex-row md:items-center"><div><p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#B71922]">Tunisia Edition</p><h2 className="mt-2 font-display text-4xl">Faites du branding B2B un avantage stratégique.</h2></div><Link href="/livres/b2b-brand-management" className="inline-flex items-center gap-3 bg-[#B71922] px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white">Commander <ArrowRight className="h-4 w-4"/></Link></div></section>
-</main><SiteFooter/></div>}
+const A = "/editorial/b2b-launch/";
+
+const proof = [
+  ["100+", "participants au lancement"],
+  ["50", "dirigeants & décideurs"],
+  ["10–11", "médias présents"],
+  ["30+", "publications"],
+  ["10K+", "vues, réactions & partages"],
+  ["95%+", "satisfaction"],
+];
+
+const caseStudies = [
+  { name: "BIAT", logo: "biat.jpg" },
+  { name: "Wallyscar", logo: "wallyscar.jpg" },
+  { name: "MSB", logo: "msb.jpg" },
+  { name: "ARVEA", logo: "arvea.jpg" },
+  { name: "Gourmandise", logo: "gourmandise.jpg" },
+  { name: "MPBS", logo: "mpbs.jpg" },
+  { name: "CHO Group", logo: "cho-group.jpg" },
+];
+
+const transformations = [
+  "Produit → Marque",
+  "Notoriété → Préférence",
+  "Communication → Stratégie",
+  "Promesse → Expérience",
+  "Identité → Architecture de marque",
+  "Marketing isolé → Alignement",
+];
+
+const valueProps = [
+  [
+    "Être préféré",
+    "Dépasser une comparaison fondée uniquement sur le prix et les caractéristiques.",
+  ],
+  [
+    "Construire la confiance",
+    "Réduire le risque perçu dans les décisions B2B.",
+  ],
+  ["Créer de la valeur", "Faire de la marque un actif stratégique."],
+  [
+    "Aligner l’organisation",
+    "Relier stratégie, culture, expérience client et promesse.",
+  ],
+];
+
+// Motion reveal variants with smooth easeOutExpo easing
+const fadeInUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.65, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const staggerContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+export default function Home() {
+  return (
+    <div className="min-h-screen bg-[#F6F1E7] text-[#141E33] selection:bg-[#BC3B2C]/20 selection:text-[#141E33]">
+      <SiteHeader />
+      <main>
+        {/* SECTION 1: HERO */}
+        <section
+          id="livre"
+          className="relative overflow-hidden border-b border-[#141E33]/08 bg-[#F6F1E7]"
+        >
+          {/* Subtle warm depth gradient */}
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#E9DFCF]/40 via-transparent to-[#F6F1E7]" />
+
+          <div className="container relative grid min-h-[720px] items-center gap-12 py-14 lg:grid-cols-[1.05fr_.95fr] lg:py-24">
+            <motion.div
+              className="max-w-3xl"
+              initial="hidden"
+              animate="visible"
+              variants={staggerContainer}
+            >
+              <motion.p
+                variants={fadeInUp}
+                className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#BC3B2C]"
+              >
+                Tunisia Edition · B2B Brand Management
+              </motion.p>
+
+              <motion.h1
+                variants={fadeInUp}
+                className="mt-6 font-display text-[clamp(3.8rem,7vw,7.4rem)] leading-[.86] tracking-[-.055em] text-[#141E33]"
+              >
+                Construire une marque B2B qui crée de la{" "}
+                <span className="text-[#BC3B2C]">préférence.</span>
+              </motion.h1>
+
+              <motion.p
+                variants={fadeInUp}
+                className="mt-7 text-xl font-semibold text-[#141E33]"
+              >
+                Philip Kotler · Waldemar Pfoertsch · Walid Kallel
+              </motion.p>
+
+              <motion.p
+                variants={fadeInUp}
+                className="mt-5 max-w-2xl text-base leading-7 text-[#5C574C]"
+              >
+                Une édition tunisienne qui relie les fondamentaux internationaux du B2B Brand Management à des études de cas et à la réalité des organisations tunisiennes.
+              </motion.p>
+
+              <motion.div
+                variants={fadeInUp}
+                className="mt-9 flex flex-wrap items-center gap-4"
+              >
+                <Link
+                  href="/livres/b2b-brand-management"
+                  className="btn-terracotta inline-flex items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white shadow-md"
+                >
+                  Commander le livre <ArrowRight className="h-4 w-4" />
+                </Link>
+                <a
+                  href="#decouvrir"
+                  className="inline-flex items-center rounded-full border border-[#141E33]/20 bg-white/70 px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] shadow-xs transition-all duration-300 hover:border-[#141E33] hover:bg-white hover:-translate-y-0.5"
+                >
+                  Découvrir le livre
+                </a>
+              </motion.div>
+
+              <motion.div
+                variants={fadeInUp}
+                className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-xs font-semibold text-[#5C574C]"
+              >
+                <span className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
+                  Édition tunisienne
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
+                  Études de cas tunisiennes
+                </span>
+                <span className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
+                  Disponible maintenant
+                </span>
+              </motion.div>
+            </motion.div>
+
+            {/* Book Cover with subtle 3D hover & layered depth */}
+            <motion.div
+              className="relative mx-auto w-full max-w-[560px]"
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+            >
+              <div className="absolute -inset-5 -z-10 translate-x-5 translate-y-5 rounded-2xl bg-[#E9DFCF] shadow-lg" />
+              <motion.div
+                whileHover={{ scale: 1.015, translateY: -4 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-[#141E33]/10"
+              >
+                <img
+                  src={`${A}book-angle.jpg`}
+                  alt="B2B Brand Management Tunisia Edition"
+                  className="h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                />
+              </motion.div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* SECTION 2: TRUST / AUTHOR BAR */}
+        <section className="border-y border-[#141E33]/10 bg-[#141E33] py-7 text-white">
+          <div className="container flex flex-wrap items-center justify-between gap-5">
+            <p className="text-sm font-semibold tracking-wide text-white/90">
+              Une édition portée par trois regards complémentaires sur le marketing, la marque B2B et son application.
+            </p>
+            <div className="flex flex-wrap gap-6 text-xs font-extrabold uppercase tracking-[.16em] text-white/75">
+              <span className="transition-colors hover:text-white">Philip Kotler</span>
+              <span className="transition-colors hover:text-white">Waldemar Pfoertsch</span>
+              <span className="transition-colors hover:text-white">Walid Kallel</span>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 3: POURQUOI CE LIVRE */}
+        <section id="decouvrir" className="container py-20 md:py-28">
+          <div className="grid gap-12 lg:grid-cols-[.9fr_1.1fr] lg:items-start">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              variants={fadeInUp}
+            >
+              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+                Pourquoi ce livre
+              </p>
+              <h2 className="mt-4 font-display text-5xl leading-[.92] tracking-[-.04em] text-[#141E33] md:text-6xl">
+                Le branding B2B ne se résume pas à un logo.
+              </h2>
+              <p className="mt-6 max-w-xl text-base leading-7 text-[#5C574C]">
+                Quand les offres deviennent comparables et que plusieurs décideurs participent à l’achat, la marque aide à construire confiance, préférence et valeur.
+              </p>
+            </motion.div>
+
+            {/* 4 Value Cards with refined depth & rounded corners */}
+            <motion.div
+              className="grid gap-4 sm:grid-cols-2"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={staggerContainer}
+            >
+              {valueProps.map(([t, b]) => (
+                <motion.div
+                  variants={fadeInUp}
+                  key={t}
+                  className="card-depth flex flex-col justify-between rounded-xl p-8 transition-all duration-300"
+                >
+                  <div>
+                    <h3 className="font-display text-3xl text-[#141E33]">{t}</h3>
+                    <p className="mt-4 text-sm leading-6 text-[#5C574C]">{b}</p>
+                  </div>
+                  <div className="mt-6 h-0.5 w-8 rounded-full bg-[#BC3B2C]/30" />
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* SECTION 4: LE LANCEMENT (STATS) */}
+        <section className="border-y border-[#141E33]/08 bg-[#E9DFCF] py-20 md:py-24">
+          <div className="container">
+            <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
+              <div>
+                <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+                  Le lancement
+                </p>
+                <h2 className="mt-4 max-w-3xl font-display text-5xl leading-[.92] text-[#141E33] md:text-6xl">
+                  Une édition présentée à l’écosystème business tunisien.
+                </h2>
+              </div>
+              <p className="text-sm leading-7 text-[#5C574C]">
+                Des chiffres de la cérémonie de lancement, présentés comme repères d’activité et de mobilisation autour de cette première édition.
+              </p>
+            </div>
+
+            {/* Event photo */}
+            <div className="mt-10 overflow-hidden rounded-xl shadow-xl">
+              <img
+                src={`${A}audience.jpg`}
+                alt="Cérémonie de lancement B2B Brand Management"
+                className="aspect-[16/7] w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+
+            {/* Stats grid with animated number counters */}
+            <motion.div
+              className="mt-6 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              variants={staggerContainer}
+            >
+              {proof.map(([n, l]) => (
+                <motion.div
+                  variants={fadeInUp}
+                  key={l}
+                  className="card-depth flex flex-col justify-center rounded-xl p-6 text-center"
+                >
+                  <p className="font-display text-4xl text-[#BC3B2C]">
+                    <AnimatedCounter value={n} />
+                  </p>
+                  <p className="mt-2 text-xs leading-5 text-[#5C574C]">{l}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+
+        {/* SECTION 5: CE QUE VOUS ALLEZ TRAVAILLER */}
+        <section className="container py-20 md:py-28">
+          <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+            Ce que vous allez travailler
+          </p>
+          <h2 className="mt-4 max-w-4xl font-display text-5xl leading-[.92] text-[#141E33] md:text-6xl">
+            Passer du produit à la marque. De la notoriété à la préférence.
+          </h2>
+
+          <motion.div
+            className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            variants={staggerContainer}
+          >
+            {transformations.map((x) => (
+              <motion.div
+                variants={fadeInUp}
+                key={x}
+                className="card-depth rounded-xl border-t-4 border-t-[#BC3B2C] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+              >
+                <p className="font-display text-2xl text-[#141E33]">{x}</p>
+              </motion.div>
+            ))}
+          </motion.div>
+        </section>
+
+        {/* SECTION 6: DARK INTERNATIONAL THINKING SECTION */}
+        <section className="relative overflow-hidden border-y border-white/10 bg-[#141E33] py-20 text-white md:py-24">
+          {/* Ambient soft glow behind photo */}
+          <div className="pointer-events-none absolute right-0 top-1/2 h-[500px] w-[500px] -translate-y-1/2 translate-x-1/4 rounded-full bg-[#BC3B2C]/15 blur-3xl" />
+
+          <div className="container relative grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#E9DFCF]">
+                International thinking. Tunisian reality.
+              </p>
+              <h2 className="mt-4 font-display text-5xl leading-[.92] text-white">
+                Des principes internationaux confrontés aux décisions d’entreprises tunisiennes.
+              </h2>
+              <p className="mt-6 text-sm leading-7 text-white/70">
+                Une édition qui rapproche les cadres du B2B Brand Management de cas et contextes locaux, pour rendre l’analyse plus concrète et directement discutable.
+              </p>
+            </div>
+
+            <div className="overflow-hidden rounded-xl shadow-2xl ring-1 ring-white/10">
+              <img
+                src={`${A}recognition.jpg`}
+                alt="Lancement et reconnaissance autour du livre"
+                className="aspect-[4/3] w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 7: CASE STUDIES LOGO STRIP */}
+        <section
+          id="cas"
+          className="border-y border-[#141E33]/10 bg-white py-18 md:py-22"
+        >
+          <div className="container">
+            <div className="max-w-3xl">
+              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+                Case Studies · Tunisia Edition
+              </p>
+              <h2 className="mt-4 font-display text-5xl leading-[.95] text-[#141E33]">
+                Des entreprises tunisiennes au cœur du livre.
+              </h2>
+              <p className="mt-5 text-base leading-7 text-[#5C574C]">
+                L’édition tunisienne relie les principes du B2B Brand Management à des études de cas issues d’entreprises et d’organisations du marché tunisien. Une preuve de terrain qui donne au lecteur des situations concrètes à analyser.
+              </p>
+            </div>
+
+            {/* Responsive grid with subtle hover elevation & infinite marquee support */}
+            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+              {caseStudies.map((x) => (
+                <div
+                  key={x.name}
+                  className="card-depth flex min-h-36 flex-col items-center justify-center gap-3 rounded-xl border border-[#141E33]/08 bg-[#F6F1E7]/50 px-4 py-5 text-center transition-all duration-300 hover:bg-white hover:shadow-md"
+                >
+                  <img
+                    src={`/editorial/case-study-logos/${x.logo}`}
+                    alt={`Logo ${x.name}`}
+                    className="h-14 w-full object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105"
+                  />
+                  <span className="text-[10px] font-extrabold uppercase tracking-[.12em] text-[#5C574C]">
+                    {x.name}
+                  </span>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-6 text-xs text-[#5C574C]/80">
+              Entreprises et organisations présentées dans les études de cas de l’édition tunisienne.
+            </p>
+          </div>
+        </section>
+
+        {/* SECTION 8: EDUCATOR OFFER */}
+        <section id="educator" className="container py-20 md:py-28">
+          <div className="grid overflow-hidden rounded-2xl border border-[#BC3B2C]/20 bg-white shadow-lg lg:grid-cols-[.9fr_1.1fr]">
+            <div className="flex flex-col justify-between p-8 md:p-12">
+              <div>
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#BC3B2C] px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white">
+                  <GraduationCap className="h-4 w-4" /> Offre Educator
+                </div>
+                <h2 className="mt-6 font-display text-5xl leading-[.92] text-[#141E33]">
+                  Vous enseignez ou formez au marketing ?
+                </h2>
+                <p className="mt-5 text-base leading-7 text-[#5C574C]">
+                  À l’achat de <strong>B2B Brand Management — Tunisia Edition</strong>, les enseignants et formateurs éligibles bénéficient de <strong>50 % de remise</strong> sur la version numérique de l’<em>Educator’s Guide & Case Study Companion — Tunisia Edition 2026</em>.
+                </p>
+
+                <div className="mt-8 flex flex-wrap gap-3">
+                  <Link
+                    href="/educators"
+                    className="inline-flex items-center gap-2 rounded-full bg-[#141E33] px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white transition-all duration-300 hover:bg-[#BC3B2C] hover:shadow-md"
+                  >
+                    Découvrir l’offre Educator <ArrowRight className="h-4 w-4" />
+                  </Link>
+                </div>
+              </div>
+
+              <div className="mt-8 flex items-start gap-3 text-xs leading-5 text-[#5C574C]">
+                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#BC3B2C]" />
+                Avantage réservé aux enseignants et formateurs, conditionné à l’achat du livre.
+              </div>
+            </div>
+
+            <div className="grid min-h-[460px] grid-cols-2 bg-[#E9DFCF] p-8">
+              <div className="overflow-hidden rounded-xl shadow-xl">
+                <img
+                  src={`${A}book-front.jpg`}
+                  alt="B2B Brand Management"
+                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+                />
+              </div>
+              <div className="flex flex-col justify-center rounded-xl bg-[#141E33] p-7 text-white shadow-xl">
+                <GraduationCap className="h-8 w-8 text-[#E9DFCF]" />
+                <p className="mt-7 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#E9DFCF]">
+                  Digital companion
+                </p>
+                <h3 className="mt-3 font-display text-3xl">
+                  Educator’s Guide & Case Study Companion
+                </h3>
+                <p className="mt-4 text-sm text-white/60">Tunisia Edition 2026</p>
+                <p className="mt-8 font-display text-5xl text-[#E9DFCF]">−50%</p>
+                <p className="mt-2 text-xs text-white/60">
+                  avec achat du livre + statut Educator éligible
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* SECTION 9: PHOTO GALLERY */}
+        <section id="lancement" className="container pb-24">
+          <div className="grid gap-4 md:grid-cols-3">
+            <div className="overflow-hidden rounded-xl shadow-md">
+              <img
+                src={`${A}speaker.jpg`}
+                className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
+                alt="Prise de parole au lancement"
+              />
+            </div>
+            <div className="overflow-hidden rounded-xl shadow-md">
+              <img
+                src={`${A}community.jpg`}
+                className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
+                alt="Communauté autour du lancement"
+              />
+            </div>
+            <div className="overflow-hidden rounded-xl shadow-md">
+              <img
+                src={`${A}media.jpg`}
+                className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
+                alt="Interview média lors du lancement"
+              />
+            </div>
+          </div>
+
+          {/* SECTION 10: CLOSING CTA BAND */}
+          <div className="mt-12 flex flex-col items-start justify-between gap-6 rounded-2xl border border-[#141E33]/10 bg-white p-8 shadow-sm md:flex-row md:items-center md:p-10">
+            <div>
+              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+                Tunisia Edition
+              </p>
+              <h2 className="mt-2 font-display text-4xl text-[#141E33]">
+                Faites du branding B2B un avantage stratégique.
+              </h2>
+            </div>
+            <Link
+              href="/livres/b2b-brand-management"
+              className="btn-terracotta inline-flex shrink-0 items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white shadow-md"
+            >
+              Commander <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+        </section>
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}

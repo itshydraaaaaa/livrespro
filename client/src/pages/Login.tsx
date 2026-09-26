@@ -96,9 +96,9 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#F8F5EE] text-[#172C41]">
+    <div className="flex min-h-screen flex-col bg-[#F6F1E7] text-[#141E33] selection:bg-[#BC3B2C]/20 selection:text-[#141E33]">
       {/* Top Header */}
-      <header className="border-b border-[#172C41]/10 bg-white/70 px-6 py-4 backdrop-blur-md">
+      <header className="border-b border-[#141E33]/10 bg-white/70 px-6 py-4 backdrop-blur-md">
         <div className="container flex items-center justify-between">
           <Link href="/">
             <BrandMark />
@@ -106,13 +106,13 @@ export default function Login() {
           <div className="flex items-center gap-4">
             <Link
               href="/librairie"
-              className="text-xs font-bold uppercase tracking-wider text-[#52606B] hover:text-[#172C41]"
+              className="text-xs font-bold uppercase tracking-wider text-[#5C574C] hover:text-[#141E33] transition-colors"
             >
               La Librairie
             </Link>
             <Link
               href="/"
-              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#52606B] hover:text-[#C94E36]"
+              className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#5C574C] hover:text-[#BC3B2C] transition-colors"
             >
               <ArrowLeft className="h-4 w-4" />
               Retour au site
@@ -123,22 +123,22 @@ export default function Login() {
 
       {/* Main Authentication Box */}
       <main className="flex flex-1 items-center justify-center p-6">
-        <div className="w-full max-w-lg border border-[#172C41]/15 bg-white p-8 shadow-2xl sm:p-10">
+        <div className="card-depth w-full max-w-lg rounded-2xl border border-[#141E33]/15 bg-white p-8 shadow-2xl sm:p-10">
           <div className="text-center">
-            <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#E9E2D7] text-[#172C41]">
+            <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-[#E9DFCF] text-[#141E33] shadow-xs">
               <Lock className="h-5 w-5" />
             </span>
-            <p className="eyebrow mt-4">Espace Membre & Gestion</p>
-            <h1 className="mt-2 font-display text-3xl text-[#172C41]">
+            <p className="eyebrow mt-4 text-[#BC3B2C]">Espace Membre & Gestion</p>
+            <h1 className="mt-2 font-display text-3xl text-[#141E33]">
               {activeTab === "login" ? "Connexion" : "Créer un compte"}
             </h1>
-            <p className="mt-2 text-xs text-[#52606B]">
+            <p className="mt-2 text-xs text-[#5C574C]">
               Accédez au tableau de bord, au suivi des commandes et à la gestion du catalogue LivresPro.tn.
             </p>
           </div>
 
           {/* Tab Selector */}
-          <div className="mt-6 grid grid-cols-2 rounded-lg bg-[#F8F5EE] p-1 border border-[#172C41]/10">
+          <div className="mt-6 grid grid-cols-2 rounded-xl bg-[#F6F1E7] p-1 border border-[#141E33]/10">
             <button
               type="button"
               onClick={() => {
@@ -146,10 +146,10 @@ export default function Login() {
                 setError(null);
                 setSuccessMsg(null);
               }}
-              className={`flex items-center justify-center gap-2 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition ${
+              className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
                 activeTab === "login"
-                  ? "bg-white text-[#172C41] shadow-sm"
-                  : "text-[#52606B] hover:text-[#172C41]"
+                  ? "bg-white text-[#141E33] shadow-sm"
+                  : "text-[#5C574C] hover:text-[#141E33]"
               }`}
             >
               <KeyRound className="h-3.5 w-3.5" />
@@ -162,10 +162,10 @@ export default function Login() {
                 setError(null);
                 setSuccessMsg(null);
               }}
-              className={`flex items-center justify-center gap-2 py-2 text-xs font-bold uppercase tracking-wider rounded-md transition ${
+              className={`flex items-center justify-center gap-2 py-2.5 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
                 activeTab === "register"
-                  ? "bg-white text-[#172C41] shadow-sm"
-                  : "text-[#52606B] hover:text-[#172C41]"
+                  ? "bg-white text-[#141E33] shadow-sm"
+                  : "text-[#5C574C] hover:text-[#141E33]"
               }`}
             >
               <UserPlus className="h-3.5 w-3.5" />
@@ -202,15 +202,15 @@ export default function Login() {
                     placeholder="admin@livrespro.tn"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
-                    className="border-[#172C41]/20 bg-[#F8F5EE] pl-9"
+                    className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
                   />
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[#52606B]" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[#5C574C]" />
                 </div>
               </div>
 
               <div>
                 <div className="flex items-center justify-between">
-                  <Label className="text-xs font-bold uppercase tracking-wider text-[#172C41]">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">
                     Mot de passe
                   </Label>
                 </div>
@@ -221,18 +221,16 @@ export default function Login() {
                     placeholder="••••••••••••"
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
-                    className="border-[#172C41]/20 bg-[#F8F5EE] pl-9"
+                    className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
                   />
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-[#52606B]" />
+                  <Lock className="absolute left-3 top-3 h-4 w-4 text-[#5C574C]" />
                 </div>
               </div>
-
-
 
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#172C41] py-5 text-xs font-extrabold uppercase tracking-widest text-[#F8F5EE] hover:bg-[#263f58]"
+                className="w-full rounded-xl bg-[#141E33] py-5 text-xs font-extrabold uppercase tracking-widest text-[#F6F1E7] hover:bg-[#BC3B2C] shadow-md transition-all"
               >
                 {loading ? "Connexion en cours…" : "Se connecter"}
               </Button>
@@ -243,7 +241,7 @@ export default function Login() {
           {activeTab === "register" && (
             <form onSubmit={handleRegisterSubmit} className="mt-6 space-y-4">
               <div>
-                <Label className="text-xs font-bold uppercase tracking-wider text-[#172C41]">
+                <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">
                   Nom et Prénom
                 </Label>
                 <div className="relative mt-1">
@@ -253,14 +251,14 @@ export default function Login() {
                     placeholder="Walid Kallel"
                     value={registerName}
                     onChange={(e) => setRegisterName(e.target.value)}
-                    className="border-[#172C41]/20 bg-[#F8F5EE] pl-9"
+                    className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
                   />
-                  <User className="absolute left-3 top-3 h-4 w-4 text-[#52606B]" />
+                  <User className="absolute left-3 top-3 h-4 w-4 text-[#5C574C]" />
                 </div>
               </div>
 
               <div>
-                <Label className="text-xs font-bold uppercase tracking-wider text-[#172C41]">
+                <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">
                   Adresse Email
                 </Label>
                 <div className="relative mt-1">
@@ -270,15 +268,15 @@ export default function Login() {
                     placeholder="votre.email@exemple.tn"
                     value={registerEmail}
                     onChange={(e) => setRegisterEmail(e.target.value)}
-                    className="border-[#172C41]/20 bg-[#F8F5EE] pl-9"
+                    className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
                   />
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[#52606B]" />
+                  <Mail className="absolute left-3 top-3 h-4 w-4 text-[#5C574C]" />
                 </div>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <Label className="text-xs font-bold uppercase tracking-wider text-[#172C41]">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">
                     Mot de passe
                   </Label>
                   <div className="relative mt-1">
@@ -288,14 +286,14 @@ export default function Login() {
                       placeholder="Min. 6 caractères"
                       value={registerPassword}
                       onChange={(e) => setRegisterPassword(e.target.value)}
-                      className="border-[#172C41]/20 bg-[#F8F5EE] pl-9"
+                      className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
                     />
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#52606B]" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#5C574C]" />
                   </div>
                 </div>
 
                 <div>
-                  <Label className="text-xs font-bold uppercase tracking-wider text-[#172C41]">
+                  <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">
                     Confirmation
                   </Label>
                   <div className="relative mt-1">
@@ -305,9 +303,9 @@ export default function Login() {
                       placeholder="Confirmer"
                       value={registerConfirm}
                       onChange={(e) => setRegisterConfirm(e.target.value)}
-                      className="border-[#172C41]/20 bg-[#F8F5EE] pl-9"
+                      className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
                     />
-                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#52606B]" />
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-[#5C574C]" />
                   </div>
                 </div>
               </div>
@@ -315,7 +313,7 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#C94E36] py-5 text-xs font-extrabold uppercase tracking-widest text-white hover:bg-[#A93D2D]"
+                className="btn-terracotta w-full rounded-xl py-5 text-xs font-extrabold uppercase tracking-widest text-white shadow-md disabled:opacity-50"
               >
                 {loading ? "Création du compte…" : "Créer mon compte"}
               </Button>

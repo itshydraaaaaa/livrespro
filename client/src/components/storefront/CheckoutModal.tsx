@@ -91,15 +91,15 @@ export function CheckoutModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="fixed inset-0 bg-[#172C41]/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-[#141E33]/60 backdrop-blur-sm transition-opacity"
         onClick={handleClose}
       />
 
-      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-sm border border-[#172C41]/20 bg-[#F8F5EE] p-6 text-[#172C41] shadow-2xl sm:p-9">
+      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#141E33]/15 bg-[#F6F1E7] p-6 text-[#141E33] shadow-2xl sm:p-9">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-[#172C41]/15 text-[#172C41] hover:bg-[#172C41] hover:text-[#F8F5EE]"
+          className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-[#141E33]/15 text-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7] transition-colors"
           aria-label="Fermer"
         >
           <X className="h-4 w-4" />
@@ -111,18 +111,18 @@ export function CheckoutModal() {
               <CheckCircle2 className="h-8 w-8" />
             </span>
             <p className="eyebrow mt-5 text-emerald-800">Commande Confirmée</p>
-            <h2 className="mt-2 font-display text-4xl">Merci pour votre commande !</h2>
-            <p className="mt-3 text-base font-semibold text-[#172C41]">
-              Référence de commande : <span className="text-[#C94E36]">{createdOrder.orderNumber}</span>
+            <h2 className="mt-2 font-display text-4xl text-[#141E33]">Merci pour votre commande !</h2>
+            <p className="mt-3 text-base font-semibold text-[#141E33]">
+              Référence de commande : <span className="text-[#BC3B2C]">{createdOrder.orderNumber}</span>
             </p>
-            <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[#52606B]">
+            <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-[#5C574C]">
               Nous avons bien enregistré votre commande. Notre équipe vous contactera au{" "}
               <strong>{phone}</strong> pour confirmer l’adresse de livraison avant l’expédition.
             </p>
 
-            <div className="mt-8 rounded-sm border border-[#172C41]/10 bg-white p-5 text-left text-xs text-[#52606B]">
-              <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-[#172C41]">
-                <Truck className="h-4 w-4 text-[#C94E36]" />
+            <div className="mt-8 rounded-xl border border-[#141E33]/10 bg-white p-5 text-left text-xs text-[#5C574C] shadow-xs">
+              <div className="flex items-center gap-2 font-bold uppercase tracking-wider text-[#141E33]">
+                <Truck className="h-4 w-4 text-[#BC3B2C]" />
                 Modalités de réception
               </div>
               <p className="mt-2">
@@ -132,41 +132,41 @@ export function CheckoutModal() {
 
             <Button
               onClick={handleClose}
-              className="mt-8 bg-[#172C41] px-8 py-5 text-xs font-extrabold uppercase tracking-widest text-[#F8F5EE] hover:bg-[#263f58]"
+              className="mt-8 bg-[#141E33] px-8 py-5 text-xs font-extrabold uppercase tracking-widest text-[#F6F1E7] hover:bg-[#BC3B2C] rounded-full shadow-md transition-all"
             >
               Continuer mes découvertes
             </Button>
           </div>
         ) : (
           <div>
-            <div className="border-b border-[#172C41]/10 pb-5">
-              <p className="eyebrow text-[#C94E36]">Paiement à la livraison · Tunisie</p>
-              <h2 className="mt-2 font-display text-3xl sm:text-4xl">Finaliser votre commande</h2>
-              <p className="mt-2 text-xs text-[#52606B]">
+            <div className="border-b border-[#141E33]/10 pb-5">
+              <p className="eyebrow text-[#BC3B2C]">Paiement à la livraison · Tunisie</p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl text-[#141E33]">Finaliser votre commande</h2>
+              <p className="mt-2 text-xs text-[#5C574C]">
                 Renseignez vos coordonnées pour recevoir votre sélection de livres professionnels.
               </p>
 
               {/* RestCountries Official Tunisia Badge */}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-sm border border-[#C94E36]/20 bg-[#F1EBE0] p-3 text-xs shadow-xs">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#BC3B2C]/20 bg-[#E9DFCF]/60 p-3.5 text-xs shadow-xs">
                 <div className="flex items-center gap-2.5">
                   <span className="text-2xl" role="img" aria-label="Drapeau de la Tunisie">
                     {tunisia?.flag?.emoji || "🇹🇳"}
                   </span>
                   <div>
-                    <div className="flex items-center gap-1.5 font-bold text-[#172C41]">
+                    <div className="flex items-center gap-1.5 font-bold text-[#141E33]">
                       <span>{tunisia?.name?.french || "Tunisie"}</span>
-                      <span className="text-sm text-[#C94E36] font-normal">({tunisia?.name?.arabic || "تونس"})</span>
-                      <span className="rounded bg-[#172C41]/10 px-1.5 py-0.5 text-[10px] uppercase font-mono font-semibold text-[#172C41]">
+                      <span className="text-sm text-[#BC3B2C] font-normal">({tunisia?.name?.arabic || "تونس"})</span>
+                      <span className="rounded bg-[#141E33]/10 px-1.5 py-0.5 text-[10px] uppercase font-mono font-semibold text-[#141E33]">
                         {tunisia?.alpha2 || "TN"}
                       </span>
                     </div>
-                    <p className="text-[11px] text-[#52606B]">
+                    <p className="text-[11px] text-[#5C574C]">
                       Livraison express COD sur les 24 gouvernorats · Devise : {tunisia?.currency?.code || "TND"} ({tunisia?.currency?.symbol || "DT"})
                     </p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#172C41]">
-                  <Truck className="h-3.5 w-3.5 text-[#C94E36]" />
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#141E33]">
+                  <Truck className="h-3.5 w-3.5 text-[#BC3B2C]" />
                   <span>Expédié depuis {tunisia?.capital || "Tunis"} ({tunisia?.timezone || "UTC+01:00"})</span>
                 </div>
               </div>
@@ -328,36 +328,36 @@ export function CheckoutModal() {
                 </div>
               </div>
 
-              <div className="rounded-sm border border-[#C94E36]/30 bg-[#F9E5E0] p-4 text-xs">
+              <div className="rounded-xl border border-[#BC3B2C]/30 bg-[#E9DFCF]/40 p-4 text-xs">
                 <label className="flex items-start gap-3 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={isEducator}
                     onChange={(e) => setIsEducator(e.target.checked)}
-                    className="mt-0.5"
+                    className="mt-0.5 accent-[#BC3B2C]"
                   />
                   <span>
-                    <strong className="text-[#C94E36] flex items-center gap-1.5">
+                    <strong className="text-[#BC3B2C] flex items-center gap-1.5 font-bold">
                       <GraduationCap className="h-4 w-4" />
                       Je suis enseignant ou formateur (Offre Educator).
                     </strong>
-                    <span className="block mt-1 text-[#52606B]">
+                    <span className="block mt-1 text-[#5C574C]">
                       Je souhaite bénéficier, sous réserve de justificatif, de l’avantage Educator −50 % sur l’Educator’s Guide numérique.
                     </span>
                   </span>
                 </label>
               </div>
 
-              <div className="border-t border-[#172C41]/10 pt-4">
-                <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-[#52606B]">
-                  <Truck className="h-4 w-4 text-[#C94E36]" />
+              <div className="border-t border-[#141E33]/10 pt-4">
+                <div className="mb-4 flex items-center gap-2 text-xs font-semibold text-[#5C574C]">
+                  <Truck className="h-4 w-4 text-[#BC3B2C]" />
                   Paiement sécurisé en espèces à la livraison. Aucun paiement en ligne requis.
                 </div>
 
                 <Button
                   type="submit"
                   disabled={createOrderMutation.isPending || !cart?.items.length}
-                  className="w-full bg-[#C94E36] py-6 text-xs font-extrabold uppercase tracking-widest text-white hover:bg-[#A93D2D]"
+                  className="btn-terracotta w-full rounded-full py-6 text-xs font-extrabold uppercase tracking-widest text-white shadow-md disabled:opacity-50"
                 >
                   {createOrderMutation.isPending
                     ? "Enregistrement en cours…"

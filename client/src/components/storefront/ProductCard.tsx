@@ -14,32 +14,32 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
   return (
     <article className="group animate-rise" style={{ animationDelay: `${index * 65}ms` }}>
-      <Link href={`/livres/${product.handle}`} className="block focus:outline-none">
-        <div className="relative mb-5 aspect-[3/4] overflow-hidden rounded-sm bg-[#E7E0D4] shadow-[0_22px_38px_-29px_rgba(23,44,65,0.8)] transition duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_28px_45px_-25px_rgba(23,44,65,0.45)]">
+      <Link href={`/livres/${product.handle}`} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BC3B2C] rounded-xl">
+        <div className="relative mb-5 aspect-[3/4] overflow-hidden rounded-xl bg-[#E9DFCF] shadow-[0_16px_32px_-12px_rgba(20,30,51,0.22)] ring-1 ring-[#141E33]/08 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1.5 group-hover:shadow-[0_24px_44px_-10px_rgba(20,30,51,0.3)]">
           {image?.url ? (
             <img
               src={image.url}
               alt={image.altText || `Couverture de ${product.title}`}
-              className="h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]"
+              className="h-full w-full object-cover transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(145deg,#eee7db,#d8cfbf)]">
-              <BookOpen className="h-10 w-10 text-[#172C41]/35" strokeWidth={1.2} />
+            <div className="flex h-full w-full items-center justify-center bg-[linear-gradient(145deg,#F6F1E7,#E9DFCF)]">
+              <BookOpen className="h-10 w-10 text-[#141E33]/30" strokeWidth={1.2} />
             </div>
           )}
-          <span className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-[#F8F5EE] text-[#172C41] opacity-0 shadow-sm transition duration-200 group-hover:opacity-100">
+          <span className="absolute right-3.5 top-3.5 grid h-9 w-9 place-items-center rounded-full bg-[#F6F1E7]/90 text-[#141E33] opacity-0 shadow-md backdrop-blur-sm transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:scale-105">
             <ArrowUpRight className="h-4 w-4" />
           </span>
         </div>
-        <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#C94E36]">
+        <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#BC3B2C]">
           {productKind}
         </p>
-        <h3 className="font-display text-[25px] leading-[1.05] text-[#172C41] transition-colors group-hover:text-[#C94E36]">
+        <h3 className="font-display text-[25px] leading-[1.05] text-[#141E33] transition-colors duration-300 group-hover:text-[#BC3B2C]">
           {product.title}
         </h3>
-        <div className="mt-3 flex items-center justify-between gap-3 text-sm text-[#52606B]">
+        <div className="mt-3 flex items-center justify-between gap-3 text-sm text-[#5C574C]">
           <span className="truncate">{product.vendor || "Édition indépendante"}</span>
-          <span className="shrink-0 font-semibold text-[#172C41]">
+          <span className="shrink-0 font-semibold text-[#141E33]">
             {formatMoney(product.priceRange.min)}
           </span>
         </div>

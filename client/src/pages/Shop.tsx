@@ -3,6 +3,7 @@ import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { trpc } from "@/lib/trpc";
 import { BookOpen, SlidersHorizontal } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
 import { useMemo, useState } from "react";
 
 export default function Shop() {
@@ -18,29 +19,29 @@ export default function Shop() {
   );
 
   return (
-    <div className="min-h-screen bg-[#F8F5EE] text-[#172C41]">
+    <div className="min-h-screen bg-[#F6F1E7] text-[#141E33] selection:bg-[#BC3B2C]/20 selection:text-[#141E33]">
       <SiteHeader />
       <main>
-        <section className="overflow-hidden border-b border-[#172C41]/10 bg-[#E9E2D7]">
+        <section className="overflow-hidden border-b border-[#141E33]/08 bg-[#E9DFCF]">
           <div className="container grid gap-8 py-14 lg:grid-cols-[1fr_0.62fr] lg:py-20">
             <div className="max-w-2xl animate-rise">
-              <p className="eyebrow">La librairie business</p>
-              <h1 className="mt-4 font-display text-[clamp(3.1rem,7vw,6.6rem)] leading-[0.88] tracking-[-0.045em]">
+              <p className="eyebrow text-[#BC3B2C]">La librairie business</p>
+              <h1 className="mt-4 font-display text-[clamp(3.1rem,7vw,6.6rem)] leading-[0.88] tracking-[-0.045em] text-[#141E33]">
                 Lire juste.<br />
-                <em className="font-normal text-[#C94E36]">Décider mieux.</em>
+                <em className="font-normal text-[#BC3B2C]">Décider mieux.</em>
               </h1>
-              <p className="mt-7 max-w-lg text-base leading-7 text-[#52606B]">
+              <p className="mt-7 max-w-lg text-base leading-7 text-[#5C574C]">
                 Explorez les idées et méthodes qui font évoluer une marque, une équipe, une stratégie ou une entreprise.
               </p>
             </div>
-            <div className="relative min-h-[230px] overflow-hidden rounded-[2px] bg-[#172C41]">
+            <div className="relative min-h-[230px] overflow-hidden rounded-xl bg-[#141E33] shadow-xl">
               <img
                 src="/editorial/b2b-launch/audience.jpg"
                 alt="Une sélection de livres business, marketing et management"
-                className="absolute inset-0 h-full w-full object-cover opacity-90 mix-blend-luminosity"
+                className="absolute inset-0 h-full w-full object-cover opacity-90 mix-blend-luminosity transition-transform duration-700 hover:scale-105"
               />
-              <div className="absolute inset-0 bg-[#172C41]/25" />
-              <p className="absolute bottom-7 left-7 max-w-[230px] font-display text-3xl leading-tight text-[#F8F5EE]">
+              <div className="absolute inset-0 bg-[#141E33]/30" />
+              <p className="absolute bottom-7 left-7 max-w-[230px] font-display text-3xl leading-tight text-[#F6F1E7]">
                 « Une bonne idée devient utile quand elle passe à l’action. »
               </p>
             </div>
@@ -48,34 +49,44 @@ export default function Shop() {
         </section>
 
         <section className="container py-12 md:py-16">
-          <div className="flex flex-col justify-between gap-5 border-b border-[#172C41]/12 pb-6 md:flex-row md:items-end">
+          <div className="flex flex-col justify-between gap-5 border-b border-[#141E33]/10 pb-6 md:flex-row md:items-end">
             <div>
-              <p className="eyebrow">Les rayons business</p>
-              <h2 className="mt-3 font-display text-4xl tracking-[-0.03em]">Les idées qui font avancer</h2>
+              <p className="eyebrow text-[#BC3B2C]">Les rayons business</p>
+              <h2 className="mt-3 font-display text-4xl tracking-[-0.03em] text-[#141E33]">Les idées qui font avancer</h2>
             </div>
-            <div className="flex items-center gap-2 text-xs font-bold text-[#52606B]">
-              <SlidersHorizontal className="h-4 w-4 text-[#C94E36]" />
+            <div className="flex items-center gap-2 text-xs font-bold text-[#5C574C]">
+              <SlidersHorizontal className="h-4 w-4 text-[#BC3B2C]" />
               {products.length ? `${visibleProducts.length} titre${visibleProducts.length > 1 ? "s" : ""}` : "Catalogue en préparation"}
             </div>
           </div>
 
           {tags.length > 0 && (
             <div className="mt-6 flex flex-wrap gap-2">
-              {["Tous les livres", ...tags].map(tag => (
-                <button
-                  key={tag}
-                  type="button"
-                  data-pressable
-                  onClick={() => setActiveTag(tag)}
-                  className={`rounded-full border px-4 py-2 text-[10px] font-extrabold uppercase tracking-[0.14em] transition ${
-                    activeTag === tag
-                      ? "border-[#172C41] bg-[#172C41] text-[#F8F5EE]"
-                      : "border-[#172C41]/15 text-[#52606B] hover:border-[#172C41]"
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
+              {["Tous les livres", ...tags].map(tag => {
+                const isActive = activeTag === tag;
+                return (
+                  <button
+                    key={tag}
+                    type="button"
+                    data-pressable
+                    onClick={() => setActiveTag(tag)}
+                    className={`relative rounded-full px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-[0.14em] transition-all duration-300 ${
+                      isActive
+                        ? "text-[#F6F1E7]"
+                        : "border border-[#141E33]/15 bg-white/70 text-[#5C574C] hover:border-[#141E33] hover:text-[#141E33]"
+                    }`}
+                  >
+                    {isActive && (
+                      <motion.span
+                        layoutId="activeFilterPill"
+                        className="absolute inset-0 rounded-full bg-[#141E33] shadow-sm"
+                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                      />
+                    )}
+                    <span className="relative z-10">{tag}</span>
+                  </button>
+                );
+              })}
             </div>
           )}
 
@@ -83,25 +94,34 @@ export default function Shop() {
             <div role="status" aria-label="Chargement du catalogue" className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
               {Array.from({ length: 8 }).map((_, index) => (
                 <div key={index} className="animate-pulse">
-                  <div className="aspect-[3/4] bg-[#E9E2D7]" />
-                  <div className="mt-4 h-3 w-20 bg-[#E9E2D7]" />
-                  <div className="mt-3 h-6 w-4/5 bg-[#E9E2D7]" />
+                  <div className="aspect-[3/4] rounded-xl bg-[#E9DFCF]" />
+                  <div className="mt-4 h-3 w-20 rounded bg-[#E9DFCF]" />
+                  <div className="mt-3 h-6 w-4/5 rounded bg-[#E9DFCF]" />
                 </div>
               ))}
             </div>
           ) : visibleProducts.length ? (
-            <div className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-4">
-              {visibleProducts.map((product, index) => (
-                <ProductCard product={product} index={index} key={product.id} />
-              ))}
-            </div>
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={activeTag}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                className="mt-10 grid grid-cols-2 gap-x-5 gap-y-10 md:grid-cols-3 lg:grid-cols-4"
+              >
+                {visibleProducts.map((product, index) => (
+                  <ProductCard product={product} index={index} key={product.id} />
+                ))}
+              </motion.div>
+            </AnimatePresence>
           ) : (
-            <div className="mt-10 grid place-items-center border border-dashed border-[#172C41]/20 bg-[#FCFAF5] px-6 py-20 text-center">
-              <span className="grid h-14 w-14 place-items-center rounded-full bg-[#E9E2D7] text-[#172C41]">
+            <div className="mt-10 grid place-items-center rounded-2xl border border-dashed border-[#141E33]/20 bg-white p-12 text-center shadow-xs">
+              <span className="grid h-14 w-14 place-items-center rounded-full bg-[#E9DFCF] text-[#141E33]">
                 <BookOpen className="h-6 w-6" strokeWidth={1.4} />
               </span>
-              <h3 className="mt-5 font-display text-3xl">Les rayons business prennent forme.</h3>
-              <p className="mt-3 max-w-md text-sm leading-6 text-[#52606B]">
+              <h3 className="mt-5 font-display text-3xl text-[#141E33]">Les rayons business prennent forme.</h3>
+              <p className="mt-3 max-w-md text-sm leading-6 text-[#5C574C]">
                 {isError
                   ? "Le catalogue business n’est pas disponible pour le moment. Revenez bientôt explorer les premières sélections."
                   : "Les premiers titres de marketing, management et stratégie seront ajoutés ici. Chaque rayon est déjà prêt à les mettre en perspective."}
