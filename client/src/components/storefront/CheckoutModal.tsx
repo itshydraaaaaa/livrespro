@@ -25,12 +25,15 @@ export function CheckoutModal() {
   const [deliveryAddress, setDeliveryAddress] = useState("");
   const [city, setCity] = useState("");
   const [governorate, setGovernorate] = useState("Tunis");
+  const [postalCode, setPostalCode] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
   const [isEducator, setIsEducator] = useState(false);
   const [createdOrder, setCreatedOrder] = useState<{
     orderId: number;
     orderNumber: string;
   } | null>(null);
+
+  const { data: tunisia } = trpc.site.tunisia.useQuery();
 
   const createOrderMutation = trpc.site.orders.create.useMutation({
     onSuccess: (data) => {
@@ -62,10 +65,11 @@ export function CheckoutModal() {
       customerFirstName: firstName,
       customerLastName: lastName,
       customerEmail: email,
-      customerPhone: phone,
+      customerPhone: phone.startsWith("+216") ? phone : `+216 ${phone.trim()}`,
       deliveryAddress,
       city,
       governorate,
+      postalCode: postalCode.trim() || null,
       orderNotes,
       isEducator,
       shippingCost,
@@ -141,6 +145,31 @@ export function CheckoutModal() {
               <p className="mt-2 text-xs text-[#52606B]">
                 Renseignez vos coordonnées pour recevoir votre sélection de livres professionnels.
               </p>
+
+              {/* RestCountries Official Tunisia Badge */}
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-sm border border-[#C94E36]/20 bg-[#F1EBE0] p-3 text-xs shadow-xs">
+                <div className="flex items-center gap-2.5">
+                  <span className="text-2xl" role="img" aria-label="Drapeau de la Tunisie">
+                    {tunisia?.flag?.emoji || "🇹🇳"}
+                  </span>
+                  <div>
+                    <div className="flex items-center gap-1.5 font-bold text-[#172C41]">
+                      <span>{tunisia?.name?.french || "Tunisie"}</span>
+                      <span className="text-sm text-[#C94E36] font-normal">({tunisia?.name?.arabic || "تونس"})</span>
+                      <span className="rounded bg-[#172C41]/10 px-1.5 py-0.5 text-[10px] uppercase font-mono font-semibold text-[#172C41]">
+                        {tunisia?.alpha2 || "TN"}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-[#52606B]">
+                      Livraison express COD sur les 24 gouvernorats · Devise : {tunisia?.currency?.code || "TND"} ({tunisia?.currency?.symbol || "DT"})
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#172C41]">
+                  <Truck className="h-3.5 w-3.5 text-[#C94E36]" />
+                  <span>Expédié depuis {tunisia?.capital || "Tunis"} ({tunisia?.timezone || "UTC+01:00"})</span>
+                </div>
+              </div>
             </div>
 
             {/* Cart summary strip */}
@@ -196,14 +225,20 @@ export function CheckoutModal() {
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <Label className="text-xs font-bold uppercase tracking-wider">Téléphone (joignable) *</Label>
-                  <Input
-                    required
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="21 000 000"
-                    className="mt-1 border-[#172C41]/20 bg-white"
-                  />
+                  <div className="relative mt-1 flex rounded-sm border border-[#172C41]/20 bg-white shadow-xs focus-within:border-[#172C41]">
+                    <span className="inline-flex items-center gap-1.5 border-r border-[#172C41]/15 bg-[#F8F5EE] px-2.5 text-xs font-bold text-[#172C41]">
+                      <span>{tunisia?.flag?.emoji || "🇹🇳"}</span>
+                      <span className="font-mono">{tunisia?.callingCode || "+216"}</span>
+                    </span>
+                    <input
+                      required
+                      type="tel"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      placeholder="21 000 000"
+                      className="w-full bg-transparent px-3 py-2 text-sm outline-none"
+                    />
+                  </div>
                 </div>
                 <div>
                   <Label className="text-xs font-bold uppercase tracking-wider">Adresse email *</Label>
@@ -230,7 +265,7 @@ export function CheckoutModal() {
                 />
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid gap-3 sm:grid-cols-3">
                 <div>
                   <Label className="text-xs font-bold uppercase tracking-wider">Gouvernorat *</Label>
                   <select
@@ -277,6 +312,18 @@ export function CheckoutModal() {
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Ex: Les Berges du Lac"
                     className="mt-1 border-[#172C41]/20 bg-white"
+                  />
+                </div>
+                <div>
+                  <Label className="text-xs font-bold uppercase tracking-wider">
+                    Code postal ({tunisia?.postalCode?.format || "####"})
+                  </Label>
+                  <Input
+                    value={postalCode}
+                    maxLength={4}
+                    onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    placeholder="1001"
+                    className="mt-1 border-[#172C41]/20 bg-white font-mono"
                   />
                 </div>
               </div>

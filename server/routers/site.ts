@@ -8,6 +8,7 @@ import {
 } from "../db";
 import { publicProcedure, router } from "../_core/trpc";
 import { persistOrderToSupabase } from "../services/supabase";
+import { fetchTunisiaData } from "../services/restcountries";
 
 const analyticsInput = z.object({
   visitorId: z.string().uuid(),
@@ -102,6 +103,8 @@ export const siteRouter = router({
           delivery_address: input.deliveryAddress,
           city: input.city ?? null,
           governorate: input.governorate ?? null,
+          postal_code: input.postalCode ?? null,
+          order_notes: input.orderNotes ?? null,
           is_educator: input.isEducator ? 1 : 0,
           subtotal: subtotalSum.toFixed(2),
           shipping_cost: shippingVal.toFixed(2),
@@ -224,6 +227,9 @@ export const siteRouter = router({
       } catch {}
       return { recorded: true };
     }),
+  }),
+  tunisia: publicProcedure.query(async () => {
+    return await fetchTunisiaData();
   }),
 });
 

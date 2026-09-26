@@ -59,7 +59,14 @@ export function SiteFooter() {
       </div>
 
       <div className="container flex flex-col items-center justify-between gap-4 border-t border-white/10 py-5 text-[10px] font-bold uppercase tracking-[.14em] text-white/40 sm:flex-row">
-        <span>© 2026 L’Atelier des Pages · Tous droits réservés.</span>
+        <div className="flex flex-wrap items-center gap-3">
+          <span>© 2026 L’Atelier des Pages · Tous droits réservés.</span>
+          <span>·</span>
+          <span className="flex items-center gap-1.5 text-white/60">
+            <span>🇹🇳</span>
+            <span>Tunisie (TND · Indicatif +216)</span>
+          </span>
+        </div>
         <div className="flex items-center gap-4">
           <Link href="/login" className="hover:text-white">
             Connexion

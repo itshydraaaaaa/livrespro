@@ -10,6 +10,14 @@ export function SiteHeader() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-[#172C41]/10 bg-[#F8F5EE]/95 backdrop-blur-md">
+      {/* Top Tunisia Delivery Strip */}
+      <div className="border-b border-[#172C41]/10 bg-[#172C41] px-4 py-1 text-center text-[10px] font-semibold tracking-wider text-[#F8F5EE]/90">
+        <span className="flex items-center justify-center gap-2">
+          <span>🇹🇳</span>
+          <span>Livraison express COD sur les 24 gouvernorats de Tunisie · Paiement à la réception</span>
+        </span>
+      </div>
+
       <div className="container flex h-[72px] items-center justify-between gap-4">
         <Link href="/" aria-label="Accueil de L’Atelier des Pages" className="shrink-0">
           <BrandMark />
