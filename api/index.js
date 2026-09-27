@@ -2081,7 +2081,7 @@ function createExpressApp() {
 }
 var app = createExpressApp();
 
-// api/index.ts
+// server/serverless.ts
 function handler(req, res) {
   try {
     return app(req, res);
