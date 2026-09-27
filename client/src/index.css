@@ -274,3 +274,13 @@
     animation: none !important;
   }
 }
+
+/* DRM & Anti-Screen Capture Print Rules */
+@media print {
+  #sommaire,
+  canvas {
+    display: none !important;
+    visibility: hidden !important;
+  }
+}
+

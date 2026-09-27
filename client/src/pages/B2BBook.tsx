@@ -1,7 +1,8 @@
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
+import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight } from "lucide-react";
+import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -80,13 +81,25 @@ export default function B2BBook() {
                 Aucun paiement en ligne. Vos coordonnées servent à confirmer et livrer votre commande.
               </p>
             </div>
-            <a
-              href="#commander"
-              className="btn-terracotta mt-8 inline-flex w-full sm:w-auto justify-center items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-white shadow-md"
-            >
-              Commander le livre <ArrowRight className="h-4 w-4" />
-            </a>
+            <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+              <a
+                href="#commander"
+                className="btn-terracotta inline-flex w-full sm:w-auto justify-center items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-white shadow-md"
+              >
+                Commander le livre <ArrowRight className="h-4 w-4" />
+              </a>
+              <a
+                href="#sommaire"
+                className="glass-panel inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] hover:bg-white transition shadow-xs"
+              >
+                <BookOpen className="h-4 w-4 text-[#BC3B2C]" /> Consulter le sommaire protégé
+              </a>
+            </div>
           </div>
+        </section>
+
+        <section className="container py-8">
+          <ProtectedBookTableOfContents />
         </section>
 
         <section className="border-y border-[#141E33]/10 bg-white py-16">

@@ -1,4 +1,5 @@
 import { ProductCard } from "@/components/storefront/ProductCard";
+import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trackBehavior } from "@/components/AnalyticsManager";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
@@ -133,6 +134,12 @@ export default function ProductDetail() {
                 <p className="mt-3 text-xs leading-5 text-[#5C574C]">Version numérique · avec achat du livre + statut enseignant/formateur éligible.</p>
               </div>
             </div>
+          </section>
+        )}
+
+        {(product.title.toLowerCase().includes("b2b brand") || product.handle.includes("b2b")) && (
+          <section className="container py-10 md:py-16">
+            <ProtectedBookTableOfContents />
           </section>
         )}
 

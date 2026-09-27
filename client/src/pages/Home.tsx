@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { AnimatedCounter } from "@/components/storefront/AnimatedCounter";
+import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { ArrowRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
@@ -517,6 +518,11 @@ export default function Home() {
               Entreprises et organisations présentées dans les études de cas de l’édition tunisienne.
             </p>
           </div>
+        </section>
+
+        {/* SECTION: SOMMAIRE & STRUCTURE DE L'OUVRAGE (LECTURE PROTÉGÉE) */}
+        <section id="decouvrir" className="container py-12 md:py-16">
+          <ProtectedBookTableOfContents />
         </section>
 
         {/* SECTION 8: EDUCATOR OFFER */}
