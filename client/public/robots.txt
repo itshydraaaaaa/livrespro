@@ -1,0 +1,18 @@
+# LivresPro.tn Robots configuration
+User-agent: *
+Allow: /
+Allow: /librairie
+Allow: /livres/
+Allow: /educators
+Allow: /privacy
+Allow: /terms
+
+# Disallow back-office and internal endpoints
+Disallow: /admin
+Disallow: /admin/
+Disallow: /api/
+Disallow: /mon-compte
+Disallow: /login
+
+# Sitemap location
+Sitemap: https://livrespro.vercel.app/sitemap.xml

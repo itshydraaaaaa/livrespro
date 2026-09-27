@@ -1,52 +1,47 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { AlertCircle, Home } from "lucide-react";
-import { useLocation } from "wouter";
+import { ArrowLeft, BookOpen, Compass } from "lucide-react";
+import { Link } from "wouter";
 
 export default function NotFound() {
-  const [, setLocation] = useLocation();
-
-  const handleGoHome = () => {
-    setLocation("/");
-  };
-
   return (
-    <div className="min-h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-slate-100">
-      <Card className="w-full max-w-lg mx-4 shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-        <CardContent className="pt-8 pb-8 text-center">
-          <div className="flex justify-center mb-6">
-            <div className="relative">
-              <div className="absolute inset-0 bg-red-100 rounded-full animate-pulse" />
-              <AlertCircle className="relative h-16 w-16 text-red-500" />
-            </div>
-          </div>
+    <div className="min-h-screen w-full flex items-center justify-center bg-[#F6F1E7] p-4 text-[#141E33] antialiased">
+      <div className="relative w-full max-w-lg overflow-hidden rounded-3xl border border-white/60 bg-white/70 p-8 md:p-12 text-center shadow-2xl backdrop-blur-xl">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-[#BC3B2C]/10 text-[#BC3B2C] shadow-inner mb-6">
+          <Compass className="h-8 w-8 animate-spin-slow" />
+        </div>
 
-          <h1 className="text-4xl font-bold text-slate-900 mb-2">404</h1>
+        <p className="text-xs font-extrabold uppercase tracking-[0.2em] text-[#BC3B2C]">
+          Erreur 404 · Page introuvable
+        </p>
 
-          <h2 className="text-xl font-semibold text-slate-700 mb-4">
-            Page Not Found
-          </h2>
+        <h1 className="mt-3 font-display text-3xl md:text-4xl font-normal tracking-tight text-[#141E33]">
+          Cette page n’existe pas ou a été déplacée
+        </h1>
 
-          <p className="text-slate-600 mb-8 leading-relaxed">
-            Sorry, the page you are looking for doesn't exist.
-            <br />
-            It may have been moved or deleted.
-          </p>
+        <p className="mt-4 text-sm md:text-base leading-relaxed text-[#5C574C]">
+          L'ouvrage ou la section que vous cherchez n'est pas accessible à cette adresse. Vous pouvez explorer notre sélection business ou regagner l'accueil.
+        </p>
 
-          <div
-            id="not-found-button-group"
-            className="flex flex-col sm:flex-row gap-3 justify-center"
-          >
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <Link href="/" className="w-full sm:w-auto">
             <Button
-              onClick={handleGoHome}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg"
+              className="w-full h-12 min-h-[44px] rounded-full bg-[#141E33] px-6 text-xs font-bold uppercase tracking-wider text-white shadow-md transition-all hover:bg-[#BC3B2C]"
             >
-              <Home className="w-4 h-4 mr-2" />
-              Go Home
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Retour à l’accueil
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </Link>
+          <Link href="/librairie" className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              className="w-full h-12 min-h-[44px] rounded-full border-[#141E33]/20 bg-transparent px-6 text-xs font-bold uppercase tracking-wider text-[#141E33] transition-all hover:bg-white/80 hover:text-[#BC3B2C]"
+            >
+              <BookOpen className="mr-2 h-4 w-4" />
+              La Librairie
+            </Button>
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

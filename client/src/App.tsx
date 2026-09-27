@@ -17,6 +17,8 @@ import Shop from "./pages/Shop";
 import Educators from "./pages/Educators";
 import B2BBook from "./pages/B2BBook";
 import Account from "./pages/Account";
+import Privacy from "./pages/Privacy";
+import Terms from "./pages/Terms";
 
 function Router() {
   return (
@@ -28,6 +30,11 @@ function Router() {
       <Route path="/connexion" component={Login} />
       <Route path="/mon-compte" component={Account} />
       <Route path="/profil" component={Account} />
+      <Route path="/privacy" component={Privacy} />
+      <Route path="/politique-de-confidentialite" component={Privacy} />
+      <Route path="/terms" component={Terms} />
+      <Route path="/conditions-generales" component={Terms} />
+      <Route path="/conditions-de-vente" component={Terms} />
       <Route path="/livres/b2b-brand-management" component={B2BBook} />
       <Route path="/livres/:handle" component={ProductDetail} />
       

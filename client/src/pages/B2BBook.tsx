@@ -41,18 +41,20 @@ export default function B2BBook() {
             <div className="col-span-3 overflow-hidden rounded-xl shadow-2xl">
               <img
                 src={A + "book-angle.jpg"}
+                fetchPriority="high"
+                decoding="async"
                 className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
                 alt="B2B Brand Management angle"
               />
             </div>
             <div className="overflow-hidden rounded-lg shadow-sm">
-              <img src={A + "book-front.jpg"} className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management front" />
+              <img src={A + "book-front.jpg"} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management front" />
             </div>
             <div className="overflow-hidden rounded-lg shadow-sm">
-              <img src={A + "book-back.jpg"} className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management back" />
+              <img src={A + "book-back.jpg"} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management back" />
             </div>
             <div className="overflow-hidden rounded-lg shadow-sm">
-              <img src={A + "media.jpg"} className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management media" />
+              <img src={A + "media.jpg"} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management media" />
             </div>
           </div>
 
@@ -112,6 +114,8 @@ export default function B2BBook() {
                   <img
                     src={`/editorial/case-study-logos/${x.logo}`}
                     alt={`Logo ${x.name}`}
+                    loading="lazy"
+                    decoding="async"
                     className="h-14 w-full object-contain mix-blend-multiply"
                   />
                   <span className="text-[10px] font-extrabold uppercase tracking-[.12em] text-[#5C574C]">

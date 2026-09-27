@@ -38,6 +38,8 @@ export default function Educators() {
             <div className="overflow-hidden rounded-xl shadow-xl">
               <img
                 src={`${A}book-front.jpg`}
+                loading="lazy"
+                decoding="async"
                 className="h-[520px] w-full object-cover transition-transform duration-700 hover:scale-105"
                 alt="B2B Brand Management"
               />

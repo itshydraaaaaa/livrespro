@@ -253,6 +253,8 @@ export default function Home() {
                 <img
                   src={`${A}book-angle.jpg`}
                   alt="B2B Brand Management Tunisia Edition"
+                  fetchPriority="high"
+                  decoding="async"
                   className="h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
                 />
                 {/* Floating Glassmorphic Pill on Book Cover */}
@@ -353,6 +355,8 @@ export default function Home() {
               <img
                 src={`${A}audience.jpg`}
                 alt="Cérémonie de lancement B2B Brand Management"
+                loading="lazy"
+                decoding="async"
                 className="aspect-[16/7] w-full object-cover transition-transform duration-700 hover:scale-105"
               />
             </div>
@@ -455,6 +459,8 @@ export default function Home() {
               <img
                 src={`${A}recognition.jpg`}
                 alt="Lancement et reconnaissance autour du livre"
+                loading="lazy"
+                decoding="async"
                 className="aspect-[4/3] w-full rounded-xl object-cover transition-transform duration-700 hover:scale-105"
               />
             </motion.div>
@@ -496,6 +502,8 @@ export default function Home() {
                   <img
                     src={`/editorial/case-study-logos/${x.logo}`}
                     alt={`Logo ${x.name}`}
+                    loading="lazy"
+                    decoding="async"
                     className="h-14 w-full object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105"
                   />
                   <span className="text-[10px] font-extrabold uppercase tracking-[.12em] text-[#5C574C]">
@@ -547,6 +555,8 @@ export default function Home() {
                 <img
                   src={`${A}book-front.jpg`}
                   alt="B2B Brand Management"
+                  loading="lazy"
+                  decoding="async"
                   className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                 />
               </div>
@@ -574,6 +584,8 @@ export default function Home() {
             <div className="overflow-hidden rounded-2xl shadow-md ring-1 ring-[#141E33]/08">
               <img
                 src={`${A}speaker.jpg`}
+                loading="lazy"
+                decoding="async"
                 className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
                 alt="Prise de parole au lancement"
               />
@@ -581,6 +593,8 @@ export default function Home() {
             <div className="overflow-hidden rounded-2xl shadow-md ring-1 ring-[#141E33]/08">
               <img
                 src={`${A}community.jpg`}
+                loading="lazy"
+                decoding="async"
                 className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
                 alt="Communauté autour du lancement"
               />
@@ -588,6 +602,8 @@ export default function Home() {
             <div className="overflow-hidden rounded-2xl shadow-md ring-1 ring-[#141E33]/08">
               <img
                 src={`${A}media.jpg`}
+                loading="lazy"
+                decoding="async"
                 className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
                 alt="Interview média lors du lancement"
               />

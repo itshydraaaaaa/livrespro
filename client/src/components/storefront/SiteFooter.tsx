@@ -63,13 +63,17 @@ export function SiteFooter() {
             <span>Tunisie (TND · Indicatif +216)</span>
           </span>
         </div>
-        <div className="flex items-center gap-4">
-          <Link href="/login" className="transition-colors hover:text-white">
-            Connexion
+        <div className="flex flex-wrap items-center gap-3">
+          <Link href="/terms" className="transition-colors hover:text-white">
+            CGV & Mentions Légales
+          </Link>
+          <span>·</span>
+          <Link href="/privacy" className="transition-colors hover:text-white">
+            Confidentialité
           </Link>
           <span>·</span>
           <Link href="/login" className="transition-colors hover:text-white">
-            Inscription
+            Connexion
           </Link>
           <span>·</span>
           <Link href="/mon-compte" className="transition-colors hover:text-white">

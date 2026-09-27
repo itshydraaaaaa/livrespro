@@ -28,6 +28,7 @@ export function CheckoutModal() {
   const [postalCode, setPostalCode] = useState("");
   const [orderNotes, setOrderNotes] = useState("");
   const [isEducator, setIsEducator] = useState(false);
+  const [honeypot, setHoneypot] = useState("");
   const [createdOrder, setCreatedOrder] = useState<{
     orderId: number;
     orderNumber: string;
@@ -56,8 +57,21 @@ export function CheckoutModal() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (honeypot) {
+      clearCart();
+      closeCheckout();
+      return;
+    }
+
     if (!cart?.items.length) {
       toast.error("Votre sélection est vide.");
+      return;
+    }
+
+    const digitsOnly = phone.replace(/\D/g, "");
+    const nationalDigits = digitsOnly.startsWith("216") && digitsOnly.length === 11 ? digitsOnly.slice(3) : digitsOnly;
+    if (nationalDigits.length < 8) {
+      toast.error("Veuillez saisir un numéro de téléphone tunisien valide à 8 chiffres.");
       return;
     }
 
@@ -199,6 +213,17 @@ export function CheckoutModal() {
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-4">
+              <input
+                type="text"
+                name="b2b_company_verification"
+                value={honeypot}
+                onChange={(e) => setHoneypot(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                className="hidden"
+                aria-hidden="true"
+                style={{ display: "none" }}
+              />
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
                   <Label className="text-xs font-bold uppercase tracking-wider">Prénom *</Label>

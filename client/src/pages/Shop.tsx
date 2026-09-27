@@ -40,6 +40,8 @@ export default function Shop() {
               <img
                 src="/editorial/b2b-launch/audience.jpg"
                 alt="Une sélection de livres business, marketing et management"
+                loading="lazy"
+                decoding="async"
                 className="absolute inset-0 h-full w-full object-cover opacity-90 mix-blend-luminosity transition-transform duration-700 hover:scale-105"
               />
               <div className="absolute inset-0 bg-[#141E33]/30" />

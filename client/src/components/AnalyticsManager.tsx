@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { ShieldCheck, X } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "wouter";
+import { Link, useLocation } from "wouter";
 
 export type BehavioralEvent = "page_view" | "view_book" | "add_to_cart" | "initiate_checkout";
 
@@ -115,7 +115,8 @@ export function AnalyticsManager() {
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button type="button" size="sm" onClick={() => setChoice("accepted")} className="bg-[#C94E36] text-white hover:bg-[#A93D2D]">Accepter</Button>
             <Button type="button" size="sm" variant="outline" onClick={() => setChoice("rejected")} className="border-[#172C41]/20 bg-transparent">Refuser</Button>
-            <button type="button" onClick={() => setShowDetails(value => !value)} className="text-xs font-semibold text-[#52606B] underline underline-offset-4">{showDetails ? "Réduire" : "En savoir plus"}</button>
+            <button type="button" onClick={() => setShowDetails(value => !value)} className="text-xs font-semibold text-[#52606B] underline underline-offset-4">{showDetails ? "Réduire" : "Détails"}</button>
+            <Link href="/privacy" className="text-xs font-semibold text-[#52606B] underline underline-offset-4">Politique de confidentialité</Link>
             <button type="button" onClick={() => setChoice("rejected")} className="ml-auto text-[#52606B]" aria-label="Fermer et refuser"><X className="h-4 w-4" /></button>
           </div>
         </div>

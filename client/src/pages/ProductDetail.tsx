@@ -80,7 +80,7 @@ export default function ProductDetail() {
             <div className="flex justify-center rounded-2xl bg-[#E9DFCF] px-8 py-10 shadow-md md:px-12">
               <div className="w-full max-w-[440px] overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-[#141E33]/10">
                 {mainImage?.url ? (
-                  <img src={mainImage.url} alt={mainImage.altText || `Couverture de ${product.title}`} className="w-full object-cover transition-transform duration-700 hover:scale-105" />
+                  <img src={mainImage.url} alt={mainImage.altText || `Couverture de ${product.title}`} fetchPriority="high" decoding="async" className="w-full object-cover transition-transform duration-700 hover:scale-105" />
                 ) : (
                   <div className="aspect-[3/4] grid place-items-center bg-[#E9DFCF]">
                     <BookOpen className="h-12 w-12 text-[#141E33]/30" />
