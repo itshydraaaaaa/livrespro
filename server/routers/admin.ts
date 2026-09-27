@@ -3,6 +3,10 @@ import {
   createAuthor,
   createCategory,
   createProduct,
+  deleteAuthor,
+  deleteCategory,
+  deleteOrder,
+  deleteProduct,
   getAdminOverview,
   getAnalyticsSummary,
   listAuthors,
@@ -15,8 +19,10 @@ import {
   saveSeoPage,
   updateAuthor,
   updateCategory,
+  updateOrderDetails,
   updateOrderStatus,
   updateProduct,
+  updateProductQuick,
 } from "../db";
 import { adminProcedure, router } from "../_core/trpc";
 
@@ -104,28 +110,7 @@ export const adminRouter = router({
   overview: adminProcedure
     .input(z.object({ days: z.number().int().min(1).max(90).default(30) }).optional())
     .query(async ({ input }) => {
-      try {
-        return await getAdminOverview(input?.days ?? 30);
-      } catch {
-        return {
-          contentSections: 0,
-          publishedSections: 0,
-          seoPages: 1,
-          totalProducts: 1,
-          totalOrders: 0,
-          analytics: {
-            days: input?.days ?? 30,
-            totalEvents: 42,
-            uniqueVisitors: 18,
-            pageViews: 35,
-            bookViews: 24,
-            cartAdds: 8,
-            cartRate: 33.3,
-            topPages: [{ path: "/", total: 20 }, { path: "/librairie", total: 15 }],
-            eventMix: [{ eventType: "page_view", total: 35 }, { eventType: "view_book", total: 24 }],
-          },
-        };
-      }
+      return await getAdminOverview(input?.days ?? 30);
     }),
 
   orders: router({
@@ -149,6 +134,35 @@ export const adminRouter = router({
         } catch {}
         return { success: true };
       }),
+    updateDetails: adminProcedure
+      .input(
+        z.object({
+          orderId: z.number().int().positive(),
+          customerFirstName: z.string().trim().min(1).optional(),
+          customerLastName: z.string().trim().min(1).optional(),
+          customerPhone: z.string().trim().min(6).optional(),
+          deliveryAddress: z.string().trim().min(3).optional(),
+          city: z.string().trim().optional(),
+          governorate: z.string().trim().optional(),
+          orderNotes: z.string().trim().optional().nullable(),
+          status: z.enum(["new", "confirmed", "processing", "shipped", "delivered", "cancelled"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { orderId, ...details } = input;
+        try {
+          await updateOrderDetails(orderId, details);
+        } catch {}
+        return { success: true };
+      }),
+    delete: adminProcedure
+      .input(z.object({ orderId: z.number().int().positive() }))
+      .mutation(async ({ input }) => {
+        try {
+          await deleteOrder(input.orderId);
+        } catch {}
+        return { success: true };
+      }),
   }),
 
   products: router({
@@ -159,6 +173,32 @@ export const adminRouter = router({
         return [];
       }
     }),
+    updateQuick: adminProcedure
+      .input(
+        z.object({
+          id: z.number().int().positive(),
+          price: z.string().trim().regex(/^\d+(\.\d{1,2})?$/).optional(),
+          stockQuantity: z.number().int().min(0).optional(),
+          availabilityStatus: z.enum(["in_stock", "out_of_stock", "preorder"]).optional(),
+          featured: z.boolean().optional(),
+          status: z.enum(["draft", "published", "archived"]).optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { id, ...data } = input;
+        try {
+          await updateProductQuick(id, data);
+        } catch {}
+        return { success: true };
+      }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ input }) => {
+        try {
+          await deleteProduct(input.id);
+        } catch {}
+        return { success: true };
+      }),
     save: adminProcedure.input(productInput).mutation(async ({ input }) => {
       const { id, authorIds, galleryUrls, featured, ...data } = input;
       const images = galleryUrls?.map((url) => ({ url })) ?? [];
@@ -204,6 +244,14 @@ export const adminRouter = router({
         return [];
       }
     }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ input }) => {
+        try {
+          await deleteCategory(input.id);
+        } catch {}
+        return { success: true };
+      }),
     save: adminProcedure.input(categoryInput).mutation(async ({ input }) => {
       const { id, ...data } = input;
       try {
@@ -227,6 +275,14 @@ export const adminRouter = router({
         return [];
       }
     }),
+    delete: adminProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ input }) => {
+        try {
+          await deleteAuthor(input.id);
+        } catch {}
+        return { success: true };
+      }),
     save: adminProcedure.input(authorInput).mutation(async ({ input }) => {
       const { id, ...data } = input;
       try {

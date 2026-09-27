@@ -7,7 +7,14 @@ import {
   setSessionCookie,
   verifyPassword,
 } from "./_core/auth";
-import { createUser, getUserByEmail, updateLastSignedIn, updateUserProfile } from "./db";
+import {
+  createUser,
+  deleteUserAccount,
+  getUserByEmail,
+  updateLastSignedIn,
+  updateUserPassword,
+  updateUserProfile,
+} from "./db";
 import { adminRouter } from "./routers/admin";
 import { commerceRouter } from "./routers/commerce";
 import { siteRouter } from "./routers/site";
@@ -157,6 +164,11 @@ export const appRouter = router({
       .input(
         z.object({
           name: z.string().trim().min(2, "Le nom doit comporter au moins 2 caractères"),
+          phone: z.string().trim().optional(),
+          deliveryAddress: z.string().trim().optional(),
+          city: z.string().trim().optional(),
+          governorate: z.string().trim().optional(),
+          postalCode: z.string().trim().optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -165,7 +177,18 @@ export const appRouter = router({
         }
 
         try {
-          await updateUserProfile(ctx.user.id, input.name.trim());
+          await updateUserProfile(
+            ctx.user.id,
+            {
+              name: input.name.trim(),
+              phone: input.phone?.trim(),
+              address: input.deliveryAddress?.trim(),
+              city: input.city?.trim(),
+              governorate: input.governorate?.trim(),
+              postalCode: input.postalCode?.trim(),
+            },
+            ctx.user.email
+          );
         } catch (err) {
           console.warn("[Auth] Failed to update user profile in DB:", err);
         }
@@ -173,6 +196,11 @@ export const appRouter = router({
         const updatedUser = {
           ...ctx.user,
           name: input.name.trim(),
+          phone: input.phone?.trim() ?? ctx.user.phone ?? null,
+          deliveryAddress: input.deliveryAddress?.trim() ?? ctx.user.deliveryAddress ?? null,
+          city: input.city?.trim() ?? ctx.user.city ?? null,
+          governorate: input.governorate?.trim() ?? ctx.user.governorate ?? null,
+          postalCode: input.postalCode?.trim() ?? ctx.user.postalCode ?? null,
         };
 
         const token = await createSessionToken(updatedUser);
@@ -181,6 +209,68 @@ export const appRouter = router({
         return {
           success: true,
           user: updatedUser,
+        };
+      }),
+
+    changePassword: publicProcedure
+      .input(
+        z.object({
+          currentPassword: z.string().min(1, "Le mot de passe actuel est requis"),
+          newPassword: z.string().min(6, "Le nouveau mot de passe doit comporter au moins 6 caractères"),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+        }
+
+        const userRecord = await getUserByEmail(ctx.user.email);
+        if (!userRecord) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Utilisateur non trouvé" });
+        }
+
+        const isValid = verifyPassword(input.currentPassword, userRecord.passwordHash);
+        if (!isValid) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Le mot de passe actuel saisi est incorrect.",
+          });
+        }
+
+        const newHash = hashPassword(input.newPassword);
+        await updateUserPassword(userRecord.id, newHash);
+
+        return {
+          success: true,
+          message: "Mot de passe modifié avec succès.",
+        };
+      }),
+
+    deleteAccount: publicProcedure
+      .input(
+        z.object({
+          confirmation: z.string().optional(),
+        }).optional()
+      )
+      .mutation(async ({ ctx }) => {
+        if (!ctx.user) {
+          throw new TRPCError({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+        }
+
+        const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
+        if (ctx.user.role === "admin" && ctx.user.email.toLowerCase().trim() === adminEmail) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Le compte administrateur racine de la plateforme ne peut pas être supprimé.",
+          });
+        }
+
+        await deleteUserAccount(ctx.user.id, ctx.user.email);
+        clearSessionCookie(ctx.res);
+
+        return {
+          success: true,
+          message: "Votre compte et vos données associées ont été supprimés.",
         };
       }),
 

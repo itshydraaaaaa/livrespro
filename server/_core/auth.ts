@@ -12,6 +12,11 @@ export type AuthSession = {
   email: string;
   name: string | null;
   role: "admin" | "user";
+  phone?: string | null;
+  deliveryAddress?: string | null;
+  city?: string | null;
+  governorate?: string | null;
+  postalCode?: string | null;
 };
 
 /**
@@ -47,6 +52,11 @@ export async function createSessionToken(user: AuthSession): Promise<string> {
     email: user.email,
     name: user.name,
     role: user.role,
+    phone: user.phone ?? null,
+    deliveryAddress: user.deliveryAddress ?? null,
+    city: user.city ?? null,
+    governorate: user.governorate ?? null,
+    postalCode: user.postalCode ?? null,
   })
     .setProtectedHeader({ alg: "HS256" })
     .setIssuedAt()
@@ -65,6 +75,11 @@ export async function verifySessionToken(token: string): Promise<AuthSession | n
       email: String(payload.email),
       name: payload.name ? String(payload.name) : null,
       role: (payload.role as "admin" | "user") || "user",
+      phone: payload.phone ? String(payload.phone) : null,
+      deliveryAddress: payload.deliveryAddress ? String(payload.deliveryAddress) : null,
+      city: payload.city ? String(payload.city) : null,
+      governorate: payload.governorate ? String(payload.governorate) : null,
+      postalCode: payload.postalCode ? String(payload.postalCode) : null,
     };
   } catch {
     return null;
