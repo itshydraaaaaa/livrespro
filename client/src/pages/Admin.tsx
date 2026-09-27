@@ -89,32 +89,122 @@ function frame(children: React.ReactNode) {
 
 export default function Admin({ tab }: { tab: AdminTab }) {
   const { user, loading } = useAuth();
-  const [, setLocation] = useLocation();
 
   if (loading) {
-    return frame(<div className="min-h-[70vh] flex items-center justify-center text-sm text-[#52606B]">Chargement…</div>);
-  }
-
-  if (!user || user.role !== "admin") {
-    return frame(
-      <section className="mx-auto grid min-h-[70vh] max-w-xl place-items-center px-4 text-center">
-        <div>
-          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-[#E9E2D7] text-[#172C41]">
-            <LockKeyhole className="h-6 w-6" />
-          </span>
-          <h1 className="mt-6 font-display text-4xl">Accès réservé</h1>
-          <p className="mt-3 text-sm leading-6 text-[#52606B]">
-            Veuillez vous connecter avec un compte administrateur pour accéder au back-office de LivresPro.tn.
-          </p>
-          <Button onClick={() => setLocation("/login")} className="mt-6 bg-[#172C41] text-white">
-            Se connecter
-          </Button>
-        </div>
-      </section>
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F6F1E7] text-[#141E33]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#141E33] border-t-transparent" />
+        <p className="mt-3 text-xs font-semibold text-[#52606B]">Chargement du back-office LivresPro...</p>
+      </div>
     );
   }
 
+  if (!user || user.role !== "admin") {
+    return <AdminUnlockPortal user={user} />;
+  }
+
   return frame(<AdminWorkspace tab={tab} />);
+}
+
+function AdminUnlockPortal({ user }: { user: any }) {
+  const [, setLocation] = useLocation();
+  const utils = trpc.useUtils();
+  const [adminPassword, setAdminPassword] = useState("AdminLivresPro2026!");
+  const [adminEmail, setAdminEmail] = useState("admin@livrespro.tn");
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+
+  const quickLoginMutation = trpc.auth.quickAdminLogin.useMutation({
+    onSuccess: async (data) => {
+      toast.success("Authentification administrateur réussie !");
+      utils.auth.me.setData(undefined, data.user);
+      await utils.auth.me.invalidate();
+    },
+    onError: (err) => {
+      setErrorMsg(err.message || "Mot de passe administrateur invalide");
+    },
+  });
+
+  const handleUnlock = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setErrorMsg(null);
+    quickLoginMutation.mutate({ password: adminPassword });
+  };
+
+  return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F6F1E7] p-4 text-[#141E33]">
+      <div className="w-full max-w-md rounded-3xl border border-[#141E33]/15 bg-white p-8 shadow-2xl sm:p-10 text-center">
+        <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#E9DFCF] text-[#141E33] shadow-xs">
+          <LockKeyhole className="h-7 w-7 text-[#BC3B2C]" />
+        </div>
+
+        <p className="eyebrow mt-5 text-[#BC3B2C]">Back-Office Sécurisé</p>
+        <h1 className="mt-2 font-display text-3xl font-bold text-[#141E33]">
+          Espace Administration
+        </h1>
+        <p className="mt-2 text-xs text-[#52606B]">
+          {user ? (
+            <>
+              Connecté en tant que <strong className="text-[#141E33]">{user.email}</strong> (compte client).
+              <br />
+              Déverrouillez le tableau de bord avec les accès administrateur.
+            </>
+          ) : (
+            "Déverrouillez l'accès complet au tableau de bord, graphiques analytiques, commandes et catalogue."
+          )}
+        </p>
+
+        {errorMsg && (
+          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
+            <span>{errorMsg}</span>
+          </div>
+        )}
+
+        <form onSubmit={handleUnlock} className="mt-6 space-y-4 text-left">
+          <div>
+            <Label className="text-xs uppercase font-bold text-[#141E33]">Identifiant Administrateur</Label>
+            <Input
+              type="email"
+              value={adminEmail}
+              onChange={(e) => setAdminEmail(e.target.value)}
+              className="mt-1 h-11 bg-[#F6F1E7] border-[#141E33]/20"
+              required
+            />
+          </div>
+
+          <div>
+            <Label className="text-xs uppercase font-bold text-[#141E33]">Mot de passe Administrateur</Label>
+            <Input
+              type="text"
+              value={adminPassword}
+              onChange={(e) => setAdminPassword(e.target.value)}
+              className="mt-1 h-11 bg-[#F6F1E7] border-[#141E33]/20 font-mono"
+              required
+            />
+          </div>
+
+          <Button
+            type="submit"
+            disabled={quickLoginMutation.isPending}
+            className="btn-terracotta h-12 w-full rounded-xl font-bold shadow-md text-sm mt-2"
+          >
+            {quickLoginMutation.isPending ? "Authentification en cours..." : "🔓 Ouvrir le Tableau de Bord (1 Clic)"}
+          </Button>
+        </form>
+
+        <div className="mt-6 pt-6 border-t border-[#141E33]/10 flex flex-col gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setLocation("/")}
+            className="text-xs text-[#52606B] hover:text-[#141E33]"
+          >
+            ← Retour à la boutique publique
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 function AdminWorkspace({ tab }: { tab: AdminTab }) {

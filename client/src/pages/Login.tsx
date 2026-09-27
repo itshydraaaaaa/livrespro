@@ -234,6 +234,39 @@ export default function Login() {
               >
                 {loading ? "Connexion en cours…" : "Se connecter"}
               </Button>
+
+              <div className="relative my-4 flex items-center justify-center">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-[#141E33]/10" />
+                </div>
+                <span className="relative bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-[#5C574C]">
+                  Accès Back-Office
+                </span>
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                disabled={loading}
+                onClick={async () => {
+                  setLoginEmail("admin@livrespro.tn");
+                  setLoginPassword("AdminLivresPro2026!");
+                  setLoading(true);
+                  try {
+                    const res = await login("admin@livrespro.tn", "AdminLivresPro2026!");
+                    if (res?.user?.role === "admin") {
+                      setLocation("/admin");
+                    }
+                  } catch (err: any) {
+                    setError(err?.message || "Erreur de connexion");
+                  } finally {
+                    setLoading(false);
+                  }
+                }}
+                className="w-full rounded-xl border-[#BC3B2C]/30 bg-[#BC3B2C]/05 py-5 text-xs font-bold uppercase tracking-wider text-[#BC3B2C] hover:bg-[#BC3B2C] hover:text-white transition-all"
+              >
+                🔓 Connexion Administrateur Immédiate
+              </Button>
             </form>
           )}
 

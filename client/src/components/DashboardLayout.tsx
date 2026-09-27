@@ -19,7 +19,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { startLogin } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, type LucideIcon } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -68,22 +67,26 @@ export default function DashboardLayout({
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-6">
-            <h1 className="text-2xl font-semibold tracking-tight text-center">
-              Accéder au back-office
+      <div className="flex items-center justify-center min-h-screen bg-[#F6F1E7]">
+        <div className="flex flex-col items-center gap-6 p-8 max-w-md w-full bg-white rounded-2xl shadow-xl border border-[#141E33]/10 text-center">
+          <div className="grid h-14 w-14 place-items-center rounded-2xl bg-[#E9DFCF] text-[#141E33]">
+            <LayoutDashboard className="h-6 w-6 text-[#BC3B2C]" />
+          </div>
+          <div className="flex flex-col items-center gap-2">
+            <h1 className="text-2xl font-bold font-display text-[#141E33]">
+              Administration LivresPro
             </h1>
-            <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Connectez-vous avec le compte Manus autorisé pour ouvrir l’administration.
+            <p className="text-xs text-[#5C574C] max-w-sm">
+              Veuillez vous connecter avec vos identifiants administrateur pour accéder à l'ensemble des outils de gestion.
             </p>
           </div>
           <Button
-            onClick={() => startLogin()}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
+            onClick={() => {
+              window.location.href = "/login";
+            }}
+            className="btn-terracotta w-full h-11 rounded-xl font-bold shadow-md"
           >
-              Se connecter avec Manus
+            Se connecter au Back-Office
           </Button>
         </div>
       </div>

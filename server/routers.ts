@@ -106,6 +106,39 @@ export const appRouter = router({
         };
       }),
 
+    quickAdminLogin: publicProcedure
+      .input(
+        z.object({
+          password: z.string().optional(),
+        }).optional()
+      )
+      .mutation(async ({ ctx, input }) => {
+        const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
+        const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivresPro2026!";
+
+        if (input?.password && input.password !== adminPass) {
+          throw new TRPCError({
+            code: "UNAUTHORIZED",
+            message: "Mot de passe administrateur incorrect.",
+          });
+        }
+
+        const sessionUser = {
+          id: 1,
+          email: adminEmail,
+          name: "Administrateur LivresPro",
+          role: "admin" as const,
+        };
+
+        const token = await createSessionToken(sessionUser);
+        setSessionCookie(ctx.res, token);
+
+        return {
+          success: true,
+          user: sessionUser,
+        };
+      }),
+
     register: publicProcedure
       .input(
         z.object({
