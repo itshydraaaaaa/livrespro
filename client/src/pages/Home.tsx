@@ -177,7 +177,7 @@ export default function Home() {
 
               <motion.h1
                 variants={fadeInUp}
-                className="mt-6 font-display text-[clamp(3.8rem,7vw,7.4rem)] leading-[.86] tracking-[-.055em] text-[#141E33]"
+                className="mt-6 font-display text-[clamp(2.4rem,6vw,7.4rem)] leading-[.94] sm:leading-[.86] tracking-[-.045em] text-[#141E33]"
               >
                 Construire une marque B2B qui crée de la{" "}
                 <span className="italic bg-gradient-to-r from-[#BC3B2C] via-[#BC3B2C] to-[#1E5FC2] bg-clip-text text-transparent">
@@ -201,17 +201,17 @@ export default function Home() {
 
               <motion.div
                 variants={fadeInUp}
-                className="mt-9 flex flex-wrap items-center gap-4"
+                className="mt-9 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3 sm:gap-4"
               >
                 <Link
                   href="/livres/b2b-brand-management"
-                  className="btn-terracotta inline-flex items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white shadow-md"
+                  className="btn-terracotta inline-flex w-full sm:w-auto items-center justify-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white shadow-md"
                 >
                   Commander le livre <ArrowRight className="h-4 w-4" />
                 </Link>
                 <a
                   href="#decouvrir"
-                  className="glass-panel inline-flex items-center rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] shadow-xs transition-all duration-300 hover:border-[#141E33] hover:bg-white hover:-translate-y-0.5"
+                  className="glass-panel inline-flex w-full sm:w-auto items-center justify-center rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] shadow-xs transition-all duration-300 hover:border-[#141E33] hover:bg-white hover:-translate-y-0.5"
                 >
                   Découvrir le livre
                 </a>
@@ -255,10 +255,10 @@ export default function Home() {
                   alt="B2B Brand Management Tunisia Edition"
                   fetchPriority="high"
                   decoding="async"
-                  className="h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                  className="h-[360px] sm:h-[480px] lg:h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
                 />
                 {/* Floating Glassmorphic Pill on Book Cover */}
-                <div className="glass-panel absolute bottom-6 left-6 z-20 flex items-center gap-2.5 rounded-full px-4 py-2 text-xs font-bold text-[#141E33] shadow-lg">
+                <div className="glass-panel absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex items-center gap-2.5 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-[#141E33] shadow-lg">
                   <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
                   <span>Édition Reliée · 65,00 DT</span>
                 </div>
@@ -294,7 +294,7 @@ export default function Home() {
               <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Pourquoi ce livre
               </motion.p>
-              <h2 className="mt-4 font-display text-5xl leading-[.92] tracking-[-.04em] text-[#141E33] md:text-6xl">
+              <h2 className="mt-4 font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.05] sm:leading-[.92] tracking-[-.04em] text-[#141E33]">
                 Le branding B2B ne se résume pas à un logo.
               </h2>
               <p className="mt-6 max-w-xl text-base leading-7 text-[#5C574C]">
@@ -314,7 +314,7 @@ export default function Home() {
                 <motion.div
                   variants={blurInUp}
                   key={t}
-                  className="glass-panel flex flex-col justify-between rounded-2xl p-8 transition-all duration-300"
+                  className="glass-panel flex flex-col justify-between rounded-2xl p-5 sm:p-8 transition-all duration-300"
                 >
                   <div>
                     <h3 className="font-display text-3xl text-[#141E33]">{t}</h3>
@@ -373,9 +373,9 @@ export default function Home() {
                 <motion.div
                   variants={statScaleIn}
                   key={l}
-                  className="glass-panel flex flex-col justify-center rounded-2xl p-6 text-center border border-white/80 transition-all duration-300"
+                  className="glass-panel flex flex-col justify-center rounded-2xl p-3.5 sm:p-5 lg:p-6 text-center border border-white/80 transition-all duration-300"
                 >
-                  <p className="font-display text-4xl text-[#BC3B2C]">
+                  <p className="font-display text-3xl sm:text-4xl text-[#BC3B2C]">
                     <AnimatedCounter value={n} />
                   </p>
                   <p className="mt-2 text-xs leading-5 text-[#5C574C]">{l}</p>
@@ -398,7 +398,7 @@ export default function Home() {
               <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Ce que vous allez travailler
               </motion.p>
-              <h2 className="mt-4 max-w-4xl font-display text-5xl leading-[.92] text-[#141E33] md:text-6xl">
+              <h2 className="mt-4 max-w-4xl font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl leading-[1.05] sm:leading-[.92] text-[#141E33]">
                 Passer du produit à la marque. De la notoriété à la préférence.
               </h2>
             </motion.div>
@@ -415,9 +415,9 @@ export default function Home() {
                 <motion.div
                   variants={index % 2 === 0 ? slideInLeft : slideInRight}
                   key={x}
-                  className="glass-panel rounded-2xl border-t-4 border-t-[#BC3B2C] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  className="glass-panel rounded-2xl border-t-4 border-t-[#BC3B2C] p-5 sm:p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <p className="font-display text-2xl text-[#141E33]">{x}</p>
+                  <p className="font-display text-xl sm:text-2xl text-[#141E33]">{x}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -443,7 +443,7 @@ export default function Home() {
               <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#E9DFCF]">
                 International thinking. Tunisian reality.
               </motion.p>
-              <h2 className="mt-4 font-display text-5xl leading-[.92] text-white">
+              <h2 className="mt-4 font-display text-3xl sm:text-4xl lg:text-5xl leading-[1.05] sm:leading-[.92] text-white">
                 Des principes internationaux confrontés aux décisions d’entreprises tunisiennes.
               </h2>
               <p className="mt-6 text-sm leading-7 text-white/70">
@@ -484,7 +484,7 @@ export default function Home() {
               <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Case Studies · Tunisia Edition
               </motion.p>
-              <h2 className="mt-4 font-display text-5xl leading-[.95] text-[#141E33]">
+              <h2 className="mt-4 font-display text-3xl sm:text-4xl lg:text-5xl leading-[1.05] sm:leading-[.95] text-[#141E33]">
                 Des entreprises tunisiennes au cœur du livre.
               </h2>
               <p className="mt-5 text-base leading-7 text-[#5C574C]">
@@ -493,18 +493,18 @@ export default function Home() {
             </motion.div>
 
             {/* Responsive grid with frosted glass panels */}
-            <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
+            <div className="mt-10 grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-4 lg:grid-cols-7">
               {caseStudies.map((x) => (
                 <div
                   key={x.name}
-                  className="glass-panel flex min-h-36 flex-col items-center justify-center gap-3 rounded-2xl p-5 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+                  className="glass-panel flex min-h-28 sm:min-h-36 flex-col items-center justify-center gap-2 sm:gap-3 rounded-2xl p-3.5 sm:p-5 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
                 >
                   <img
                     src={`/editorial/case-study-logos/${x.logo}`}
                     alt={`Logo ${x.name}`}
                     loading="lazy"
                     decoding="async"
-                    className="h-14 w-full object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105"
+                    className="h-12 sm:h-14 w-full object-contain mix-blend-multiply transition-transform duration-300 hover:scale-105"
                   />
                   <span className="text-[10px] font-extrabold uppercase tracking-[.12em] text-[#5C574C]">
                     {x.name}
@@ -522,12 +522,12 @@ export default function Home() {
         {/* SECTION 8: EDUCATOR OFFER */}
         <section id="educator" className="container py-20 md:py-28">
           <div className="glass-panel grid overflow-hidden rounded-3xl shadow-xl lg:grid-cols-[.9fr_1.1fr]">
-            <div className="flex flex-col justify-between p-8 md:p-12">
+            <div className="flex flex-col justify-between p-6 sm:p-8 md:p-12">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#BC3B2C] px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white shadow-xs">
                   <GraduationCap className="h-4 w-4" /> Offre Educator
                 </div>
-                <h2 className="mt-6 font-display text-5xl leading-[.92] text-[#141E33]">
+                <h2 className="mt-6 font-display text-3xl sm:text-4xl lg:text-5xl leading-[1.05] sm:leading-[.92] text-[#141E33]">
                   Vous enseignez ou formez au marketing ?
                 </h2>
                 <p className="mt-5 text-base leading-7 text-[#5C574C]">
@@ -537,7 +537,7 @@ export default function Home() {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/educators"
-                    className="inline-flex items-center gap-2 rounded-full bg-[#141E33] px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white transition-all duration-300 hover:bg-[#BC3B2C] hover:shadow-md"
+                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-[#141E33] px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white transition-all duration-300 hover:bg-[#BC3B2C] hover:shadow-md"
                   >
                     Découvrir l’offre Educator <ArrowRight className="h-4 w-4" />
                   </Link>
@@ -550,7 +550,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="grid min-h-[460px] grid-cols-2 bg-[#E9DFCF] p-8">
+            <div className="grid min-h-[400px] grid-cols-1 sm:grid-cols-2 gap-4 bg-[#E9DFCF] p-5 sm:p-8">
               <div className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-[#141E33]/10">
                 <img
                   src={`${A}book-front.jpg`}
@@ -560,16 +560,16 @@ export default function Home() {
                   className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
                 />
               </div>
-              <div className="flex flex-col justify-center rounded-2xl bg-[#141E33] p-7 text-white shadow-xl">
+              <div className="flex flex-col justify-center rounded-2xl bg-[#141E33] p-5 sm:p-7 text-white shadow-xl">
                 <GraduationCap className="h-8 w-8 text-[#E9DFCF]" />
                 <p className="mt-7 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#E9DFCF]">
                   Digital companion
                 </p>
-                <h3 className="mt-3 font-display text-3xl">
+                <h3 className="mt-3 font-display text-2xl sm:text-3xl">
                   Educator’s Guide & Case Study Companion
                 </h3>
                 <p className="mt-4 text-sm text-white/60">Tunisia Edition 2026</p>
-                <p className="mt-8 font-display text-5xl text-[#E9DFCF]">−50%</p>
+                <p className="mt-8 font-display text-4xl sm:text-5xl text-[#E9DFCF]">−50%</p>
                 <p className="mt-2 text-xs text-white/60">
                   avec achat du livre + statut Educator éligible
                 </p>
@@ -622,7 +622,7 @@ export default function Home() {
               <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Tunisia Edition
               </motion.p>
-              <h2 className="mt-2 font-display text-4xl text-[#141E33]">
+              <h2 className="mt-2 font-display text-2xl sm:text-3xl md:text-4xl text-[#141E33]">
                 Faites du branding B2B un{" "}
                 <span className="bg-gradient-to-r from-[#141E33] via-[#BC3B2C] to-[#BC3B2C] bg-clip-text text-transparent">
                   avantage stratégique.
@@ -631,7 +631,7 @@ export default function Home() {
             </div>
             <Link
               href="/livres/b2b-brand-management"
-              className="btn-terracotta inline-flex shrink-0 items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white shadow-md"
+              className="btn-terracotta inline-flex w-full sm:w-auto justify-center shrink-0 items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.16em] text-white shadow-md"
             >
               Commander <ArrowRight className="h-4 w-4" />
             </Link>

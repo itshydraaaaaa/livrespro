@@ -76,8 +76,8 @@ export default function ProductDetail() {
           <Link href="/librairie" className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#5C574C] transition hover:text-[#BC3B2C]">
             <ArrowLeft className="h-3.5 w-3.5" /> Retour au catalogue
           </Link>
-          <div className="mt-8 grid gap-10 lg:grid-cols-[0.9fr_1fr] lg:gap-20">
-            <div className="flex justify-center rounded-2xl bg-[#E9DFCF] px-8 py-10 shadow-md md:px-12">
+          <div className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:gap-20">
+            <div className="flex justify-center rounded-2xl bg-[#E9DFCF] px-4 py-6 sm:px-8 sm:py-10 md:px-12 shadow-md">
               <div className="w-full max-w-[440px] overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-[#141E33]/10">
                 {mainImage?.url ? (
                   <img src={mainImage.url} alt={mainImage.altText || `Couverture de ${product.title}`} fetchPriority="high" decoding="async" className="w-full object-cover transition-transform duration-700 hover:scale-105" />
@@ -90,7 +90,7 @@ export default function ProductDetail() {
             </div>
             <div className="flex max-w-xl flex-col justify-center">
               <p className="eyebrow text-[#BC3B2C]">{product.productType || "Livre business"}</p>
-              <h1 className="mt-4 font-display text-[clamp(3rem,5vw,5.4rem)] leading-[0.91] tracking-[-0.04em] text-[#141E33]">{product.title}</h1>
+              <h1 className="mt-4 font-display text-[clamp(2.2rem,5vw,5.4rem)] leading-[0.93] sm:leading-[0.91] tracking-[-0.04em] text-[#141E33]">{product.title}</h1>
               {product.vendor ? <p className="mt-5 text-base font-semibold text-[#5C574C]">par {product.vendor}</p> : null}
               <p className="mt-7 font-display text-3xl text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
               <div className="my-8 h-px bg-[#141E33]/10" />
@@ -146,6 +146,24 @@ export default function ProductDetail() {
               </div>
             </div>
           </section>
+        )}
+        {/* Floating Mobile Bottom Action Bar */}
+        {variant && variant.availableForSale && (
+          <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-3 border-t border-white/80 bg-[#F6F1E7]/95 px-4 py-3 shadow-[0_-10px_25px_-5px_rgba(20,30,51,0.12)] backdrop-blur-xl sm:hidden pb-safe">
+            <div className="min-w-0">
+              <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C] truncate">{product.title}</p>
+              <p className="font-display text-lg text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
+            </div>
+            <button
+              type="button"
+              disabled={cartLoading}
+              onClick={onAddToCart}
+              className="btn-terracotta flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white shadow-md disabled:opacity-50"
+            >
+              <ShoppingBag className="h-3.5 w-3.5" />
+              <span>{cartLoading ? "Ajout…" : "Ajouter"}</span>
+            </button>
+          </div>
         )}
       </main>
       <SiteFooter />

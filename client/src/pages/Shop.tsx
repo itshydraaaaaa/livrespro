@@ -28,7 +28,7 @@ export default function Shop() {
           <div className="container relative z-10 grid gap-8 py-14 lg:grid-cols-[1fr_0.62fr] lg:py-20">
             <div className="max-w-2xl animate-rise">
               <p className="eyebrow text-[#BC3B2C]">La librairie business</p>
-              <h1 className="mt-4 font-display text-[clamp(3.1rem,7vw,6.6rem)] leading-[0.88] tracking-[-0.045em] text-[#141E33]">
+              <h1 className="mt-4 font-display text-[clamp(2.4rem,7vw,6.6rem)] leading-[0.92] sm:leading-[0.88] tracking-[-0.045em] text-[#141E33]">
                 Lire juste.<br />
                 <em className="font-normal text-[#BC3B2C]">Décider mieux.</em>
               </h1>
@@ -36,7 +36,7 @@ export default function Shop() {
                 Explorez les idées et méthodes qui font évoluer une marque, une équipe, une stratégie ou une entreprise.
               </p>
             </div>
-            <div className="relative min-h-[230px] overflow-hidden rounded-2xl bg-[#141E33] shadow-xl ring-1 ring-white/10">
+            <div className="relative min-h-[200px] sm:min-h-[230px] overflow-hidden rounded-2xl bg-[#141E33] shadow-xl ring-1 ring-white/10">
               <img
                 src="/editorial/b2b-launch/audience.jpg"
                 alt="Une sélection de livres business, marketing et management"
@@ -45,7 +45,7 @@ export default function Shop() {
                 className="absolute inset-0 h-full w-full object-cover opacity-90 mix-blend-luminosity transition-transform duration-700 hover:scale-105"
               />
               <div className="absolute inset-0 bg-[#141E33]/30" />
-              <p className="absolute bottom-7 left-7 max-w-[230px] font-display text-3xl leading-tight text-[#F6F1E7]">
+              <p className="absolute bottom-5 left-5 sm:bottom-7 sm:left-7 max-w-[230px] font-display text-2xl sm:text-3xl leading-tight text-[#F6F1E7]">
                 « Une bonne idée devient utile quand elle passe à l’action. »
               </p>
             </div>
@@ -56,16 +56,16 @@ export default function Shop() {
           <div className="flex flex-col justify-between gap-5 border-b border-[#141E33]/10 pb-6 md:flex-row md:items-end">
             <div>
               <p className="eyebrow text-[#BC3B2C]">Les rayons business</p>
-              <h2 className="mt-3 font-display text-4xl tracking-[-0.03em] text-[#141E33]">Les idées qui font avancer</h2>
+              <h2 className="mt-3 font-display text-3xl sm:text-4xl tracking-[-0.03em] text-[#141E33]">Les idées qui font avancer</h2>
             </div>
-            <div className="glass-pill flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-[#5C574C]">
+            <div className="glass-pill flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold text-[#5C574C] w-fit">
               <SlidersHorizontal className="h-4 w-4 text-[#BC3B2C]" />
               {products.length ? `${visibleProducts.length} titre${visibleProducts.length > 1 ? "s" : ""}` : "Catalogue en préparation"}
             </div>
           </div>
 
           {tags.length > 0 && (
-            <div className="glass-panel mt-6 flex flex-wrap gap-2 rounded-2xl p-2.5 border border-white/80">
+            <div className="glass-panel mt-6 flex overflow-x-auto no-scrollbar scroll-smooth flex-nowrap sm:flex-wrap gap-2 rounded-2xl p-2 sm:p-2.5 border border-white/80">
               {["Tous les livres", ...tags].map(tag => {
                 const isActive = activeTag === tag;
                 return (
@@ -74,7 +74,7 @@ export default function Shop() {
                     type="button"
                     data-pressable
                     onClick={() => setActiveTag(tag)}
-                    className={`relative rounded-full px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-[0.14em] transition-all duration-300 ${
+                    className={`shrink-0 relative rounded-full px-4 sm:px-5 py-2 sm:py-2.5 text-[10px] font-extrabold uppercase tracking-[0.14em] transition-all duration-300 ${
                       isActive
                         ? "text-[#F6F1E7]"
                         : "text-[#5C574C] hover:text-[#141E33]"

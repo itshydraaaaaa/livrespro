@@ -62,7 +62,7 @@ export default function B2BBook() {
             <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
               Tunisia Edition
             </p>
-            <h1 className="mt-4 font-display text-[clamp(3.4rem,6vw,6.5rem)] leading-[.88] tracking-[-.05em] text-[#141E33]">
+            <h1 className="mt-4 font-display text-[clamp(2.4rem,6vw,6.5rem)] leading-[.92] sm:leading-[.88] tracking-[-.05em] text-[#141E33]">
               B2B Brand Management
             </h1>
             <p className="mt-5 text-lg font-semibold text-[#141E33]">
@@ -82,7 +82,7 @@ export default function B2BBook() {
             </div>
             <a
               href="#commander"
-              className="btn-terracotta mt-8 inline-flex items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-white shadow-md"
+              className="btn-terracotta mt-8 inline-flex w-full sm:w-auto justify-center items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-white shadow-md"
             >
               Commander le livre <ArrowRight className="h-4 w-4" />
             </a>
@@ -94,7 +94,7 @@ export default function B2BBook() {
             <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
               Case Studies · Tunisia Edition
             </p>
-            <h2 className="mt-3 font-display text-5xl text-[#141E33]">
+            <h2 className="mt-3 font-display text-3xl sm:text-4xl lg:text-5xl text-[#141E33]">
               Les entreprises au cœur des cas.
             </h2>
             <div className="mt-9 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
@@ -172,8 +172,8 @@ export default function B2BBook() {
                 </p>
               </div>
             ) : (
-              <form onSubmit={submit} className="rounded-2xl bg-white p-7 text-[#141E33] shadow-xl md:p-9">
-                <div className="mb-7 flex items-center justify-between border-b border-[#141E33]/10 pb-5">
+              <form onSubmit={submit} className="rounded-2xl bg-white p-5 sm:p-7 md:p-9 text-[#141E33] shadow-xl">
+                <div className="mb-7 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between border-b border-[#141E33]/10 pb-5">
                   <div>
                     <p className="font-display text-2xl text-[#141E33]">B2B Brand Management</p>
                     <p className="text-xs text-[#5C574C]">Tunisia Edition · Paiement à la livraison</p>

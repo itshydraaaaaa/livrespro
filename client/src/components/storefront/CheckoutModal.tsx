@@ -103,17 +103,17 @@ export function CheckoutModal() {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
       <div
         className="fixed inset-0 bg-[#141E33]/70 backdrop-blur-md transition-opacity"
         onClick={handleClose}
       />
 
-      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/80 bg-[#F6F1E7]/95 backdrop-blur-2xl p-6 text-[#141E33] shadow-[0_30px_70px_-15px_rgba(20,30,51,0.35)] sm:p-9 ring-1 ring-[#141E33]/05">
+      <div className="relative max-h-[94dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-2xl sm:rounded-3xl border border-white/80 bg-[#F6F1E7]/95 backdrop-blur-2xl p-4 sm:p-9 text-[#141E33] shadow-[0_30px_70px_-15px_rgba(20,30,51,0.35)] ring-1 ring-[#141E33]/05">
         <button
           type="button"
           onClick={handleClose}
-          className="glass-pill absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full text-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7] transition-colors"
+          className="glass-pill absolute right-4 top-4 sm:right-5 sm:top-5 grid h-9 w-9 place-items-center rounded-full text-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7] transition-colors"
           aria-label="Fermer"
         >
           <X className="h-4 w-4" />
@@ -125,7 +125,7 @@ export function CheckoutModal() {
               <CheckCircle2 className="h-8 w-8" />
             </span>
             <p className="eyebrow mt-5 text-emerald-800">Commande Confirmée</p>
-            <h2 className="mt-2 font-display text-4xl text-[#141E33]">Merci pour votre commande !</h2>
+            <h2 className="mt-2 font-display text-2xl sm:text-4xl text-[#141E33]">Merci pour votre commande !</h2>
             <p className="mt-3 text-base font-semibold text-[#141E33]">
               Référence de commande : <span className="text-[#BC3B2C]">{createdOrder.orderNumber}</span>
             </p>

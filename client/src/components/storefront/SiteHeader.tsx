@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/_core/hooks/useAuth";
-import { LayoutDashboard, ShoppingBag, User } from "lucide-react";
+import { AnimatePresence, motion } from "framer-motion";
+import { ChevronRight, LayoutDashboard, Menu, ShoppingBag, User, X } from "lucide-react";
 import { Link } from "wouter";
 import { BrandMark } from "./BrandMark";
 
@@ -10,6 +11,7 @@ export function SiteHeader() {
   const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
   const [activeSection, setActiveSection] = useState<string>("");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -156,8 +158,111 @@ export function SiteHeader() {
               {itemCount}
             </span>
           </button>
+
+          {/* Mobile Navigation Hamburger */}
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="glass-pill flex h-10 w-10 items-center justify-center rounded-full text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7] lg:hidden"
+            aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            aria-expanded={isMobileMenuOpen}
+          >
+            {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+          </button>
         </div>
       </div>
+
+      {/* Mobile Navigation Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden border-b border-[#141E33]/10 bg-[#F6F1E7]/95 backdrop-blur-2xl lg:hidden"
+          >
+            <div className="container py-5 space-y-4">
+              <nav className="flex flex-col space-y-1">
+                <Link
+                  href="/librairie"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#141E33] transition-colors hover:bg-white/80 hover:text-[#BC3B2C]"
+                >
+                  <span>La Librairie</span>
+                  <ChevronRight className="h-4 w-4 text-[#BC3B2C]" />
+                </Link>
+                <a
+                  href="/#livre"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#141E33] transition-colors hover:bg-white/80 hover:text-[#BC3B2C]"
+                >
+                  <span>Le livre phare</span>
+                  <ChevronRight className="h-4 w-4 text-[#BC3B2C]" />
+                </a>
+                <a
+                  href="/#cas"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#141E33] transition-colors hover:bg-white/80 hover:text-[#BC3B2C]"
+                >
+                  <span>Études de cas</span>
+                  <ChevronRight className="h-4 w-4 text-[#BC3B2C]" />
+                </a>
+                <a
+                  href="/#educator"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#141E33] transition-colors hover:bg-white/80 hover:text-[#BC3B2C]"
+                >
+                  <span>Offre Educator</span>
+                  <ChevronRight className="h-4 w-4 text-[#BC3B2C]" />
+                </a>
+                <a
+                  href="/#lancement"
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className="flex items-center justify-between rounded-xl px-4 py-3 text-xs font-extrabold uppercase tracking-[0.14em] text-[#141E33] transition-colors hover:bg-white/80 hover:text-[#BC3B2C]"
+                >
+                  <span>Lancement</span>
+                  <ChevronRight className="h-4 w-4 text-[#BC3B2C]" />
+                </a>
+              </nav>
+
+              <div className="pt-3 border-t border-[#141E33]/10 flex flex-col gap-2">
+                {user ? (
+                  <div className="flex flex-col gap-2">
+                    <Link
+                      href="/mon-compte"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                      className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-4 text-xs font-bold uppercase tracking-wider text-[#141E33] shadow-xs"
+                    >
+                      <User className="h-4 w-4 text-[#BC3B2C]" />
+                      <span>{user.name ? user.name : "Mon Espace Lecteur"}</span>
+                    </Link>
+                    {user.role === "admin" && (
+                      <Link
+                        href="/admin"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                        className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#141E33] px-4 text-xs font-bold uppercase tracking-wider text-white shadow-xs"
+                      >
+                        <LayoutDashboard className="h-4 w-4" />
+                        <span>Accès Back-Office Admin</span>
+                      </Link>
+                    )}
+                  </div>
+                ) : (
+                  <Link
+                    href="/login"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl bg-[#141E33] px-4 text-xs font-bold uppercase tracking-wider text-white shadow-xs"
+                  >
+                    <User className="h-4 w-4" />
+                    <span>Connexion / Inscription</span>
+                  </Link>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
