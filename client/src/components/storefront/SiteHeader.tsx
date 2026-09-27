@@ -9,10 +9,26 @@ export function SiteHeader() {
   const { itemCount, openCart } = useCart();
   const { user } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [activeSection, setActiveSection] = useState<string>("");
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 24);
+
+      const sections = ["livre", "decouvrir", "cas", "educator", "lancement"];
+      const scrollPosition = window.scrollY + 220;
+
+      for (const sectionId of sections) {
+        const el = document.getElementById(sectionId);
+        if (el) {
+          const top = el.offsetTop;
+          const height = el.offsetHeight;
+          if (scrollPosition >= top && scrollPosition < top + height) {
+            setActiveSection(sectionId);
+            return;
+          }
+        }
+      }
     };
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
@@ -22,7 +38,7 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-40 transition-all duration-300 ${
         isScrolled
-          ? "border-b border-white/80 bg-[#F6F1E7]/85 shadow-[0_12px_36px_-6px_rgba(20,30,51,0.07)] backdrop-blur-2xl"
+          ? "glass-panel !rounded-none !border-x-0 !border-t-0 border-b border-white/80 shadow-[0_12px_36px_-6px_rgba(20,30,51,0.07)]"
           : "border-b border-[#141E33]/06 bg-[#F6F1E7]/90 backdrop-blur-xl"
       }`}
     >
@@ -47,25 +63,41 @@ export function SiteHeader() {
             La Librairie
           </Link>
           <a
-            className="relative py-1 transition-colors hover:text-[#BC3B2C] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-[#BC3B2C] after:transition-all after:duration-300 hover:after:w-full"
+            className={`relative py-1 transition-colors ${
+              activeSection === "livre" ? "text-[#BC3B2C]" : "hover:text-[#BC3B2C]"
+            } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:transition-all after:duration-300 ${
+              activeSection === "livre" ? "after:w-full after:bg-[#BC3B2C]" : "after:w-0 hover:after:w-full after:bg-[#BC3B2C]"
+            }`}
             href="/#livre"
           >
             Le livre phare
           </a>
           <a
-            className="relative py-1 transition-colors hover:text-[#BC3B2C] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-[#BC3B2C] after:transition-all after:duration-300 hover:after:w-full"
+            className={`relative py-1 transition-colors ${
+              activeSection === "cas" ? "text-[#BC3B2C]" : "hover:text-[#BC3B2C]"
+            } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:transition-all after:duration-300 ${
+              activeSection === "cas" ? "after:w-full after:bg-[#BC3B2C]" : "after:w-0 hover:after:w-full after:bg-[#BC3B2C]"
+            }`}
             href="/#cas"
           >
             Études de cas
           </a>
           <a
-            className="relative py-1 transition-colors hover:text-[#BC3B2C] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-[#BC3B2C] after:transition-all after:duration-300 hover:after:w-full"
+            className={`relative py-1 transition-colors ${
+              activeSection === "educator" ? "text-[#BC3B2C]" : "hover:text-[#BC3B2C]"
+            } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:transition-all after:duration-300 ${
+              activeSection === "educator" ? "after:w-full after:bg-[#BC3B2C]" : "after:w-0 hover:after:w-full after:bg-[#BC3B2C]"
+            }`}
             href="/#educator"
           >
             Offre Educator
           </a>
           <a
-            className="relative py-1 transition-colors hover:text-[#BC3B2C] after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-[#BC3B2C] after:transition-all after:duration-300 hover:after:w-full"
+            className={`relative py-1 transition-colors ${
+              activeSection === "lancement" ? "text-[#BC3B2C]" : "hover:text-[#BC3B2C]"
+            } after:absolute after:bottom-0 after:left-0 after:h-[2px] after:transition-all after:duration-300 ${
+              activeSection === "lancement" ? "after:w-full after:bg-[#BC3B2C]" : "after:w-0 hover:after:w-full after:bg-[#BC3B2C]"
+            }`}
             href="/#lancement"
           >
             Lancement

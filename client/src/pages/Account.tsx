@@ -154,7 +154,7 @@ export default function Account() {
         </nav>
 
         {/* Hero Profile Banner with Glassmorphic Dashboard Elevation */}
-        <div className="overflow-hidden rounded-3xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-xl">
+        <div className="glass-panel overflow-hidden rounded-3xl border border-white/80 shadow-xl">
           <div className="relative overflow-hidden bg-[#141E33] px-6 py-8 text-white sm:px-8">
             <div className="ambient-mesh-glow -right-10 -top-10 h-64 w-64 bg-[#BC3B2C]/20" />
             <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
@@ -272,7 +272,7 @@ export default function Account() {
               </div>
             ) : myOrders.length === 0 ? (
               /* Empty state with gentle idle floating illustration */
-              <div className="rounded-2xl border border-[#141E33]/10 bg-white p-12 text-center shadow-sm">
+              <div className="glass-panel rounded-2xl p-12 text-center shadow-sm">
                 <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#E9DFCF] text-[#141E33] shadow-md animate-float-gentle">
                   <ShoppingBag className="h-8 w-8 text-[#BC3B2C]" />
                 </div>
@@ -430,7 +430,7 @@ export default function Account() {
         {activeTab === "profile" && (
           <div className="mt-8 grid gap-8 md:grid-cols-2">
             {/* Personal Details Card */}
-            <div className="card-depth rounded-2xl border border-[#141E33]/10 bg-white p-6 shadow-sm">
+            <div className="glass-panel rounded-2xl p-6 shadow-sm">
               <div className="flex items-center justify-between border-b border-[#141E33]/10 pb-4">
                 <h3 className="font-display text-lg font-bold text-[#141E33]">Informations Personnelles</h3>
                 {!editingName ? (
@@ -527,7 +527,7 @@ export default function Account() {
             {/* Delivery & Security Card */}
             <div className="space-y-6">
               {/* Coordonnées de livraison */}
-              <div className="card-depth rounded-2xl border border-[#141E33]/10 bg-white p-6 shadow-sm">
+              <div className="glass-panel rounded-2xl p-6 shadow-sm">
                 <div className="border-b border-[#141E33]/10 pb-4">
                   <h3 className="font-display text-lg font-bold text-[#141E33]">Adresse de livraison par défaut</h3>
                   <p className="text-xs text-[#5C574C]">
@@ -566,7 +566,7 @@ export default function Account() {
               </div>
 
               {/* Service Client & Support */}
-              <div className="card-depth rounded-2xl border border-[#141E33]/10 bg-white p-6 shadow-sm">
+              <div className="glass-panel rounded-2xl p-6 shadow-sm">
                 <h3 className="font-display text-lg font-bold text-[#141E33]">Support & Service Client</h3>
                 <p className="mt-1 text-xs text-[#5C574C]">
                   Une question sur une commande ou un livre ? Notre équipe est à votre disposition.

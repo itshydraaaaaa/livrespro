@@ -1,8 +1,9 @@
+import { useRef } from "react";
 import { AnimatedCounter } from "@/components/storefront/AnimatedCounter";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { ArrowRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
-import { motion, type Variants } from "framer-motion";
+import { motion, useScroll, useTransform, useReducedMotion, type Variants } from "framer-motion";
 import { Link } from "wouter";
 
 const A = "/editorial/b2b-launch/";
@@ -61,6 +62,54 @@ const fadeInUp: Variants = {
   },
 };
 
+const kickerReveal: Variants = {
+  hidden: { opacity: 0, y: -6, letterSpacing: "0.14em" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    letterSpacing: "0.22em",
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const blurInUp: Variants = {
+  hidden: { opacity: 0, y: 32, filter: "blur(6px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 0.7, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const statScaleIn: Variants = {
+  hidden: { opacity: 0, scale: 0.95, y: 16 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    y: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const slideInLeft: Variants = {
+  hidden: { opacity: 0, x: -30 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
+const slideInRight: Variants = {
+  hidden: { opacity: 0, x: 30 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.55, ease: [0.16, 1, 0.3, 1] },
+  },
+};
+
 const staggerContainer: Variants = {
   hidden: { opacity: 0 },
   visible: {
@@ -73,6 +122,30 @@ const staggerContainer: Variants = {
 };
 
 export default function Home() {
+  const prefersReduced = useReducedMotion();
+
+  const heroSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroSectionRef,
+    offset: ["start start", "end start"],
+  });
+  const heroParallaxY = useTransform(
+    heroProgress,
+    [0, 1],
+    prefersReduced ? [0, 0] : [0, 45]
+  );
+
+  const darkSectionRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: darkProgress } = useScroll({
+    target: darkSectionRef,
+    offset: ["start end", "end start"],
+  });
+  const darkParallaxY = useTransform(
+    darkProgress,
+    [0, 1],
+    prefersReduced ? [0, 0] : [-30, 30]
+  );
+
   return (
     <div className="min-h-screen bg-[#F6F1E7] text-[#141E33] selection:bg-[#BC3B2C]/20 selection:text-[#141E33]">
       <SiteHeader />
@@ -80,6 +153,7 @@ export default function Home() {
         {/* SECTION 1: HERO */}
         <section
           id="livre"
+          ref={heroSectionRef}
           className="relative overflow-hidden border-b border-[#141E33]/08 bg-[#F6F1E7]"
         >
           {/* Subtle warm depth gradient & ambient glowing orbs */}
@@ -94,7 +168,7 @@ export default function Home() {
               animate="visible"
               variants={staggerContainer}
             >
-              <motion.div variants={fadeInUp} className="inline-flex items-center gap-2.5 rounded-full border border-white/80 bg-white/70 px-4 py-1.5 shadow-xs backdrop-blur-md">
+              <motion.div variants={kickerReveal} className="glass-panel inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 shadow-xs">
                 <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
                 <span className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#BC3B2C]">
                   Tunisia Edition · B2B Brand Management
@@ -106,7 +180,9 @@ export default function Home() {
                 className="mt-6 font-display text-[clamp(3.8rem,7vw,7.4rem)] leading-[.86] tracking-[-.055em] text-[#141E33]"
               >
                 Construire une marque B2B qui crée de la{" "}
-                <span className="text-[#BC3B2C]">préférence.</span>
+                <span className="italic bg-gradient-to-r from-[#BC3B2C] via-[#BC3B2C] to-[#1E5FC2] bg-clip-text text-transparent">
+                  préférence.
+                </span>
               </motion.h1>
 
               <motion.p
@@ -135,7 +211,7 @@ export default function Home() {
                 </Link>
                 <a
                   href="#decouvrir"
-                  className="glass-pill inline-flex items-center rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] shadow-xs transition-all duration-300 hover:border-[#141E33] hover:bg-white hover:-translate-y-0.5"
+                  className="glass-panel inline-flex items-center rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] shadow-xs transition-all duration-300 hover:border-[#141E33] hover:bg-white hover:-translate-y-0.5"
                 >
                   Découvrir le livre
                 </a>
@@ -145,25 +221,26 @@ export default function Home() {
                 variants={fadeInUp}
                 className="mt-9 flex flex-wrap gap-x-4 gap-y-2.5 text-xs font-semibold text-[#5C574C]"
               >
-                <span className="glass-pill flex items-center gap-2 rounded-full px-3.5 py-1.5">
+                <span className="glass-panel flex items-center gap-2 rounded-full px-3.5 py-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
                   Édition tunisienne
                 </span>
-                <span className="glass-pill flex items-center gap-2 rounded-full px-3.5 py-1.5">
+                <span className="glass-panel flex items-center gap-2 rounded-full px-3.5 py-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
                   Études de cas tunisiennes
                 </span>
-                <span className="glass-pill flex items-center gap-2 rounded-full px-3.5 py-1.5">
+                <span className="glass-panel flex items-center gap-2 rounded-full px-3.5 py-1.5">
                   <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
                   Disponible maintenant
                 </span>
               </motion.div>
             </motion.div>
 
-            {/* Book Cover with subtle 3D hover & layered depth */}
+            {/* Book Cover with subtle 3D hover & scroll parallax */}
             <motion.div
+              style={{ y: heroParallaxY }}
               className="relative mx-auto w-full max-w-[560px]"
-              initial={{ opacity: 0, scale: 0.96 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
@@ -179,7 +256,7 @@ export default function Home() {
                   className="h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
                 />
                 {/* Floating Glassmorphic Pill on Book Cover */}
-                <div className="glass-pill absolute bottom-6 left-6 z-20 flex items-center gap-2.5 rounded-full px-4 py-2 text-xs font-bold text-[#141E33] shadow-lg backdrop-blur-xl border border-white/80">
+                <div className="glass-panel absolute bottom-6 left-6 z-20 flex items-center gap-2.5 rounded-full px-4 py-2 text-xs font-bold text-[#141E33] shadow-lg">
                   <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
                   <span>Édition Reliée · 65,00 DT</span>
                 </div>
@@ -212,9 +289,9 @@ export default function Home() {
               viewport={{ once: true, margin: "-60px" }}
               variants={fadeInUp}
             >
-              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+              <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Pourquoi ce livre
-              </p>
+              </motion.p>
               <h2 className="mt-4 font-display text-5xl leading-[.92] tracking-[-.04em] text-[#141E33] md:text-6xl">
                 Le branding B2B ne se résume pas à un logo.
               </h2>
@@ -223,7 +300,7 @@ export default function Home() {
               </p>
             </motion.div>
 
-            {/* 4 Value Cards with refined glassmorphism & rounded corners */}
+            {/* 4 Value Cards with blur-to-sharp focus transition & .glass-panel */}
             <motion.div
               className="grid gap-4 sm:grid-cols-2"
               initial="hidden"
@@ -233,9 +310,9 @@ export default function Home() {
             >
               {valueProps.map(([t, b]) => (
                 <motion.div
-                  variants={fadeInUp}
+                  variants={blurInUp}
                   key={t}
-                  className="glass-card-light flex flex-col justify-between rounded-2xl p-8 transition-all duration-300"
+                  className="glass-panel flex flex-col justify-between rounded-2xl p-8 transition-all duration-300"
                 >
                   <div>
                     <h3 className="font-display text-3xl text-[#141E33]">{t}</h3>
@@ -253,14 +330,19 @@ export default function Home() {
           <div className="ambient-mesh-glow -right-20 top-20 h-80 w-80 bg-white/40" />
           <div className="container relative z-10">
             <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-end">
-              <div>
-                <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+                variants={fadeInUp}
+              >
+                <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                   Le lancement
-                </p>
+                </motion.p>
                 <h2 className="mt-4 max-w-3xl font-display text-5xl leading-[.92] text-[#141E33] md:text-6xl">
                   Une édition présentée à l’écosystème business tunisien.
                 </h2>
-              </div>
+              </motion.div>
               <p className="text-sm leading-7 text-[#5C574C]">
                 Des chiffres de la cérémonie de lancement, présentés comme repères d’activité et de mobilisation autour de cette première édition.
               </p>
@@ -275,7 +357,7 @@ export default function Home() {
               />
             </div>
 
-            {/* Stats grid with animated number counters and frosted glass tiles */}
+            {/* Stats grid with animated number counters and frosted glass panels */}
             <motion.div
               className="mt-6 grid grid-cols-2 gap-3.5 md:grid-cols-3 lg:grid-cols-6"
               initial="hidden"
@@ -285,9 +367,9 @@ export default function Home() {
             >
               {proof.map(([n, l]) => (
                 <motion.div
-                  variants={fadeInUp}
+                  variants={statScaleIn}
                   key={l}
-                  className="glass-card-light flex flex-col justify-center rounded-2xl p-6 text-center border border-white/80 transition-all duration-300"
+                  className="glass-panel flex flex-col justify-center rounded-2xl p-6 text-center border border-white/80 transition-all duration-300"
                 >
                   <p className="font-display text-4xl text-[#BC3B2C]">
                     <AnimatedCounter value={n} />
@@ -303,13 +385,21 @@ export default function Home() {
         <section className="container relative py-20 md:py-28">
           <div className="ambient-mesh-glow right-10 top-1/3 h-72 w-72 bg-[#BC3B2C]/08" />
           <div className="relative z-10">
-            <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
-              Ce que vous allez travailler
-            </p>
-            <h2 className="mt-4 max-w-4xl font-display text-5xl leading-[.92] text-[#141E33] md:text-6xl">
-              Passer du produit à la marque. De la notoriété à la préférence.
-            </h2>
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={fadeInUp}
+            >
+              <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+                Ce que vous allez travailler
+              </motion.p>
+              <h2 className="mt-4 max-w-4xl font-display text-5xl leading-[.92] text-[#141E33] md:text-6xl">
+                Passer du produit à la marque. De la notoriété à la préférence.
+              </h2>
+            </motion.div>
 
+            {/* Alternating left/right sliding pairs with .glass-panel */}
             <motion.div
               className="mt-10 grid gap-4 sm:grid-cols-2 md:grid-cols-3"
               initial="hidden"
@@ -317,11 +407,11 @@ export default function Home() {
               viewport={{ once: true, margin: "-40px" }}
               variants={staggerContainer}
             >
-              {transformations.map((x) => (
+              {transformations.map((x, index) => (
                 <motion.div
-                  variants={fadeInUp}
+                  variants={index % 2 === 0 ? slideInLeft : slideInRight}
                   key={x}
-                  className="glass-card-light rounded-2xl border-t-4 border-t-[#BC3B2C] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
+                  className="glass-panel rounded-2xl border-t-4 border-t-[#BC3B2C] p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lg"
                 >
                   <p className="font-display text-2xl text-[#141E33]">{x}</p>
                 </motion.div>
@@ -330,60 +420,78 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION 6: DARK INTERNATIONAL THINKING SECTION */}
-        <section className="relative overflow-hidden border-y border-white/10 bg-[#141E33] py-20 text-white md:py-24">
+        {/* SECTION 6: DARK INTERNATIONAL THINKING SECTION WITH SCROLL PARALLAX */}
+        <section
+          ref={darkSectionRef}
+          className="relative overflow-hidden border-y border-white/10 bg-[#141E33] py-20 text-white md:py-24"
+        >
           {/* Ambient luminous glow behind photo and text */}
           <div className="ambient-mesh-glow -right-20 top-1/2 h-[500px] w-[500px] -translate-y-1/2 rounded-full bg-[#BC3B2C]/20" />
           <div className="ambient-mesh-glow -left-20 top-1/3 h-[400px] w-[400px] rounded-full bg-[#1E5FC2]/15" />
 
           <div className="container relative z-10 grid gap-12 lg:grid-cols-[.8fr_1.2fr] lg:items-center">
-            <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#E9DFCF]">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={fadeInUp}
+            >
+              <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#E9DFCF]">
                 International thinking. Tunisian reality.
-              </p>
+              </motion.p>
               <h2 className="mt-4 font-display text-5xl leading-[.92] text-white">
                 Des principes internationaux confrontés aux décisions d’entreprises tunisiennes.
               </h2>
               <p className="mt-6 text-sm leading-7 text-white/70">
                 Une édition qui rapproche les cadres du B2B Brand Management de cas et contextes locaux, pour rendre l’analyse plus concrète et directement discutable.
               </p>
-            </div>
+            </motion.div>
 
-            <div className="overflow-hidden rounded-2xl shadow-2xl ring-1 ring-white/20">
+            {/* Scroll-linked depth parallax on the dark-section photo */}
+            <motion.div
+              style={{ y: darkParallaxY }}
+              className="glass-panel-dark overflow-hidden rounded-2xl shadow-2xl p-2.5 ring-1 ring-white/20"
+            >
               <img
                 src={`${A}recognition.jpg`}
                 alt="Lancement et reconnaissance autour du livre"
-                className="aspect-[4/3] w-full object-cover transition-transform duration-700 hover:scale-105"
+                className="aspect-[4/3] w-full rounded-xl object-cover transition-transform duration-700 hover:scale-105"
               />
-            </div>
+            </motion.div>
           </div>
         </section>
 
-        {/* SECTION 7: CASE STUDIES LOGO STRIP */}
+        {/* SECTION 7: CASE STUDIES LOGO STRIP WITH MARQUEE */}
         <section
           id="cas"
           className="relative overflow-hidden border-y border-[#141E33]/10 bg-white/60 backdrop-blur-xl py-18 md:py-22"
         >
           <div className="ambient-mesh-glow left-1/3 top-10 h-72 w-72 bg-[#E9DFCF]/50" />
           <div className="container relative z-10">
-            <div className="max-w-3xl">
-              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+            <motion.div
+              className="max-w-3xl"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-50px" }}
+              variants={fadeInUp}
+            >
+              <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Case Studies · Tunisia Edition
-              </p>
+              </motion.p>
               <h2 className="mt-4 font-display text-5xl leading-[.95] text-[#141E33]">
                 Des entreprises tunisiennes au cœur du livre.
               </h2>
               <p className="mt-5 text-base leading-7 text-[#5C574C]">
                 L’édition tunisienne relie les principes du B2B Brand Management à des études de cas issues d’entreprises et d’organisations du marché tunisien. Une preuve de terrain qui donne au lecteur des situations concrètes à analyser.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Responsive grid with frosted glass cards */}
+            {/* Responsive grid with frosted glass panels */}
             <div className="mt-10 grid grid-cols-2 gap-4 sm:grid-cols-4 lg:grid-cols-7">
               {caseStudies.map((x) => (
                 <div
                   key={x.name}
-                  className="glass-card-light flex min-h-36 flex-col items-center justify-center gap-3 rounded-2xl border border-white/80 p-5 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
+                  className="glass-panel flex min-h-36 flex-col items-center justify-center gap-3 rounded-2xl p-5 text-center transition-all duration-300 hover:scale-[1.02] hover:shadow-md"
                 >
                   <img
                     src={`/editorial/case-study-logos/${x.logo}`}
@@ -405,7 +513,7 @@ export default function Home() {
 
         {/* SECTION 8: EDUCATOR OFFER */}
         <section id="educator" className="container py-20 md:py-28">
-          <div className="grid overflow-hidden rounded-3xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-xl lg:grid-cols-[.9fr_1.1fr]">
+          <div className="glass-panel grid overflow-hidden rounded-3xl shadow-xl lg:grid-cols-[.9fr_1.1fr]">
             <div className="flex flex-col justify-between p-8 md:p-12">
               <div>
                 <div className="inline-flex items-center gap-2 rounded-full bg-[#BC3B2C] px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white shadow-xs">
@@ -487,13 +595,22 @@ export default function Home() {
           </div>
 
           {/* SECTION 10: CLOSING CTA BAND */}
-          <div className="glass-card-light mt-12 flex flex-col items-start justify-between gap-6 rounded-3xl p-8 shadow-md md:flex-row md:items-center md:p-10 border border-white/90">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            variants={fadeInUp}
+            className="glass-panel mt-12 flex flex-col items-start justify-between gap-6 rounded-3xl p-8 shadow-md md:flex-row md:items-center md:p-10 border border-white/90"
+          >
             <div>
-              <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
+              <motion.p variants={kickerReveal} className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
                 Tunisia Edition
-              </p>
+              </motion.p>
               <h2 className="mt-2 font-display text-4xl text-[#141E33]">
-                Faites du branding B2B un avantage stratégique.
+                Faites du branding B2B un{" "}
+                <span className="bg-gradient-to-r from-[#141E33] via-[#BC3B2C] to-[#BC3B2C] bg-clip-text text-transparent">
+                  avantage stratégique.
+                </span>
               </h2>
             </div>
             <Link
@@ -502,7 +619,7 @@ export default function Home() {
             >
               Commander <ArrowRight className="h-4 w-4" />
             </Link>
-          </div>
+          </motion.div>
         </section>
       </main>
       <SiteFooter />

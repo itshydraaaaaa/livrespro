@@ -63,7 +63,7 @@ export default function Shop() {
           </div>
 
           {tags.length > 0 && (
-            <div className="mt-6 flex flex-wrap gap-2">
+            <div className="glass-panel mt-6 flex flex-wrap gap-2 rounded-2xl p-2.5 border border-white/80">
               {["Tous les livres", ...tags].map(tag => {
                 const isActive = activeTag === tag;
                 return (
@@ -75,7 +75,7 @@ export default function Shop() {
                     className={`relative rounded-full px-5 py-2.5 text-[10px] font-extrabold uppercase tracking-[0.14em] transition-all duration-300 ${
                       isActive
                         ? "text-[#F6F1E7]"
-                        : "glass-pill text-[#5C574C] hover:border-[#141E33] hover:text-[#141E33] hover:bg-white"
+                        : "text-[#5C574C] hover:text-[#141E33]"
                     }`}
                   >
                     {isActive && (
