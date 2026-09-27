@@ -10,13 +10,9 @@ export function SiteFooter() {
           <p className="mt-5 max-w-sm text-sm leading-6 text-white/70">
             Une sélection éditoriale business conçue pour transformer les idées en décisions, puis les décisions en impact.
           </p>
-          <div className="mt-6">
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 text-xs font-bold text-[#E9DFCF] transition hover:text-[#BC3B2C] underline underline-offset-4"
-            >
-              🔐 Espace Administration & Connexion
-            </Link>
+          <div className="mt-6 flex items-center gap-2.5 rounded-full border border-white/10 bg-white/[0.05] px-4 py-2 text-xs font-medium text-[#E9DFCF] backdrop-blur-md w-fit">
+            <span className="h-2 w-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span>Livraison COD sur toute la Tunisie</span>
           </div>
         </div>
 
@@ -37,8 +33,8 @@ export function SiteFooter() {
             <a href="/#educator" className="block transition-colors hover:text-white">
               Offre Enseignants & Formateurs
             </a>
-            <Link href="/admin" className="block transition-colors hover:text-white">
-              Tableau de bord Back-Office
+            <Link href="/mon-compte" className="block transition-colors hover:text-white">
+              Espace Lecteur & Commandes
             </Link>
           </div>
         </div>
@@ -68,16 +64,16 @@ export function SiteFooter() {
           </span>
         </div>
         <div className="flex items-center gap-4">
-          <Link href="/login" className="hover:text-white">
+          <Link href="/login" className="transition-colors hover:text-white">
             Connexion
           </Link>
           <span>·</span>
-          <Link href="/login" className="hover:text-white">
+          <Link href="/login" className="transition-colors hover:text-white">
             Inscription
           </Link>
           <span>·</span>
-          <Link href="/admin" className="hover:text-white">
-            Admin
+          <Link href="/mon-compte" className="transition-colors hover:text-white">
+            Mon Compte
           </Link>
         </div>
       </div>

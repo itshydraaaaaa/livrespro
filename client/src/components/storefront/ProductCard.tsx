@@ -14,8 +14,8 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
 
   return (
     <article className="group animate-rise" style={{ animationDelay: `${index * 65}ms` }}>
-      <Link href={`/livres/${product.handle}`} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BC3B2C] rounded-xl">
-        <div className="relative mb-5 aspect-[3/4] overflow-hidden rounded-xl bg-[#E9DFCF] shadow-[0_16px_32px_-12px_rgba(20,30,51,0.22)] ring-1 ring-[#141E33]/08 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-1.5 group-hover:shadow-[0_24px_44px_-10px_rgba(20,30,51,0.3)]">
+      <Link href={`/livres/${product.handle}`} className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-[#BC3B2C] rounded-2xl">
+        <div className="relative mb-5 aspect-[3/4] overflow-hidden rounded-2xl bg-[#E9DFCF] shadow-[0_16px_32px_-12px_rgba(20,30,51,0.18)] ring-1 ring-[#141E33]/08 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:-translate-y-2 group-hover:shadow-[0_24px_48px_-10px_rgba(20,30,51,0.28)]">
           {image?.url ? (
             <img
               src={image.url}
@@ -27,7 +27,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
               <BookOpen className="h-10 w-10 text-[#141E33]/30" strokeWidth={1.2} />
             </div>
           )}
-          <span className="absolute right-3.5 top-3.5 grid h-9 w-9 place-items-center rounded-full bg-[#F6F1E7]/90 text-[#141E33] opacity-0 shadow-md backdrop-blur-sm transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:scale-105">
+          <span className="glass-pill absolute right-3.5 top-3.5 grid h-9 w-9 place-items-center rounded-full text-[#141E33] opacity-0 shadow-md backdrop-blur-md transition-all duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:opacity-100 group-hover:scale-105 border border-white/80">
             <ArrowUpRight className="h-4 w-4" />
           </span>
         </div>
@@ -39,7 +39,7 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         </h3>
         <div className="mt-3 flex items-center justify-between gap-3 text-sm text-[#5C574C]">
           <span className="truncate">{product.vendor || "Édition indépendante"}</span>
-          <span className="shrink-0 font-semibold text-[#141E33]">
+          <span className="shrink-0 font-bold text-[#141E33]">
             {formatMoney(product.priceRange.min)}
           </span>
         </div>

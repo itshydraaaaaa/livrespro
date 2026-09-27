@@ -153,12 +153,13 @@ export default function Account() {
           <span className="text-[#141E33]">Mon Compte</span>
         </nav>
 
-        {/* Hero Profile Banner with Dashboard Elevation */}
-        <div className="overflow-hidden rounded-2xl border border-[#141E33]/10 bg-white shadow-md">
-          <div className="bg-[#141E33] px-6 py-8 text-white sm:px-8">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        {/* Hero Profile Banner with Glassmorphic Dashboard Elevation */}
+        <div className="overflow-hidden rounded-3xl border border-white/80 bg-white/70 backdrop-blur-xl shadow-xl">
+          <div className="relative overflow-hidden bg-[#141E33] px-6 py-8 text-white sm:px-8">
+            <div className="ambient-mesh-glow -right-10 -top-10 h-64 w-64 bg-[#BC3B2C]/20" />
+            <div className="relative z-10 flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
               <div className="flex items-center gap-4">
-                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#BC3B2C] font-display text-2xl font-bold text-white shadow-md">
+                <div className="grid h-16 w-16 shrink-0 place-items-center rounded-2xl bg-[#BC3B2C] font-display text-2xl font-bold text-white shadow-md ring-2 ring-white/20">
                   {initials}
                 </div>
                 <div>

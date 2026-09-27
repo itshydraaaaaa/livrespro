@@ -91,15 +91,15 @@ export function CheckoutModal() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="fixed inset-0 bg-[#141E33]/60 backdrop-blur-sm transition-opacity"
+        className="fixed inset-0 bg-[#141E33]/70 backdrop-blur-md transition-opacity"
         onClick={handleClose}
       />
 
-      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-2xl border border-[#141E33]/15 bg-[#F6F1E7] p-6 text-[#141E33] shadow-2xl sm:p-9">
+      <div className="relative max-h-[92vh] w-full max-w-2xl overflow-y-auto rounded-3xl border border-white/80 bg-[#F6F1E7]/95 backdrop-blur-2xl p-6 text-[#141E33] shadow-[0_30px_70px_-15px_rgba(20,30,51,0.35)] sm:p-9 ring-1 ring-[#141E33]/05">
         <button
           type="button"
           onClick={handleClose}
-          className="absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full border border-[#141E33]/15 text-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7] transition-colors"
+          className="glass-pill absolute right-5 top-5 grid h-9 w-9 place-items-center rounded-full text-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7] transition-colors"
           aria-label="Fermer"
         >
           <X className="h-4 w-4" />

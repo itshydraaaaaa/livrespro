@@ -22,12 +22,12 @@ export function SiteHeader() {
     <header
       className={`sticky top-0 z-40 transition-all duration-300 ${
         isScrolled
-          ? "border-b border-[#141E33]/10 bg-[#F6F1E7]/92 shadow-[0_10px_30px_rgba(20,30,51,0.06)] backdrop-blur-xl"
-          : "border-b border-[#141E33]/08 bg-[#F6F1E7]/95 backdrop-blur-md"
+          ? "border-b border-white/80 bg-[#F6F1E7]/85 shadow-[0_12px_36px_-6px_rgba(20,30,51,0.07)] backdrop-blur-2xl"
+          : "border-b border-[#141E33]/06 bg-[#F6F1E7]/90 backdrop-blur-xl"
       }`}
     >
       {/* Top Tunisia Delivery Strip */}
-      <div className="border-b border-[#141E33]/10 bg-[#141E33] px-4 py-1 text-center text-[10px] font-semibold tracking-wider text-[#F6F1E7]/90">
+      <div className="border-b border-white/10 bg-[#141E33]/95 backdrop-blur-md px-4 py-1.5 text-center text-[10px] font-semibold tracking-wider text-[#F6F1E7]/90">
         <span className="flex items-center justify-center gap-2">
           <span>🇹🇳</span>
           <span>Livraison express COD sur les 24 gouvernorats de Tunisie · Paiement à la réception</span>
@@ -79,7 +79,7 @@ export function SiteHeader() {
               {user.role === "admin" && (
                 <Link
                   href="/admin"
-                  className="flex h-10 items-center gap-2 rounded-full bg-[#141E33] px-4 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#F6F1E7] transition hover:bg-[#BC3B2C]"
+                  className="flex h-10 items-center gap-2 rounded-full bg-[#141E33] px-4 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#F6F1E7] shadow-xs transition hover:bg-[#BC3B2C]"
                   title="Accéder au Tableau de bord Administrateur"
                 >
                   <LayoutDashboard className="h-3.5 w-3.5" />
@@ -88,7 +88,7 @@ export function SiteHeader() {
               )}
               <Link
                 href="/mon-compte"
-                className="flex h-10 items-center gap-2 rounded-full border border-[#141E33]/20 bg-white/70 px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7]"
+                className="glass-pill flex h-10 items-center gap-2 rounded-full px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7]"
                 title="Consulter mon profil et mes commandes"
               >
                 <User className="h-3.5 w-3.5 text-[#BC3B2C]" />
@@ -101,7 +101,7 @@ export function SiteHeader() {
           ) : (
             <Link
               href="/login"
-              className="flex h-10 items-center gap-2 rounded-full border border-[#141E33]/20 bg-white/60 px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7]"
+              className="glass-pill flex h-10 items-center gap-2 rounded-full px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7]"
               title="Se connecter ou Créer un compte"
             >
               <User className="h-3.5 w-3.5" />
@@ -115,12 +115,12 @@ export function SiteHeader() {
             type="button"
             data-pressable
             onClick={openCart}
-            className="relative flex h-10 items-center gap-2 rounded-full border border-[#141E33]/15 bg-white/60 px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] shadow-xs transition hover:border-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7]"
+            className="glass-pill relative flex h-10 items-center gap-2 rounded-full px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition hover:border-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7]"
             aria-label={`Ouvrir le panier, ${itemCount} article${itemCount > 1 ? "s" : ""}`}
           >
             <ShoppingBag className="h-4 w-4" />
             <span className="hidden md:inline">Panier</span>
-            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#BC3B2C] px-1 text-[10px] text-white font-bold">
+            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#BC3B2C] px-1 text-[10px] text-white font-bold shadow-xs">
               {itemCount}
             </span>
           </button>

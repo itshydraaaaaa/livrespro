@@ -22,13 +22,13 @@ export function CartDrawer() {
         type="button"
         aria-label="Fermer le panier"
         onClick={closeCart}
-        className="absolute inset-0 cursor-default bg-[#141E33]/40 backdrop-blur-[3px] transition-opacity"
+        className="absolute inset-0 cursor-default bg-[#141E33]/60 backdrop-blur-md transition-opacity"
       />
       <aside
         role="dialog"
         aria-modal="true"
         aria-label="Votre panier"
-        className="absolute right-0 top-0 flex h-full w-full max-w-[430px] flex-col bg-[#F6F1E7] shadow-2xl animate-drawer"
+        className="absolute right-0 top-0 flex h-full w-full max-w-[430px] flex-col bg-[#F6F1E7]/95 backdrop-blur-2xl border-l border-white/80 shadow-[0_25px_60px_-15px_rgba(20,30,51,0.35)] animate-drawer"
       >
         <div className="flex items-center justify-between border-b border-[#141E33]/10 px-6 py-5">
           <div>
@@ -39,7 +39,7 @@ export function CartDrawer() {
             type="button"
             data-pressable
             onClick={closeCart}
-            className="grid h-10 w-10 place-items-center rounded-full border border-[#141E33]/15 text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7]"
+            className="glass-pill grid h-10 w-10 place-items-center rounded-full text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7]"
             aria-label="Fermer"
           >
             <X className="h-5 w-5" />
