@@ -62,6 +62,8 @@ export type Product = {
   /** Available option dimensions (e.g. Size, Color) for the variant picker. */
   options: ProductOption[];
   variants: ProductVariant[];
+  tableOfContentsPdf?: string | null;
+  pageCount?: number | null;
 };
 
 export type Collection = {

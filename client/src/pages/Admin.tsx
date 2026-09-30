@@ -228,6 +228,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
       toast.success("Livre enregistré dans le catalogue !");
       utils.admin.products.list.invalidate();
       utils.admin.overview.invalidate();
+      utils.commerce.products.invalidate();
     },
     onError: (err) => toast.error(err.message || "Erreur lors de l'enregistrement du livre"),
   });
@@ -236,6 +237,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
     onSuccess: () => {
       toast.success("Catalogue mis à jour !");
       utils.admin.products.list.invalidate();
+      utils.commerce.products.invalidate();
     },
     onError: (err) => toast.error(err.message || "Erreur de mise à jour"),
   });
@@ -245,6 +247,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
       toast.success("Livre archivé / supprimé.");
       utils.admin.products.list.invalidate();
       utils.admin.overview.invalidate();
+      utils.commerce.products.invalidate();
     },
   });
 
@@ -252,6 +255,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
     onSuccess: () => {
       toast.success("Catégorie enregistrée !");
       utils.admin.categories.list.invalidate();
+      utils.commerce.collections.invalidate();
     },
   });
 
@@ -259,6 +263,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
     onSuccess: () => {
       toast.success("Catégorie supprimée.");
       utils.admin.categories.list.invalidate();
+      utils.commerce.collections.invalidate();
     },
   });
 

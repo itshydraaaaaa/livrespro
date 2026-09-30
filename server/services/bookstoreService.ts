@@ -4,7 +4,7 @@ import { fetchProductsFromSupabase } from "./supabase";
 
 const FALLBACK_B2B_PRODUCT: Product = {
   id: "1",
-  handle: "b2b-brand-management-tunisia",
+  handle: "b2b-brand-management",
   title: "B2B Brand Management — Édition Tunisie",
   description:
     "L'ouvrage de référence internationale de Philip Kotler & Waldemar Pfoertsch, adapté au contexte économique et managérial tunisien par Walid Kallel. Inclus 7 cas réels d'entreprises tunisiennes (BIAT, Wallyscar, MSB, ARVEA, Gourmandise, MPBS, CHO Group).",
@@ -134,6 +134,8 @@ function normalizeDbProduct(p: db.FullProduct): Product {
         ],
       },
     ],
+    tableOfContentsPdf: p.tableOfContentsPdf ?? (p.metadata as any)?.tableOfContentsPdf ?? null,
+    pageCount: p.pageCount ?? null,
   };
 }
 
@@ -226,14 +228,22 @@ export async function listStorefrontProducts(options?: {
 
 export async function getStorefrontProductByHandle(handle: string): Promise<Product | null> {
   try {
-    const p = await db.getProductBySlug(handle);
+    let p = await db.getProductBySlug(handle);
+    if (!p && (handle === "b2b-brand-management" || handle === "b2b-brand-management-tunisia")) {
+      const altSlug = handle === "b2b-brand-management" ? "b2b-brand-management-tunisia" : "b2b-brand-management";
+      p = await db.getProductBySlug(altSlug);
+    }
     if (!p || p.status !== "published") {
-      if (handle === FALLBACK_B2B_PRODUCT.handle) return FALLBACK_B2B_PRODUCT;
+      if (handle === FALLBACK_B2B_PRODUCT.handle || handle === "b2b-brand-management" || handle === "b2b-brand-management-tunisia") {
+        return { ...FALLBACK_B2B_PRODUCT, handle };
+      }
       return null;
     }
     return normalizeDbProduct(p);
   } catch {
-    if (handle === FALLBACK_B2B_PRODUCT.handle) return FALLBACK_B2B_PRODUCT;
+    if (handle === FALLBACK_B2B_PRODUCT.handle || handle === "b2b-brand-management" || handle === "b2b-brand-management-tunisia") {
+      return { ...FALLBACK_B2B_PRODUCT, handle };
+    }
     return null;
   }
 }

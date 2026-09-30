@@ -8,7 +8,7 @@ import { formatMoney } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
 import { ArrowLeft, BookOpen, Check, ShoppingBag } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { Link, useRoute } from "wouter";
 
 export default function ProductDetail() {
@@ -20,6 +20,28 @@ export default function ProductDetail() {
   );
   const { addItem, loading: cartLoading } = useCart();
   const { data: related = [] } = trpc.commerce.products.list.useQuery({ first: 4 });
+  const publishedSectionsQuery = trpc.site?.content?.published?.useQuery ? trpc.site.content.published.useQuery() : { data: [] };
+  const publishedSections = publishedSectionsQuery?.data;
+
+  const educatorSection = (publishedSections ?? []).find((s: any) => s.key === "educator-offer");
+  const educatorOffer = useMemo(() => {
+    let offer = {
+      trigger: "B2B Brand Management — Tunisia Edition",
+      discount: "50",
+      audience: "Enseignants et Formateurs",
+      companion: "Educator’s Guide & Case Study Companion — Tunisia Edition 2026",
+    };
+    if (educatorSection?.body) {
+      try {
+        const parsed = JSON.parse(educatorSection.body);
+        if (parsed.trigger) offer.trigger = parsed.trigger;
+        if (parsed.discount) offer.discount = parsed.discount;
+        if (parsed.audience) offer.audience = parsed.audience;
+        if (parsed.companion) offer.companion = parsed.companion;
+      } catch {}
+    }
+    return offer;
+  }, [educatorSection]);
 
   useEffect(() => {
     if (product?.handle) trackBehavior({ eventType: "view_book", productHandle: product.handle });
@@ -121,26 +143,26 @@ export default function ProductDetail() {
             <div className="container grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
               <div>
                 <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#BC3B2C]">Offre Educator</p>
-                <h2 className="mt-3 font-display text-4xl leading-tight text-[#141E33]">Vous êtes enseignant ou formateur ?</h2>
+                <h2 className="mt-3 font-display text-4xl leading-tight text-[#141E33]">Vous êtes {educatorOffer.audience.toLowerCase()} ?</h2>
                 <p className="mt-4 max-w-2xl text-sm leading-7 text-[#5C574C]">
-                  À l’achat de <strong>B2B Brand Management — Tunisia Edition</strong>, les enseignants et formateurs éligibles bénéficient de <strong>50 % de remise</strong> sur la version numérique de l’<em>Educator’s Guide & Case Study Companion — Tunisia Edition 2026</em>.
+                  À l’achat de <strong>{educatorOffer.trigger}</strong>, les {educatorOffer.audience.toLowerCase()} éligibles bénéficient de <strong>{educatorOffer.discount} % de remise</strong> sur la version numérique de l’<em>{educatorOffer.companion}</em>.
                 </p>
                 <Link href="/educators" className="mt-6 inline-flex items-center gap-2 border-b-2 border-[#BC3B2C] pb-1 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#BC3B2C] hover:text-[#141E33] transition-colors">
                   Découvrir l’avantage Educator
                 </Link>
               </div>
               <div className="rounded-xl border-l-4 border-[#BC3B2C] bg-[#E9DFCF]/50 p-7 shadow-xs">
-                <p className="font-display text-6xl text-[#BC3B2C]">−50%</p>
-                <p className="mt-3 text-xs leading-5 text-[#5C574C]">Version numérique · avec achat du livre + statut enseignant/formateur éligible.</p>
+                <p className="font-display text-6xl text-[#BC3B2C]">−{educatorOffer.discount}%</p>
+                <p className="mt-3 text-xs leading-5 text-[#5C574C]">Version numérique · avec achat du livre + statut {educatorOffer.audience.toLowerCase()} éligible.</p>
               </div>
             </div>
           </section>
         )}
 
-        {((product as any).tableOfContentsPdf || product.title.toLowerCase().includes("b2b brand") || product.handle.includes("b2b")) && (
+        {Boolean(product.tableOfContentsPdf || product.title.toLowerCase().includes("b2b brand") || product.handle.includes("b2b")) && (
           <section className="container py-10 md:py-16">
             <ProtectedBookTableOfContents
-              pdfUrl={(product as any).tableOfContentsPdf}
+              pdfUrl={product.tableOfContentsPdf || undefined}
               bookTitle={product.title}
             />
           </section>

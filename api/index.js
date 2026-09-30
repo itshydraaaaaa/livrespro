@@ -1098,7 +1098,7 @@ import { z as z2 } from "zod";
 // server/services/bookstoreService.ts
 var FALLBACK_B2B_PRODUCT = {
   id: "1",
-  handle: "b2b-brand-management-tunisia",
+  handle: "b2b-brand-management",
   title: "B2B Brand Management \u2014 \xC9dition Tunisie",
   description: "L'ouvrage de r\xE9f\xE9rence internationale de Philip Kotler & Waldemar Pfoertsch, adapt\xE9 au contexte \xE9conomique et manag\xE9rial tunisien par Walid Kallel. Inclus 7 cas r\xE9els d'entreprises tunisiennes (BIAT, Wallyscar, MSB, ARVEA, Gourmandise, MPBS, CHO Group).",
   descriptionHtml: "<p>L'ouvrage de r\xE9f\xE9rence internationale de <strong>Philip Kotler & Waldemar Pfoertsch</strong>, adapt\xE9 au contexte \xE9conomique et manag\xE9rial tunisien par <strong>Walid Kallel</strong>.</p><p>Comprend 7 \xE9tudes de cas approfondies d'entreprises tunisiennes leaders dans leur secteur.</p>",
@@ -1212,7 +1212,9 @@ function normalizeDbProduct(p) {
           }
         ]
       }
-    ]
+    ],
+    tableOfContentsPdf: p.tableOfContentsPdf ?? p.metadata?.tableOfContentsPdf ?? null,
+    pageCount: p.pageCount ?? null
   };
 }
 async function listStorefrontProducts(options) {
@@ -1295,14 +1297,22 @@ async function listStorefrontProducts(options) {
 }
 async function getStorefrontProductByHandle(handle) {
   try {
-    const p = await getProductBySlug(handle);
+    let p = await getProductBySlug(handle);
+    if (!p && (handle === "b2b-brand-management" || handle === "b2b-brand-management-tunisia")) {
+      const altSlug = handle === "b2b-brand-management" ? "b2b-brand-management-tunisia" : "b2b-brand-management";
+      p = await getProductBySlug(altSlug);
+    }
     if (!p || p.status !== "published") {
-      if (handle === FALLBACK_B2B_PRODUCT.handle) return FALLBACK_B2B_PRODUCT;
+      if (handle === FALLBACK_B2B_PRODUCT.handle || handle === "b2b-brand-management" || handle === "b2b-brand-management-tunisia") {
+        return { ...FALLBACK_B2B_PRODUCT, handle };
+      }
       return null;
     }
     return normalizeDbProduct(p);
   } catch {
-    if (handle === FALLBACK_B2B_PRODUCT.handle) return FALLBACK_B2B_PRODUCT;
+    if (handle === FALLBACK_B2B_PRODUCT.handle || handle === "b2b-brand-management" || handle === "b2b-brand-management-tunisia") {
+      return { ...FALLBACK_B2B_PRODUCT, handle };
+    }
     return null;
   }
 }

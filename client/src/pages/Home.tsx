@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { AnimatedCounter } from "@/components/storefront/AnimatedCounter";
 import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
@@ -126,7 +126,32 @@ const staggerContainer: Variants = {
 export default function Home() {
   const prefersReduced = useReducedMotion();
   const { data: publishedSections } = trpc.site.content.published.useQuery();
+  const { data: mainBook } = trpc.commerce.products.byHandle.useQuery({
+    handle: "b2b-brand-management",
+  });
   const posts = (publishedSections ?? []).filter((p: any) => p.key !== "educator-offer");
+
+  const educatorSection = (publishedSections ?? []).find((p: any) => p.key === "educator-offer");
+  const educatorOffer = useMemo(() => {
+    let offer = {
+      trigger: "B2B Brand Management — Tunisia Edition",
+      discount: "50",
+      audience: "Enseignants et Formateurs",
+      companion: "Educator’s Guide & Case Study Companion — Tunisia Edition 2026",
+    };
+    if (educatorSection?.body) {
+      try {
+        const parsed = JSON.parse(educatorSection.body);
+        if (parsed.trigger) offer.trigger = parsed.trigger;
+        if (parsed.discount) offer.discount = parsed.discount;
+        if (parsed.audience) offer.audience = parsed.audience;
+        if (parsed.companion) offer.companion = parsed.companion;
+      } catch {
+        // Body was plain text fallback
+      }
+    }
+    return offer;
+  }, [educatorSection]);
 
   const heroSectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -255,8 +280,8 @@ export default function Home() {
                 className="relative overflow-hidden rounded-2xl shadow-2xl ring-1 ring-[#141E33]/10"
               >
                 <img
-                  src="/editorial/b2b-launch/main-book.png"
-                  alt="B2B Brand Management Tunisia Edition - The Main Book"
+                  src={mainBook?.images?.[0]?.url || "/editorial/b2b-launch/main-book.png"}
+                  alt={mainBook?.title || "B2B Brand Management Tunisia Edition - The Main Book"}
                   fetchPriority="high"
                   decoding="async"
                   className="h-[380px] sm:h-[500px] lg:h-[620px] w-full object-contain object-center transition-transform duration-700 hover:scale-105 drop-shadow-2xl"
@@ -264,7 +289,9 @@ export default function Home() {
                 {/* Floating Glassmorphic Pill on Book Cover */}
                 <div className="glass-panel absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex items-center gap-2.5 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-[#141E33] shadow-lg">
                   <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
-                  <span>Édition Reliée · 65,00 DT</span>
+                  <span>
+                    Édition Reliée · {mainBook?.priceRange?.min ? `${parseFloat(mainBook.priceRange.min.amount).toFixed(2).replace(".", ",")} DT` : "65,00 DT"}
+                  </span>
                 </div>
               </motion.div>
             </motion.div>
@@ -525,7 +552,10 @@ export default function Home() {
 
         {/* SECTION: SOMMAIRE & STRUCTURE DE L'OUVRAGE (LECTURE PROTÉGÉE) */}
         <section id="decouvrir" className="container py-12 md:py-16">
-          <ProtectedBookTableOfContents />
+          <ProtectedBookTableOfContents
+            pdfUrl={mainBook?.tableOfContentsPdf || undefined}
+            bookTitle={mainBook?.title || "B2B Brand Management — Tunisia Edition"}
+          />
         </section>
 
         {/* SECTION 8: EDUCATOR OFFER */}
@@ -540,7 +570,7 @@ export default function Home() {
                   Vous enseignez ou formez au marketing ?
                 </h2>
                 <p className="mt-5 text-base leading-7 text-[#5C574C]">
-                  À l’achat de <strong>B2B Brand Management — Tunisia Edition</strong>, les enseignants et formateurs éligibles bénéficient de <strong>50 % de remise</strong> sur la version numérique de l’<em>Educator’s Guide & Case Study Companion — Tunisia Edition 2026</em>.
+                  À l’achat de <strong>{educatorOffer.trigger}</strong>, les {educatorOffer.audience.toLowerCase()} éligibles bénéficient de <strong>{educatorOffer.discount} % de remise</strong> sur la version numérique de l’<em>{educatorOffer.companion}</em>.
                 </p>
 
                 <div className="mt-8 flex flex-wrap gap-3">
@@ -555,7 +585,7 @@ export default function Home() {
 
               <div className="mt-8 flex items-start gap-3 text-xs leading-5 text-[#5C574C]">
                 <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#BC3B2C]" />
-                Avantage réservé aux enseignants et formateurs, conditionné à l’achat du livre.
+                Avantage réservé aux {educatorOffer.audience.toLowerCase()}, conditionné à l’achat du livre.
               </div>
             </div>
 
@@ -563,7 +593,7 @@ export default function Home() {
               <div className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-[#141E33]/10">
                 <img
                   src={`${A}book-front.jpg`}
-                  alt="B2B Brand Management"
+                  alt={educatorOffer.trigger}
                   loading="lazy"
                   decoding="async"
                   className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
@@ -575,12 +605,12 @@ export default function Home() {
                   Digital companion
                 </p>
                 <h3 className="mt-3 font-display text-2xl sm:text-3xl">
-                  Educator’s Guide & Case Study Companion
+                  {educatorOffer.companion}
                 </h3>
-                <p className="mt-4 text-sm text-white/60">Tunisia Edition 2026</p>
-                <p className="mt-8 font-display text-4xl sm:text-5xl text-[#E9DFCF]">−50%</p>
+                <p className="mt-4 text-sm text-white/60">{educatorOffer.trigger}</p>
+                <p className="mt-8 font-display text-4xl sm:text-5xl text-[#E9DFCF]">−{educatorOffer.discount}%</p>
                 <p className="mt-2 text-xs text-white/60">
-                  avec achat du livre + statut Educator éligible
+                  avec achat du livre + statut {educatorOffer.audience} éligible
                 </p>
               </div>
             </div>

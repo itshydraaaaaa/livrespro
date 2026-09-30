@@ -24,6 +24,7 @@ export type FullProduct = DbProduct & {
   authors: Array<{ id: number; name: string; slug: string; role: string }>;
   images: Array<{ id: number; url: string; alt: string | null; isPrimary: number }>;
   category: Category | null;
+  tableOfContentsPdf?: string | null;
 };
 
 export type ContentSectionInput = {

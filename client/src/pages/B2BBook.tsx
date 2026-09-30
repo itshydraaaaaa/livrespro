@@ -3,7 +3,7 @@ import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { toast } from "sonner";
 
 const A = "/editorial/b2b-launch/";
@@ -13,6 +13,31 @@ export default function B2BBook() {
   const [educator, setEducator] = useState(false);
   const [done, setDone] = useState<string | number | null>(null);
   const [f, setF] = useState({ firstName: "", lastName: "", email: "", phone: "", deliveryAddress: "" });
+
+  const { data: mainBook } = trpc.commerce.products.byHandle.useQuery({
+    handle: "b2b-brand-management",
+  });
+  const { data: publishedSections } = trpc.site.content.published.useQuery();
+
+  const educatorSection = (publishedSections ?? []).find((s: any) => s.key === "educator-offer");
+  const educatorOffer = useMemo(() => {
+    let offer = {
+      trigger: "B2B Brand Management — Tunisia Edition",
+      discount: "50",
+      audience: "Enseignants et Formateurs",
+      companion: "Educator’s Guide & Case Study Companion — Tunisia Edition 2026",
+    };
+    if (educatorSection?.body) {
+      try {
+        const parsed = JSON.parse(educatorSection.body);
+        if (parsed.trigger) offer.trigger = parsed.trigger;
+        if (parsed.discount) offer.discount = parsed.discount;
+        if (parsed.audience) offer.audience = parsed.audience;
+        if (parsed.companion) offer.companion = parsed.companion;
+      } catch {}
+    }
+    return offer;
+  }, [educatorSection]);
 
   const order = trpc.site.orders.create.useMutation({
     onSuccess: (r: any) => {
@@ -28,8 +53,9 @@ export default function B2BBook() {
       ...f,
       quantity: qty,
       educator,
-      productHandle: "b2b-brand-management",
-      productTitle: "B2B Brand Management — Tunisia Edition",
+      productHandle: mainBook?.handle || "b2b-brand-management",
+      productTitle: mainBook?.title || "B2B Brand Management — Tunisia Edition",
+      unitPrice: mainBook?.priceRange?.min?.amount || "65.00",
     });
   };
 
@@ -73,7 +99,12 @@ export default function B2BBook() {
               Une édition tunisienne qui relie les fondamentaux internationaux du B2B Brand Management à des études de cas et à la réalité des organisations tunisiennes.
             </p>
             <div className="mt-8 rounded-xl border border-[#141E33]/10 bg-white p-6 shadow-xs">
-              <p className="text-xs font-extrabold uppercase tracking-[.15em] text-[#5C574C]">Paiement</p>
+              <div className="flex items-baseline justify-between">
+                <p className="text-xs font-extrabold uppercase tracking-[.15em] text-[#5C574C]">Prix & Paiement</p>
+                <p className="font-display text-2xl text-[#BC3B2C]">
+                  {mainBook?.priceRange?.min ? `${parseFloat(mainBook.priceRange.min.amount).toFixed(2).replace(".", ",")} DT` : "65,00 DT"}
+                </p>
+              </div>
               <p className="mt-2 flex items-center gap-2 font-semibold text-[#141E33]">
                 <Truck className="h-5 w-5 text-[#BC3B2C]" /> Paiement à la livraison
               </p>
@@ -98,8 +129,11 @@ export default function B2BBook() {
           </div>
         </section>
 
-        <section className="container py-8">
-          <ProtectedBookTableOfContents />
+        <section id="sommaire" className="container py-8">
+          <ProtectedBookTableOfContents
+            pdfUrl={mainBook?.tableOfContentsPdf || undefined}
+            bookTitle={mainBook?.title || "B2B Brand Management — Tunisia Edition"}
+          />
         </section>
 
         <section className="border-y border-[#141E33]/10 bg-white py-16">
@@ -147,16 +181,16 @@ export default function B2BBook() {
                 <GraduationCap className="h-4 w-4" /> Offre Educator
               </div>
               <h2 className="mt-5 font-display text-4xl text-[#141E33]">
-                Vous êtes enseignant ou formateur ?
+                Vous êtes {educatorOffer.audience.toLowerCase()} ?
               </h2>
               <p className="mt-4 text-sm leading-7 text-[#5C574C]">
-                À l’achat de ce livre, les enseignants et formateurs éligibles bénéficient de <strong>50 % de remise</strong> sur la version numérique de l’<em>Educator’s Guide & Case Study Companion — Tunisia Edition 2026</em>.
+                À l’achat de <strong>{educatorOffer.trigger}</strong>, les {educatorOffer.audience.toLowerCase()} éligibles bénéficient de <strong>{educatorOffer.discount} % de remise</strong> sur la version numérique de l’<em>{educatorOffer.companion}</em>.
               </p>
             </div>
             <div className="bg-[#141E33] p-10 text-white flex flex-col justify-center">
-              <p className="font-display text-7xl text-[#E9DFCF]">−50%</p>
+              <p className="font-display text-7xl text-[#E9DFCF]">−{educatorOffer.discount}%</p>
               <p className="mt-4 text-sm text-white/65">
-                Avantage professionnel conditionné à l’achat du livre et au statut enseignant/formateur.
+                Avantage professionnel conditionné à l’achat du livre et au statut {educatorOffer.audience.toLowerCase()}.
               </p>
             </div>
           </div>
@@ -188,8 +222,10 @@ export default function B2BBook() {
               <form onSubmit={submit} className="rounded-2xl bg-white p-5 sm:p-7 md:p-9 text-[#141E33] shadow-xl">
                 <div className="mb-7 flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between border-b border-[#141E33]/10 pb-5">
                   <div>
-                    <p className="font-display text-2xl text-[#141E33]">B2B Brand Management</p>
-                    <p className="text-xs text-[#5C574C]">Tunisia Edition · Paiement à la livraison</p>
+                    <p className="font-display text-2xl text-[#141E33]">{mainBook?.title || "B2B Brand Management"}</p>
+                    <p className="text-xs text-[#5C574C]">
+                      {mainBook?.priceRange?.min ? `${parseFloat(mainBook.priceRange.min.amount).toFixed(2).replace(".", ",")} DT` : "65,00 DT"} · Paiement à la livraison
+                    </p>
                   </div>
                   <div className="flex items-center rounded-full border border-[#141E33]/15 px-1 py-1">
                     <button type="button" onClick={() => setQty(Math.max(1, qty - 1))} className="p-2 text-[#141E33]">
@@ -227,10 +263,10 @@ export default function B2BBook() {
                     className="mt-1 accent-[#BC3B2C]"
                   />
                   <span>
-                    <strong>Je suis enseignant ou formateur.</strong>
+                    <strong>Je suis {educatorOffer.audience.toLowerCase()}.</strong>
                     <br />
                     <span className="text-xs text-[#5C574C]">
-                      Je souhaite bénéficier, après vérification de mon éligibilité et avec cet achat, de l’avantage Educator −50 % sur le Guide numérique.
+                      Je souhaite bénéficier, après vérification de mon éligibilité et avec cet achat, de l’avantage Educator −{educatorOffer.discount}% sur le {educatorOffer.companion}.
                     </span>
                   </span>
                 </label>
