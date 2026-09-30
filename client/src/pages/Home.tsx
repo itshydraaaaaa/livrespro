@@ -19,13 +19,13 @@ const proof = [
 ];
 
 const caseStudies = [
-  { name: "BIAT", logo: "biat.jpg" },
-  { name: "Wallyscar", logo: "wallyscar.jpg" },
-  { name: "MSB", logo: "msb.jpg" },
-  { name: "ARVEA", logo: "arvea.jpg" },
-  { name: "Gourmandise", logo: "gourmandise.jpg" },
-  { name: "MPBS", logo: "mpbs.jpg" },
-  { name: "CHO Group", logo: "cho-group.jpg" },
+  { name: "BIAT", logo: "biat.png" },
+  { name: "Wallyscar", logo: "wallyscar.png" },
+  { name: "MSB", logo: "msb.png" },
+  { name: "ARVEA", logo: "arvea.png" },
+  { name: "Gourmandise", logo: "gourmandise.png" },
+  { name: "MPBS", logo: "mpbs.png" },
+  { name: "CHO Group", logo: "cho-group.png" },
 ];
 
 const transformations = [

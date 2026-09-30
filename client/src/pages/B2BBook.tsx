@@ -112,13 +112,13 @@ export default function B2BBook() {
             </h2>
             <div className="mt-9 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
               {[
-                { name: "BIAT", logo: "biat.jpg" },
-                { name: "Wallyscar", logo: "wallyscar.jpg" },
-                { name: "MSB", logo: "msb.jpg" },
-                { name: "ARVEA", logo: "arvea.jpg" },
-                { name: "Gourmandise", logo: "gourmandise.jpg" },
-                { name: "MPBS", logo: "mpbs.jpg" },
-                { name: "CHO Group", logo: "cho-group.jpg" },
+                { name: "BIAT", logo: "biat.png" },
+                { name: "Wallyscar", logo: "wallyscar.png" },
+                { name: "MSB", logo: "msb.png" },
+                { name: "ARVEA", logo: "arvea.png" },
+                { name: "Gourmandise", logo: "gourmandise.png" },
+                { name: "MPBS", logo: "mpbs.png" },
+                { name: "CHO Group", logo: "cho-group.png" },
               ].map((x) => (
                 <div
                   className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-[#141E33]/10 bg-[#F6F1E7]/50 px-4 py-5 text-center transition-all hover:bg-white hover:shadow-sm"
