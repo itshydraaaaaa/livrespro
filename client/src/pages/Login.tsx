@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, CheckCircle2, KeyRound, Lock, Mail, ShieldAlert, User, UserPlus } from "lucide-react";
 import { Link } from "wouter";
+import { toast } from "sonner";
 
 export default function Login() {
   const [, setLocation] = useLocation();
@@ -28,10 +29,13 @@ export default function Login() {
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const searchParams = typeof window !== "undefined" ? new URLSearchParams(window.location.search) : null;
+  const redirectTarget = searchParams?.get("redirect");
+
   // If already authenticated, redirect to appropriate area
   if (isAuthenticated && user) {
     if (user.role === "admin") {
-      setLocation("/admin");
+      setLocation(redirectTarget && redirectTarget.startsWith("/admin") ? redirectTarget : "/admin");
     } else {
       setLocation("/mon-compte");
     }
@@ -46,8 +50,14 @@ export default function Login() {
     try {
       const res = await login(loginEmail, loginPassword);
       if (res?.user?.role === "admin") {
-        setLocation("/admin");
+        toast.success("Connexion administrateur réussie");
+        setLocation(redirectTarget && redirectTarget.startsWith("/admin") ? redirectTarget : "/admin");
       } else {
+        if (redirectTarget && redirectTarget.startsWith("/admin")) {
+          toast.error("Votre compte lecteur n'a pas accès à l'administration.");
+        } else {
+          toast.success("Connexion réussie");
+        }
         setLocation("/mon-compte");
       }
     } catch (err: any) {
@@ -233,39 +243,6 @@ export default function Login() {
                 className="w-full rounded-xl bg-[#141E33] py-5 text-xs font-extrabold uppercase tracking-widest text-[#F6F1E7] hover:bg-[#BC3B2C] shadow-md transition-all"
               >
                 {loading ? "Connexion en cours…" : "Se connecter"}
-              </Button>
-
-              <div className="relative my-4 flex items-center justify-center">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-[#141E33]/10" />
-                </div>
-                <span className="relative bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-[#5C574C]">
-                  Accès Back-Office
-                </span>
-              </div>
-
-              <Button
-                type="button"
-                variant="outline"
-                disabled={loading}
-                onClick={async () => {
-                  setLoginEmail("admin@livrespro.tn");
-                  setLoginPassword("AdminLivresPro2026!");
-                  setLoading(true);
-                  try {
-                    const res = await login("admin@livrespro.tn", "AdminLivresPro2026!");
-                    if (res?.user?.role === "admin") {
-                      setLocation("/admin");
-                    }
-                  } catch (err: any) {
-                    setError(err?.message || "Erreur de connexion");
-                  } finally {
-                    setLoading(false);
-                  }
-                }}
-                className="w-full rounded-xl border-[#BC3B2C]/30 bg-[#BC3B2C]/05 py-5 text-xs font-bold uppercase tracking-wider text-[#BC3B2C] hover:bg-[#BC3B2C] hover:text-white transition-all"
-              >
-                🔓 Connexion Administrateur Immédiate
               </Button>
             </form>
           )}

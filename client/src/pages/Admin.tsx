@@ -89,122 +89,101 @@ function frame(children: React.ReactNode) {
 
 export default function Admin({ tab }: { tab: AdminTab }) {
   const { user, loading } = useAuth();
+  const [, setLocation] = useLocation();
 
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F6F1E7] text-[#141E33]">
         <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#141E33] border-t-transparent" />
-        <p className="mt-3 text-xs font-semibold text-[#52606B]">Chargement du back-office LivresPro...</p>
+        <p className="mt-3 text-xs font-semibold text-[#52606B]">Vérification des autorisations d’accès...</p>
       </div>
     );
   }
 
-  if (!user || user.role !== "admin") {
-    return <AdminUnlockPortal user={user} />;
-  }
-
-  return frame(<AdminWorkspace tab={tab} />);
-}
-
-function AdminUnlockPortal({ user }: { user: any }) {
-  const [, setLocation] = useLocation();
-  const utils = trpc.useUtils();
-  const [adminPassword, setAdminPassword] = useState("AdminLivresPro2026!");
-  const [adminEmail, setAdminEmail] = useState("admin@livrespro.tn");
-  const [errorMsg, setErrorMsg] = useState<string | null>(null);
-
-  const quickLoginMutation = trpc.auth.quickAdminLogin.useMutation({
-    onSuccess: async (data) => {
-      toast.success("Authentification administrateur réussie !");
-      utils.auth.me.setData(undefined, data.user);
-      await utils.auth.me.invalidate();
-    },
-    onError: (err) => {
-      setErrorMsg(err.message || "Mot de passe administrateur invalide");
-    },
-  });
-
-  const handleUnlock = (e?: React.FormEvent) => {
-    if (e) e.preventDefault();
-    setErrorMsg(null);
-    quickLoginMutation.mutate({ password: adminPassword });
-  };
-
-  return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-[#F6F1E7] p-4 text-[#141E33]">
-      <div className="w-full max-w-md rounded-3xl border border-[#141E33]/15 bg-white p-8 shadow-2xl sm:p-10 text-center">
-        <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#E9DFCF] text-[#141E33] shadow-xs">
-          <LockKeyhole className="h-7 w-7 text-[#BC3B2C]" />
-        </div>
-
-        <p className="eyebrow mt-5 text-[#BC3B2C]">Back-Office Sécurisé</p>
-        <h1 className="mt-2 font-display text-3xl font-bold text-[#141E33]">
-          Espace Administration
-        </h1>
-        <p className="mt-2 text-xs text-[#52606B]">
-          {user ? (
-            <>
-              Connecté en tant que <strong className="text-[#141E33]">{user.email}</strong> (compte client).
-              <br />
-              Déverrouillez le tableau de bord avec les accès administrateur.
-            </>
-          ) : (
-            "Déverrouillez l'accès complet au tableau de bord, graphiques analytiques, commandes et catalogue."
-          )}
-        </p>
-
-        {errorMsg && (
-          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs text-rose-800 flex items-center gap-2">
-            <AlertTriangle className="h-4 w-4 shrink-0 text-rose-600" />
-            <span>{errorMsg}</span>
-          </div>
-        )}
-
-        <form onSubmit={handleUnlock} className="mt-6 space-y-4 text-left">
-          <div>
-            <Label className="text-xs uppercase font-bold text-[#141E33]">Identifiant Administrateur</Label>
-            <Input
-              type="email"
-              value={adminEmail}
-              onChange={(e) => setAdminEmail(e.target.value)}
-              className="mt-1 h-11 bg-[#F6F1E7] border-[#141E33]/20"
-              required
-            />
+  // 1. Visiteur non connecté : invitation stricte à s'authentifier
+  if (!user) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F6F1E7] p-4 text-[#141E33]">
+        <div className="w-full max-w-md rounded-3xl border border-[#141E33]/15 bg-white p-8 text-center shadow-2xl sm:p-10">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-amber-50 text-amber-700 shadow-xs border border-amber-200">
+            <LockKeyhole className="h-8 w-8" />
           </div>
 
-          <div>
-            <Label className="text-xs uppercase font-bold text-[#141E33]">Mot de passe Administrateur</Label>
-            <Input
-              type="text"
-              value={adminPassword}
-              onChange={(e) => setAdminPassword(e.target.value)}
-              className="mt-1 h-11 bg-[#F6F1E7] border-[#141E33]/20 font-mono"
-              required
-            />
+          <span className="mt-5 inline-block rounded-full bg-amber-100 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-amber-900">
+            Authentification Requise
+          </span>
+          <h1 className="mt-3 font-display text-2xl font-bold text-[#141E33] sm:text-3xl">
+            Espace d’Administration
+          </h1>
+          <p className="mt-3 text-xs leading-6 text-[#5C574C]">
+            L’accès à cette section est strictement réservé aux administrateurs autorisés de LivresPro.tn. Veuillez vous connecter avec vos identifiants d’administration.
+          </p>
+
+          <div className="mt-6 flex flex-col gap-3">
+            <Button
+              type="button"
+              onClick={() => setLocation("/login?redirect=/admin")}
+              className="btn-terracotta h-12 w-full rounded-xl text-xs font-bold uppercase tracking-wider text-white shadow-md"
+            >
+              Se connecter à mon compte
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setLocation("/")}
+              className="text-xs text-[#5C574C] hover:text-[#141E33]"
+            >
+              ← Retour à la boutique publique
+            </Button>
           </div>
-
-          <Button
-            type="submit"
-            disabled={quickLoginMutation.isPending}
-            className="btn-terracotta h-12 w-full rounded-xl font-bold shadow-md text-sm mt-2"
-          >
-            {quickLoginMutation.isPending ? "Authentification en cours..." : "🔓 Ouvrir le Tableau de Bord (1 Clic)"}
-          </Button>
-        </form>
-
-        <div className="mt-6 pt-6 border-t border-[#141E33]/10 flex flex-col gap-2">
-          <Button
-            type="button"
-            variant="ghost"
-            onClick={() => setLocation("/")}
-            className="text-xs text-[#52606B] hover:text-[#141E33]"
-          >
-            ← Retour à la boutique publique
-          </Button>
         </div>
       </div>
-    </div>
-  );
+    );
+  }
+
+  // 2. Utilisateur connecté mais rôle client (user) : écran 403 Forbidden sans contournement
+  if (user.role !== "admin") {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-[#F6F1E7] p-4 text-[#141E33]">
+        <div className="w-full max-w-md rounded-3xl border border-rose-200 bg-white p-8 text-center shadow-2xl sm:p-10">
+          <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-rose-50 text-rose-600 shadow-xs border border-rose-200">
+            <AlertTriangle className="h-8 w-8 text-rose-600" />
+          </div>
+
+          <span className="mt-5 inline-block rounded-full bg-rose-100 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-rose-800">
+            Accès Non Autorisé · Erreur 403
+          </span>
+          <h1 className="mt-3 font-display text-2xl font-bold text-[#141E33] sm:text-3xl">
+            Privilèges Insuffisants
+          </h1>
+          <p className="mt-3 text-xs leading-6 text-[#5C574C]">
+            Vous êtes connecté en tant que <strong className="text-[#141E33]">{user.email}</strong> (compte lecteur). Cet espace est strictement restreint à la direction et aux gestionnaires du site.
+          </p>
+
+          <div className="mt-6 flex flex-col gap-3">
+            <Button
+              type="button"
+              onClick={() => setLocation("/mon-compte")}
+              className="h-12 w-full rounded-xl bg-[#141E33] text-xs font-bold uppercase tracking-wider text-white shadow-md hover:bg-[#BC3B2C] transition-colors"
+            >
+              Consulter Mon Espace Lecteur
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setLocation("/")}
+              className="h-11 w-full rounded-xl border-[#141E33]/20 text-xs font-bold uppercase tracking-wider text-[#141E33] hover:bg-[#F6F1E7]"
+            >
+              Retour au catalogue public
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 3. Administrateur authentifié et validé
+  return frame(<AdminWorkspace tab={tab} />);
 }
 
 function AdminWorkspace({ tab }: { tab: AdminTab }) {

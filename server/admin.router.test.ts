@@ -93,4 +93,14 @@ describe("back-office tRPC", () => {
     })).rejects.toMatchObject({ code: "BAD_REQUEST" });
     expect(dbMocks.recordAnalyticsEvent).not.toHaveBeenCalled();
   });
+
+  it("ensures quickAdminLogin backdoor is completely removed from auth router", async () => {
+    const caller = appRouter.createCaller(context(null));
+    expect((appRouter._def.procedures as any)["auth.quickAdminLogin"]).toBeUndefined();
+    await expect((caller.auth as any).quickAdminLogin()).rejects.toMatchObject({
+      code: "NOT_FOUND",
+    });
+  });
 });
+
+
