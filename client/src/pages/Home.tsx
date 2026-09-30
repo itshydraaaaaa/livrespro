@@ -207,27 +207,34 @@ export default function Home() {
 
               <motion.h1
                 variants={fadeInUp}
-                className="mt-6 font-display text-[clamp(2.4rem,6vw,7.4rem)] leading-[.94] sm:leading-[.86] tracking-[-.045em] text-[#141E33]"
+                className="mt-6 font-display text-[clamp(2.1rem,4.6vw,4.9rem)] leading-[1.05] sm:leading-[0.98] tracking-[-0.035em] text-[#141E33]"
               >
-                Construire une marque B2B qui crée de la{" "}
+                B2B Branding Management : les études de cas de Kotler et Pfoertsch, par Walid Kallel,{" "}
                 <span className="italic bg-gradient-to-r from-[#BC3B2C] via-[#BC3B2C] to-[#1E5FC2] bg-clip-text text-transparent">
-                  préférence.
+                  édition Tunisie.
                 </span>
               </motion.h1>
 
-              <motion.p
+              <motion.h2
                 variants={fadeInUp}
-                className="mt-7 text-xl font-semibold text-[#141E33]"
+                className="mt-6 text-xl sm:text-2xl font-semibold text-[#141E33]"
               >
                 Philip Kotler · Waldemar Pfoertsch · Walid Kallel
-              </motion.p>
+              </motion.h2>
 
-              <motion.p
+              <motion.h5
                 variants={fadeInUp}
-                className="mt-5 max-w-2xl text-base leading-7 text-[#5C574C]"
+                className="mt-4 text-base sm:text-lg font-medium text-[#141E33]/90"
+              >
+                Le livre de référence B2B, enfin adapté au marché tunisien par Walid Kallel.
+              </motion.h5>
+
+              <motion.h5
+                variants={fadeInUp}
+                className="mt-3 max-w-2xl text-sm sm:text-base leading-7 text-[#5C574C]"
               >
                 Une édition tunisienne qui relie les fondamentaux internationaux du B2B Brand Management à des études de cas et à la réalité des organisations tunisiennes.
-              </motion.p>
+              </motion.h5>
 
               <motion.div
                 variants={fadeInUp}
