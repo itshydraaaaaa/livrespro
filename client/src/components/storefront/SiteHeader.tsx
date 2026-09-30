@@ -145,30 +145,41 @@ export function SiteHeader() {
           )}
 
           {/* Cart Trigger */}
-          <button
+          <motion.button
             type="button"
             data-pressable
+            whileTap={{ scale: 0.96 }}
             onClick={openCart}
-            className="glass-pill relative flex h-10 items-center gap-2 rounded-full px-3.5 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition hover:border-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7]"
+            className="glass-pill relative flex h-11 items-center gap-2 rounded-full px-4 text-[11px] font-extrabold uppercase tracking-[0.12em] text-[#141E33] transition-colors hover:border-[#141E33] hover:bg-[#141E33] hover:text-[#F6F1E7]"
             aria-label={`Ouvrir le panier, ${itemCount} article${itemCount > 1 ? "s" : ""}`}
           >
             <ShoppingBag className="h-4 w-4" />
             <span className="hidden md:inline">Panier</span>
-            <span className="grid h-5 min-w-5 place-items-center rounded-full bg-[#BC3B2C] px-1 text-[10px] text-white font-bold shadow-xs">
-              {itemCount}
-            </span>
-          </button>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={itemCount}
+                initial={{ scale: 0.7, opacity: 0.5 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.7, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 500, damping: 22 }}
+                className="grid h-5 min-w-5 place-items-center rounded-full bg-[#BC3B2C] px-1.5 text-[10px] text-white font-bold shadow-xs"
+              >
+                {itemCount}
+              </motion.span>
+            </AnimatePresence>
+          </motion.button>
 
           {/* Mobile Navigation Hamburger */}
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.94 }}
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="glass-pill flex h-10 w-10 items-center justify-center rounded-full text-[#141E33] transition hover:bg-[#141E33] hover:text-[#F6F1E7] lg:hidden"
+            className="glass-pill flex h-11 w-11 items-center justify-center rounded-full text-[#141E33] transition-colors hover:bg-[#141E33] hover:text-[#F6F1E7] lg:hidden"
             aria-label={isMobileMenuOpen ? "Fermer le menu" : "Ouvrir le menu"}
             aria-expanded={isMobileMenuOpen}
           >
             {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-          </button>
+          </motion.button>
         </div>
       </div>
 
@@ -179,7 +190,7 @@ export function SiteHeader() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            transition={{ type: "spring", stiffness: 340, damping: 30 }}
             className="overflow-hidden border-b border-[#141E33]/10 bg-[#F6F1E7]/95 backdrop-blur-2xl lg:hidden"
           >
             <div className="container py-5 space-y-4">

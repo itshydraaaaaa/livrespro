@@ -391,9 +391,17 @@ export default function Account() {
           </div>
         </div>
 
-        {/* Tab Content: Mes Commandes */}
-        {activeTab === "orders" && (
-          <div className="mt-8 space-y-6">
+        {/* Tab Content with fluid transition */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {activeTab === "orders" && (
+              <div className="mt-8 space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="font-display text-xl font-bold text-[#141E33]">Historique de vos commandes</h2>
@@ -910,6 +918,8 @@ export default function Account() {
             </div>
           </div>
         )}
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Delete Account Confirmation Modal */}

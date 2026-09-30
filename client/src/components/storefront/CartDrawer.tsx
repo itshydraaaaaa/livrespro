@@ -2,6 +2,7 @@ import { useCart } from "@/contexts/CartContext";
 import { canProceedToCheckout, getNextCartQuantity } from "@/lib/cart";
 import { formatMoney } from "@/lib/format";
 import { Minus, Plus, ShoppingBag, Trash2, X } from "lucide-react";
+import { motion } from "framer-motion";
 
 export function CartDrawer() {
   const {
@@ -18,17 +19,23 @@ export function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-50" aria-hidden={!isOpen}>
-      <button
+      <motion.button
         type="button"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.25 }}
         aria-label="Fermer le panier"
         onClick={closeCart}
         className="absolute inset-0 cursor-default bg-[#141E33]/60 backdrop-blur-md transition-opacity"
       />
-      <aside
+      <motion.aside
         role="dialog"
         aria-modal="true"
         aria-label="Votre panier"
-        className="absolute right-0 top-0 flex h-full w-full max-w-[430px] flex-col bg-[#F6F1E7]/95 backdrop-blur-2xl border-l border-white/80 shadow-[0_25px_60px_-15px_rgba(20,30,51,0.35)] animate-drawer"
+        initial={{ x: "100%" }}
+        animate={{ x: 0 }}
+        transition={{ type: "spring", stiffness: 360, damping: 32 }}
+        className="absolute right-0 top-0 flex h-full w-full max-w-[430px] flex-col bg-[#F6F1E7]/95 backdrop-blur-2xl border-l border-white/80 shadow-[0_25px_60px_-15px_rgba(20,30,51,0.35)]"
       >
         <div className="flex items-center justify-between border-b border-[#141E33]/10 px-6 py-5">
           <div>
@@ -124,17 +131,18 @@ export function CartDrawer() {
               <span>Sous-total</span>
               <span className="text-[#BC3B2C]">{formatMoney(cart.subtotal)}</span>
             </div>
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.98 }}
               disabled={loading || cart.itemCount === 0}
               onClick={openCheckout}
-              className="btn-terracotta w-full rounded-full px-5 py-4 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white shadow-md disabled:opacity-50"
+              className="btn-terracotta w-full rounded-full px-5 py-4 text-[11px] font-extrabold uppercase tracking-[0.16em] text-white shadow-md disabled:opacity-50 transition-transform"
             >
               Commander · Paiement à la livraison
-            </button>
+            </motion.button>
           </div>
         ) : null}
-      </aside>
+      </motion.aside>
     </div>
   );
 }

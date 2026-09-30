@@ -6,9 +6,10 @@ import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { useCart } from "@/contexts/CartContext";
 import { formatMoney } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
-import { ArrowLeft, BookOpen, Check, ShoppingBag } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, ShieldCheck, ShoppingBag, Truck } from "lucide-react";
 import { toast } from "sonner";
-import { useEffect, useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useRoute } from "wouter";
 
 export default function ProductDetail() {
@@ -22,6 +23,8 @@ export default function ProductDetail() {
   const { data: related = [] } = trpc.commerce.products.list.useQuery({ first: 4 });
   const publishedSectionsQuery = trpc.site?.content?.published?.useQuery ? trpc.site.content.published.useQuery() : { data: [] };
   const publishedSections = publishedSectionsQuery?.data;
+
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
 
   const educatorSection = (publishedSections ?? []).find((s: any) => s.key === "educator-offer");
   const educatorOffer = useMemo(() => {
@@ -65,8 +68,12 @@ export default function ProductDetail() {
       <div className="min-h-screen bg-[#F8F5EE]">
         <SiteHeader />
         <main role="status" aria-label="Chargement de la fiche livre" className="container grid gap-10 py-14 lg:grid-cols-2">
-          <div className="aspect-[3/4] max-w-[520px] animate-pulse bg-[#E9E2D7]" />
-          <div className="animate-pulse pt-8"><div className="h-4 w-28 bg-[#E9E2D7]" /><div className="mt-6 h-16 w-4/5 bg-[#E9E2D7]" /><div className="mt-10 h-4 w-full bg-[#E9E2D7]" /></div>
+          <div className="aspect-[3/4] max-w-[520px] animate-pulse rounded-2xl bg-[#E9E2D7]" />
+          <div className="animate-pulse pt-8">
+            <div className="h-4 w-28 rounded-full bg-[#E9E2D7]" />
+            <div className="mt-6 h-16 w-4/5 rounded-xl bg-[#E9E2D7]" />
+            <div className="mt-10 h-4 w-full rounded-md bg-[#E9E2D7]" />
+          </div>
         </main>
       </div>
     );
@@ -78,10 +85,19 @@ export default function ProductDetail() {
         <SiteHeader />
         <main className="container grid min-h-[60vh] place-items-center py-16 text-center">
           <div>
-            <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-[#E9E2D7] text-[#172C41]"><BookOpen className="h-7 w-7" /></span>
+            <span className="mx-auto grid h-16 w-16 place-items-center rounded-2xl bg-[#E9E2D7] text-[#172C41]">
+              <BookOpen className="h-7 w-7" />
+            </span>
             <h1 className="mt-6 font-display text-4xl">Ce titre n’est plus au catalogue.</h1>
-            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#52606B]">Nous n’avons pas retrouvé cette référence dans les rayons business actuels.</p>
-            <Link href="/librairie" className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#172C41] px-5 py-3 text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#F8F5EE]">Voir le catalogue <ArrowLeft className="h-3.5 w-3.5 rotate-180" /></Link>
+            <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-[#52606B]">
+              Nous n’avons pas retrouvé cette référence dans les rayons business actuels.
+            </p>
+            <Link
+              href="/librairie"
+              className="mt-7 inline-flex items-center gap-2 rounded-full bg-[#172C41] px-6 py-3 text-[10px] font-extrabold uppercase tracking-[0.15em] text-[#F8F5EE] shadow-md transition hover:bg-[#BC3B2C]"
+            >
+              Voir le catalogue <ArrowLeft className="h-3.5 w-3.5 rotate-180" />
+            </Link>
           </div>
         </main>
         <SiteFooter />
@@ -90,36 +106,87 @@ export default function ProductDetail() {
   }
 
   const variant = product.variants[0];
-  const mainImage = product.images[0];
-  const otherBooks = related.filter(item => item.handle !== product.handle).slice(0, 3);
+  const galleryImages = product.images.length > 0 ? product.images : [{ url: product.coverImage || "/editorial/b2b-launch/book-angle.jpg", altText: product.title }];
+  const currentImage = galleryImages[activeImageIndex] || galleryImages[0];
+  const otherBooks = related.filter((item) => item.handle !== product.handle).slice(0, 3);
 
   return (
     <div className="min-h-screen bg-[#F6F1E7] text-[#141E33] selection:bg-[#BC3B2C]/20 selection:text-[#141E33]">
       <SiteHeader />
       <main>
         <section className="container py-7 md:py-10">
-          <Link href="/librairie" className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#5C574C] transition hover:text-[#BC3B2C]">
+          <Link
+            href="/librairie"
+            className="inline-flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#5C574C] transition hover:text-[#BC3B2C]"
+          >
             <ArrowLeft className="h-3.5 w-3.5" /> Retour au catalogue
           </Link>
-          <div className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:gap-20">
-            <div className="flex justify-center rounded-2xl bg-[#E9DFCF] px-4 py-6 sm:px-8 sm:py-10 md:px-12 shadow-md">
-              <div className="w-full max-w-[440px] overflow-hidden rounded-xl bg-white shadow-2xl ring-1 ring-[#141E33]/10">
-                {mainImage?.url ? (
-                  <img src={mainImage.url} alt={mainImage.altText || `Couverture de ${product.title}`} fetchPriority="high" decoding="async" className="w-full object-cover transition-transform duration-700 hover:scale-105" />
-                ) : (
-                  <div className="aspect-[3/4] grid place-items-center bg-[#E9DFCF]">
-                    <BookOpen className="h-12 w-12 text-[#141E33]/30" />
-                  </div>
-                )}
+
+          <div className="mt-8 grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:gap-16 items-start">
+            {/* INTERACTIVE GALLERY */}
+            <div className="flex flex-col items-center">
+              <div className="relative w-full max-w-[460px] rounded-3xl bg-[#E9DFCF] p-4 sm:p-6 md:p-8 shadow-md">
+                <div className="relative aspect-[3/4] w-full overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-[#141E33]/10">
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={currentImage?.url}
+                      src={currentImage?.url}
+                      alt={currentImage?.altText || `Couverture de ${product.title}`}
+                      fetchPriority="high"
+                      decoding="async"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                  </AnimatePresence>
+                </div>
               </div>
+
+              {/* Gallery Thumbnails */}
+              {galleryImages.length > 1 && (
+                <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+                  {galleryImages.map((img, idx) => (
+                    <button
+                      key={img.url + idx}
+                      type="button"
+                      onClick={() => setActiveImageIndex(idx)}
+                      className={`relative h-16 w-12 overflow-hidden rounded-lg border-2 transition-all duration-300 shadow-xs ${
+                        activeImageIndex === idx
+                          ? "border-[#BC3B2C] ring-2 ring-[#BC3B2C]/30 scale-105"
+                          : "border-transparent opacity-60 hover:opacity-100 hover:border-[#141E33]/20"
+                      }`}
+                      aria-label={`Afficher la vue ${idx + 1}`}
+                    >
+                      <img src={img.url} alt="" className="h-full w-full object-cover" />
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
+
+            {/* PRODUCT BUY BOX & CONTENT */}
             <div className="flex max-w-xl flex-col justify-center">
-              <p className="eyebrow text-[#BC3B2C]">{product.productType || "Livre business"}</p>
-              <h1 className="mt-4 font-display text-[clamp(2.2rem,5vw,5.4rem)] leading-[0.93] sm:leading-[0.91] tracking-[-0.04em] text-[#141E33]">{product.title}</h1>
-              {product.vendor ? <p className="mt-5 text-base font-semibold text-[#5C574C]">par {product.vendor}</p> : null}
-              <p className="mt-7 font-display text-3xl text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
-              <div className="my-8 h-px bg-[#141E33]/10" />
-              <div className="prose prose-sm max-w-none text-[#5C574C] prose-p:leading-7" dangerouslySetInnerHTML={{ __html: product.descriptionHtml || `<p>${product.description}</p>` }} />
+              <div className="flex items-center gap-2">
+                <span className="eyebrow text-[#BC3B2C]">{product.productType || "Livre business"}</span>
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C]">• Édition Officielle</span>
+              </div>
+              <h1 className="mt-4 font-display text-[clamp(2.2rem,5vw,5.4rem)] leading-[0.93] sm:leading-[0.91] tracking-[-0.04em] text-[#141E33]">
+                {product.title}
+              </h1>
+              {product.vendor ? <p className="mt-4 text-base font-semibold text-[#5C574C]">par {product.vendor}</p> : null}
+              <div className="mt-6 flex items-baseline gap-3">
+                <p className="font-display text-3xl sm:text-4xl text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
+                <span className="text-xs font-semibold text-[#5C574C]">Paiement à la livraison inclus</span>
+              </div>
+
+              <div className="my-7 h-px bg-[#141E33]/10" />
+              <div
+                className="prose prose-sm max-w-none text-[#5C574C] prose-p:leading-7"
+                dangerouslySetInnerHTML={{ __html: product.descriptionHtml || `<p>${product.description}</p>` }}
+              />
+
               {variant ? (
                 <div className="mt-8">
                   <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
@@ -141,15 +208,22 @@ export default function ProductDetail() {
                       </a>
                     )}
                   </div>
-                  <p className="mt-4 flex items-center gap-2 text-xs text-[#5C574C]">
-                    <Check className="h-4 w-4 text-[#BC3B2C]" /> Commande directe et paiement à la livraison (règlement en espèces à réception).
-                  </p>
+
+                  <div className="mt-5 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#5C574C]">
+                    <span className="flex items-center gap-1.5">
+                      <Truck className="h-4 w-4 text-[#BC3B2C]" /> Livraison partout en Tunisie (24 gouvernorats)
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <ShieldCheck className="h-4 w-4 text-[#BC3B2C]" /> Règlement en espèces à réception (COD)
+                    </span>
+                  </div>
                 </div>
               ) : null}
             </div>
           </div>
         </section>
 
+        {/* EDUCATOR OFFER CALLOUT */}
         {educatorSection && educatorSection.status === "published" && educatorOffer.active !== false && product.title.toLowerCase().includes("b2b brand") && (
           <section className="border-y border-[#BC3B2C]/20 bg-white py-14">
             <div className="container grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
@@ -171,16 +245,21 @@ export default function ProductDetail() {
           </section>
         )}
 
-        {/* TABLE OF CONTENTS FOR THIS BOOK */}
+        {/* TABLE OF CONTENTS FOR THIS BOOK (DRM SECURE) */}
         {Boolean(product.tableOfContentsPdf || product.handle.includes("b2b") || product.title.toLowerCase().includes("b2b brand")) && (
-          <section id="sommaire" className="container py-12 md:py-16 border-t border-[#141E33]/08">
+          <section id="sommaire" className="container py-12 md:py-16 border-t border-[#141E33]/08 scroll-mt-20">
             <div className="mb-8">
-              <p className="eyebrow text-[#BC3B2C]">Structure de l'ouvrage</p>
+              <div className="flex items-center gap-2">
+                <span className="eyebrow text-[#BC3B2C]">Structure de l'ouvrage</span>
+                <span className="glass-pill px-3 py-1 text-[9px] font-bold text-emerald-800 bg-emerald-50 border-emerald-200">
+                  Lecteur Sécurisé Anti-Copie
+                </span>
+              </div>
               <h2 className="mt-2 font-display text-3xl sm:text-4xl text-[#141E33]">
                 Sommaire & Extraits Protégés
               </h2>
-              <p className="mt-2 text-xs sm:text-sm text-[#5C574C]">
-                Consultez le sommaire officiel et l'organisation détaillée de <em>{product.title}</em> en lecture sécurisée anti-copie.
+              <p className="mt-2 text-xs sm:text-sm text-[#5C574C] max-w-2xl">
+                Consultez le sommaire officiel et l'organisation détaillée de <em>{product.title}</em> en lecture sécurisée anti-copie (téléchargement et capture restreints).
               </p>
             </div>
             <ProtectedBookTableOfContents
@@ -201,24 +280,33 @@ export default function ProductDetail() {
             </div>
           </section>
         )}
+
         {/* Floating Mobile Bottom Action Bar */}
-        {variant && variant.availableForSale && (
-          <div className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-3 border-t border-white/80 bg-[#F6F1E7]/95 px-4 py-3 shadow-[0_-10px_25px_-5px_rgba(20,30,51,0.12)] backdrop-blur-xl sm:hidden pb-safe">
-            <div className="min-w-0">
-              <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C] truncate">{product.title}</p>
-              <p className="font-display text-lg text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
-            </div>
-            <button
-              type="button"
-              disabled={cartLoading}
-              onClick={onAddToCart}
-              className="btn-terracotta flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-[11px] font-extrabold uppercase tracking-wider text-white shadow-md disabled:opacity-50"
+        <AnimatePresence>
+          {variant && variant.availableForSale && (
+            <motion.div
+              initial={{ y: 80, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: 80, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 360, damping: 32 }}
+              className="fixed bottom-0 left-0 right-0 z-30 flex items-center justify-between gap-3 border-t border-white/80 bg-[#F6F1E7]/95 px-4 py-3 shadow-[0_-10px_25px_-5px_rgba(20,30,51,0.14)] backdrop-blur-xl sm:hidden pb-safe"
             >
-              <ShoppingBag className="h-3.5 w-3.5" />
-              <span>{cartLoading ? "Ajout…" : "Ajouter"}</span>
-            </button>
-          </div>
-        )}
+              <div className="min-w-0">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C] truncate">{product.title}</p>
+                <p className="font-display text-lg text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
+              </div>
+              <button
+                type="button"
+                disabled={cartLoading}
+                onClick={onAddToCart}
+                className="btn-terracotta flex shrink-0 items-center justify-center gap-2 rounded-full px-6 min-h-[44px] text-[11px] font-extrabold uppercase tracking-wider text-white shadow-md disabled:opacity-50"
+              >
+                <ShoppingBag className="h-4 w-4" />
+                <span>{cartLoading ? "Ajout…" : "Ajouter"}</span>
+              </button>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </main>
       <SiteFooter />
     </div>

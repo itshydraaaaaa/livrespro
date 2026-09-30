@@ -15,6 +15,7 @@ import {
   X,
 } from "lucide-react";
 import { toast } from "sonner";
+import { motion, AnimatePresence } from "framer-motion";
 
 export function CheckoutModal() {
   const { cart, isCheckoutOpen, closeCheckout, clearCart } = useCart();
@@ -55,6 +56,10 @@ export function CheckoutModal() {
   }, 0) ?? 0;
   const totalNum = subtotalNum + parseFloat(shippingCost);
 
+  const digitsOnly = phone.replace(/\D/g, "");
+  const nationalDigits = digitsOnly.startsWith("216") && digitsOnly.length === 11 ? digitsOnly.slice(3) : digitsOnly;
+  const isPhoneValid = nationalDigits.length === 8;
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (honeypot) {
@@ -68,9 +73,7 @@ export function CheckoutModal() {
       return;
     }
 
-    const digitsOnly = phone.replace(/\D/g, "");
-    const nationalDigits = digitsOnly.startsWith("216") && digitsOnly.length === 11 ? digitsOnly.slice(3) : digitsOnly;
-    if (nationalDigits.length < 8) {
+    if (!isPhoneValid) {
       toast.error("Veuillez saisir un numéro de téléphone tunisien valide à 8 chiffres.");
       return;
     }
@@ -104,12 +107,22 @@ export function CheckoutModal() {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4">
-      <div
-        className="fixed inset-0 bg-[#141E33]/70 backdrop-blur-md transition-opacity"
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="fixed inset-0 bg-[#141E33]/70 backdrop-blur-md"
         onClick={handleClose}
       />
 
-      <div className="relative max-h-[94dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-2xl sm:rounded-3xl border border-white/80 bg-[#F6F1E7]/95 backdrop-blur-2xl p-4 sm:p-9 text-[#141E33] shadow-[0_30px_70px_-15px_rgba(20,30,51,0.35)] ring-1 ring-[#141E33]/05">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 16 }}
+        transition={{ type: "spring", stiffness: 350, damping: 28 }}
+        className="relative max-h-[94dvh] w-full max-w-2xl overflow-y-auto overscroll-contain rounded-2xl sm:rounded-3xl border border-white/80 bg-[#F6F1E7]/95 backdrop-blur-2xl p-4 sm:p-9 text-[#141E33] shadow-[0_30px_70px_-15px_rgba(20,30,51,0.35)] ring-1 ring-[#141E33]/05"
+      >
         <button
           type="button"
           onClick={handleClose}
@@ -187,26 +200,26 @@ export function CheckoutModal() {
             </div>
 
             {/* Cart summary strip */}
-            <div className="my-5 rounded-sm border border-[#172C41]/10 bg-white p-4">
-              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#52606B]">
+            <div className="my-5 rounded-xl border border-[#141E33]/10 bg-white p-4 shadow-xs">
+              <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#5C574C]">
                 Articles commandés ({cart?.itemCount ?? 0})
               </p>
-              <div className="mt-3 max-h-36 divide-y divide-[#172C41]/10 overflow-y-auto pr-2 text-xs">
+              <div className="mt-3 max-h-36 divide-y divide-[#141E33]/10 overflow-y-auto pr-2 text-xs">
                 {cart?.items.map((item) => (
                   <div key={item.lineId} className="flex items-center justify-between py-2">
-                    <span className="truncate pr-3 font-medium">
+                    <span className="truncate pr-3 font-medium text-[#141E33]">
                       {item.productTitle}{" "}
-                      <span className="text-[#52606B]">× {item.quantity}</span>
+                      <span className="text-[#5C574C]">× {item.quantity}</span>
                     </span>
-                    <span className="shrink-0 font-bold text-[#172C41]">
+                    <span className="shrink-0 font-bold text-[#141E33]">
                       {formatMoney((parseFloat(item.unitPrice.amount) * item.quantity).toFixed(2), "TND")}
                     </span>
                   </div>
                 ))}
               </div>
-              <div className="mt-3 flex items-center justify-between border-t border-[#172C41]/10 pt-3 text-sm font-bold text-[#172C41]">
+              <div className="mt-3 flex items-center justify-between border-t border-[#141E33]/10 pt-3 text-sm font-bold text-[#141E33]">
                 <span>Total (avec livraison 7,00 DT) :</span>
-                <span className="font-display text-xl text-[#C94E36]">
+                <span className="font-display text-xl text-[#BC3B2C]">
                   {formatMoney(totalNum.toFixed(2), "TND")}
                 </span>
               </div>
@@ -232,7 +245,7 @@ export function CheckoutModal() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Walid"
-                    className="mt-1 border-[#172C41]/20 bg-white"
+                    className="mt-1 rounded-xl border-[#141E33]/20 bg-white"
                   />
                 </div>
                 <div>
@@ -242,16 +255,27 @@ export function CheckoutModal() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Ben Amor"
-                    className="mt-1 border-[#172C41]/20 bg-white"
+                    className="mt-1 rounded-xl border-[#141E33]/20 bg-white"
                   />
                 </div>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <Label className="text-xs font-bold uppercase tracking-wider">Téléphone (joignable) *</Label>
-                  <div className="relative mt-1 flex rounded-sm border border-[#172C41]/20 bg-white shadow-xs focus-within:border-[#172C41]">
-                    <span className="inline-flex items-center gap-1.5 border-r border-[#172C41]/15 bg-[#F8F5EE] px-2.5 text-xs font-bold text-[#172C41]">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-xs font-bold uppercase tracking-wider">Téléphone (joignable) *</Label>
+                    {isPhoneValid ? (
+                      <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600">
+                        <CheckCircle2 className="h-3.5 w-3.5" /> 8 chiffres valides
+                      </span>
+                    ) : phone.length > 0 ? (
+                      <span className="text-[11px] font-medium text-amber-600">
+                        8 chiffres requis
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="relative mt-1 flex rounded-xl border border-[#141E33]/20 bg-white shadow-xs focus-within:border-[#BC3B2C] focus-within:ring-2 focus-within:ring-[#BC3B2C]/20 overflow-hidden transition-all">
+                    <span className="inline-flex items-center gap-1.5 border-r border-[#141E33]/15 bg-[#F6F1E7] px-3 text-xs font-bold text-[#141E33]">
                       <span>{tunisia?.flag?.emoji || "🇹🇳"}</span>
                       <span className="font-mono">{tunisia?.callingCode || "+216"}</span>
                     </span>
@@ -261,7 +285,7 @@ export function CheckoutModal() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="21 000 000"
-                      className="w-full bg-transparent px-3 py-2 text-sm outline-none"
+                      className="w-full bg-transparent px-3 py-2.5 text-sm outline-none font-medium"
                     />
                   </div>
                 </div>
@@ -273,7 +297,7 @@ export function CheckoutModal() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="contact@entreprise.tn"
-                    className="mt-1 border-[#172C41]/20 bg-white"
+                    className="mt-1 rounded-xl border-[#141E33]/20 bg-white"
                   />
                 </div>
               </div>
@@ -286,7 +310,7 @@ export function CheckoutModal() {
                   value={deliveryAddress}
                   onChange={(e) => setDeliveryAddress(e.target.value)}
                   placeholder="Numéro, rue, immeuble, bureau, entreprise…"
-                  className="mt-1 border-[#172C41]/20 bg-white"
+                  className="mt-1 rounded-xl border-[#141E33]/20 bg-white"
                 />
               </div>
 
@@ -296,7 +320,7 @@ export function CheckoutModal() {
                   <select
                     value={governorate}
                     onChange={(e) => setGovernorate(e.target.value)}
-                    className="mt-1 h-10 w-full border border-[#172C41]/20 bg-white px-3 text-sm outline-none"
+                    className="mt-1 h-10 w-full rounded-xl border border-[#141E33]/20 bg-white px-3 text-sm outline-none transition-all focus:border-[#BC3B2C] focus:ring-2 focus:ring-[#BC3B2C]/20"
                   >
                     {[
                       "Ariana",
@@ -336,7 +360,7 @@ export function CheckoutModal() {
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Ex: Les Berges du Lac"
-                    className="mt-1 border-[#172C41]/20 bg-white"
+                    className="mt-1 rounded-xl border-[#141E33]/20 bg-white"
                   />
                 </div>
                 <div>
@@ -348,7 +372,7 @@ export function CheckoutModal() {
                     maxLength={4}
                     onChange={(e) => setPostalCode(e.target.value.replace(/\D/g, "").slice(0, 4))}
                     placeholder="1001"
-                    className="mt-1 border-[#172C41]/20 bg-white font-mono"
+                    className="mt-1 rounded-xl border-[#141E33]/20 bg-white font-mono"
                   />
                 </div>
               </div>
@@ -392,7 +416,7 @@ export function CheckoutModal() {
             </form>
           </div>
         )}
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { trpc } from "@/lib/trpc";
+import { motion } from "framer-motion";
 import {
   AlertTriangle,
   ArrowUpRight,
@@ -182,7 +183,17 @@ export default function Admin({ tab }: { tab: AdminTab }) {
   }
 
   // 3. Administrateur authentifié et validé
-  return frame(<AdminWorkspace tab={tab} />);
+  return frame(
+    <motion.div
+      key={tab}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <AdminWorkspace tab={tab} />
+    </motion.div>
+  );
 }
 
 function AdminWorkspace({ tab }: { tab: AdminTab }) {
@@ -424,7 +435,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
   return (
     <div className="mx-auto max-w-7xl space-y-8 px-1 py-3 md:px-4 md:py-8">
       {/* Overview Header */}
-      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 lg:flex-row lg:items-end lg:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[#141E33]/10 pb-7 lg:flex-row lg:items-end lg:justify-between">
         <div>
           <p className="eyebrow">Tableau de bord interactif</p>
           <h1 className="mt-2 font-display text-4xl sm:text-5xl leading-none tracking-[-0.04em]">
@@ -435,14 +446,14 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Badge variant="outline" className="w-fit border-[#C94E36]/30 bg-[#F9E5E0] px-3 py-1.5 text-[#A93D2D] font-bold">
+          <Badge variant="outline" className="w-fit border-[#BC3B2C]/30 bg-[#F9E5E0] px-3 py-1.5 text-[#A93D2D] font-bold">
             Paiements COD Tunisie
           </Badge>
           <Button
             onClick={exportOrdersCsv}
             variant="outline"
             size="sm"
-            className="border-[#172C41]/20 hover:bg-[#F8F5EE] text-xs font-semibold"
+            className="border-[#141E33]/20 hover:bg-[#F8F5EE] text-xs font-semibold"
           >
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Export CSV
@@ -480,7 +491,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
       </div>
 
       {/* Main Interactive Graph: Revenue & Orders Timeline */}
-      <div className="border border-[#172C41]/10 bg-white p-6 shadow-sm rounded-xl">
+      <div className="border border-[#141E33]/10 bg-white p-6 shadow-sm rounded-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 gap-2">
           <div>
             <h2 className="font-display text-2xl text-[#141E33]">Évolution des Ventes & Volume de Commandes</h2>
@@ -552,7 +563,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
       {/* Two Column Grid: Status Breakdown & Regional Deliveries */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Order Status Distribution */}
-        <div className="border border-[#172C41]/10 bg-white p-6 shadow-sm rounded-xl flex flex-col justify-between">
+        <div className="border border-[#141E33]/10 bg-white p-6 shadow-sm rounded-xl flex flex-col justify-between">
           <div>
             <h3 className="font-display text-xl text-[#141E33]">Statuts des Commandes</h3>
             <p className="text-xs text-[#52606B]">Répartition des flux logistiques (En attente, Expédiées, Livrées).</p>
@@ -596,7 +607,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
         </div>
 
         {/* Deliveries by Governorate */}
-        <div className="border border-[#172C41]/10 bg-white p-6 shadow-sm rounded-xl flex flex-col justify-between">
+        <div className="border border-[#141E33]/10 bg-white p-6 shadow-sm rounded-xl flex flex-col justify-between">
           <div>
             <h3 className="font-display text-xl text-[#141E33]">Top Régions de Livraison (Tunisie)</h3>
             <p className="text-xs text-[#52606B]">Gouvernorats concentrant le plus de commandes physiques.</p>
@@ -728,7 +739,7 @@ function OrderManager({
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
       {/* Header */}
-      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[#141E33]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="eyebrow">Commerce & Expéditions</p>
           <h1 className="mt-2 font-display text-4xl">Commandes à la livraison (COD)</h1>
@@ -737,7 +748,7 @@ function OrderManager({
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <Button onClick={onExportCsv} className="bg-[#172C41] text-white hover:bg-[#263f58]">
+          <Button onClick={onExportCsv} className="bg-[#141E33] text-white hover:bg-[#263f58]">
             <Download className="mr-2 h-4 w-4" />
             Exporter CSV
           </Button>
@@ -745,7 +756,7 @@ function OrderManager({
       </div>
 
       {/* Control & Filter Bar */}
-      <div className="space-y-4 rounded-xl border border-[#172C41]/10 bg-white p-4 shadow-sm">
+      <div className="space-y-4 rounded-xl border border-[#141E33]/10 bg-white p-4 shadow-sm">
         <div className="grid gap-3 md:grid-cols-3">
           {/* Search Input */}
           <div className="relative md:col-span-2">
@@ -755,7 +766,7 @@ function OrderManager({
               placeholder="Rechercher par client, téléphone (+216), référence ou ville..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 h-10 border-[#172C41]/20"
+              className="pl-10 h-10 border-[#141E33]/20"
             />
             {searchTerm && (
               <button
@@ -773,7 +784,7 @@ function OrderManager({
               aria-label="Filtrer par gouvernorat"
               value={governorateFilter}
               onChange={(e) => setGovernorateFilter(e.target.value)}
-              className="h-10 w-full rounded-md border border-[#172C41]/20 bg-white px-3 text-xs font-semibold text-[#141E33] outline-none"
+              className="h-10 w-full rounded-md border border-[#141E33]/20 bg-white px-3 text-xs font-semibold text-[#141E33] outline-none"
             >
               <option value="all">Tous les gouvernorats ({orders.length})</option>
               {availableGovernorates.map((gov) => (
@@ -786,7 +797,7 @@ function OrderManager({
         </div>
 
         {/* Status Filter Tabs */}
-        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#172C41]/08">
+        <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-[#141E33]/08">
           {[
             { key: "all", label: "Toutes" },
             { key: "new", label: "Nouvelles" },
@@ -801,8 +812,8 @@ function OrderManager({
               onClick={() => setStatusFilter(tab.key)}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
                 statusFilter === tab.key
-                  ? "bg-[#172C41] text-white shadow-xs"
-                  : "bg-[#F8F5EE] text-[#52606B] hover:bg-[#E9E2D7] hover:text-[#172C41]"
+                  ? "bg-[#141E33] text-white shadow-xs"
+                  : "bg-[#F8F5EE] text-[#52606B] hover:bg-[#E9E2D7] hover:text-[#141E33]"
               }`}
             >
               <span>{tab.label}</span>
@@ -817,7 +828,7 @@ function OrderManager({
       </div>
 
       {/* Orders Table */}
-      <div className="overflow-x-auto border border-[#172C41]/10 bg-white rounded-xl shadow-sm">
+      <div className="overflow-x-auto border border-[#141E33]/10 bg-white rounded-xl shadow-sm">
         <table className="w-full min-w-[1000px] text-left text-sm">
           <thead className="bg-[#F8F5EE] text-[10px] uppercase tracking-wider text-[#52606B]">
             <tr>
@@ -831,7 +842,7 @@ function OrderManager({
               <th className="p-3">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#172C41]/10">
+          <tbody className="divide-y divide-[#141E33]/10">
             {filteredOrders.map((o: any) => {
               const phone = o.customerPhone || o.customer_phone || "";
               const cleanPhone = phone.replace(/[^0-9]/g, "");
@@ -839,7 +850,7 @@ function OrderManager({
 
               return (
                 <tr key={o.id} className="hover:bg-[#F8F5EE]/40 transition">
-                  <td className="p-3 font-bold text-[#C94E36]">{o.orderNumber || o.order_number || `#${o.id}`}</td>
+                  <td className="p-3 font-bold text-[#BC3B2C]">{o.orderNumber || o.order_number || `#${o.id}`}</td>
                   <td className="p-3 font-semibold">
                     {(o.customerFirstName || o.customer_first_name || "") + " " + (o.customerLastName || o.customer_last_name || "")}
                     {Boolean(o.isEducator === 1 || o.is_educator === 1) && (
@@ -850,7 +861,7 @@ function OrderManager({
                   </td>
                   <td className="p-3">
                     <div className="flex items-center gap-2">
-                      <span className="font-medium text-[#172C41]">{phone || "-"}</span>
+                      <span className="font-medium text-[#141E33]">{phone || "-"}</span>
                       {cleanPhone && (
                         <a
                           href={`https://wa.me/${waNumber}`}
@@ -865,17 +876,17 @@ function OrderManager({
                     </div>
                   </td>
                   <td className="max-w-xs p-3 text-xs text-[#52606B]">
-                    <p className="font-semibold text-[#172C41]">{o.governorate || o.city || "Tunisie"}</p>
+                    <p className="font-semibold text-[#141E33]">{o.governorate || o.city || "Tunisie"}</p>
                     <p className="truncate">{o.deliveryAddress || o.delivery_address || "-"}</p>
                   </td>
                   <td className="p-3 text-xs">
                     {(o.items || o.order_items || []).map((it: any, idx: number) => (
-                      <div key={idx} className="font-medium text-[#172C41]">
-                        {it.productTitle || it.product_title || "Livre"} <span className="text-[#C94E36]">× {it.quantity || 1}</span>
+                      <div key={idx} className="font-medium text-[#141E33]">
+                        {it.productTitle || it.product_title || "Livre"} <span className="text-[#BC3B2C]">× {it.quantity || 1}</span>
                       </div>
                     ))}
                   </td>
-                  <td className="p-3 font-display text-base font-bold text-[#172C41]">
+                  <td className="p-3 font-display text-base font-bold text-[#141E33]">
                     {o.totalAmount || o.total_amount || "0.00"} DT
                   </td>
                   <td className="p-3">
@@ -883,7 +894,7 @@ function OrderManager({
                       aria-label="Statut de la commande"
                       value={o.status}
                       onChange={(e) => onUpdateStatus(o.id, e.target.value)}
-                      className="border border-[#172C41]/20 bg-white px-2 py-1 text-xs font-semibold rounded-md shadow-2xs"
+                      className="border border-[#141E33]/20 bg-white px-2 py-1 text-xs font-semibold rounded-md shadow-2xs"
                     >
                       <option value="new">Nouvelle</option>
                       <option value="confirmed">Confirmée</option>
@@ -899,9 +910,9 @@ function OrderManager({
                         size="sm"
                         variant="outline"
                         onClick={() => setEditingOrder(o)}
-                        className="h-8 px-2.5 text-xs font-semibold border-[#172C41]/20 hover:bg-[#F8F5EE]"
+                        className="h-8 px-2.5 text-xs font-semibold border-[#141E33]/20 hover:bg-[#F8F5EE]"
                       >
-                        <Edit className="h-3.5 w-3.5 mr-1 text-[#172C41]" />
+                        <Edit className="h-3.5 w-3.5 mr-1 text-[#141E33]" />
                         Détails
                       </Button>
                       <Button
@@ -974,7 +985,7 @@ function OrderEditModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-      <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl border border-[#172C41]/10 max-h-[90vh] overflow-y-auto">
+      <div className="w-full max-w-2xl rounded-2xl bg-white p-6 shadow-2xl border border-[#141E33]/10 max-h-[90vh] overflow-y-auto">
         <div className="flex items-center justify-between border-b pb-4">
           <div>
             <h3 className="font-display text-xl font-bold text-[#141E33]">
@@ -1051,7 +1062,7 @@ function OrderEditModal({
               <select
                 value={form.status}
                 onChange={(e) => setForm({ ...form, status: e.target.value })}
-                className="mt-1 h-10 w-full rounded-md border border-[#172C41]/20 bg-white px-3 text-sm"
+                className="mt-1 h-10 w-full rounded-md border border-[#141E33]/20 bg-white px-3 text-sm"
               >
                 <option value="new">Nouvelle</option>
                 <option value="confirmed">Confirmée</option>
@@ -1107,7 +1118,7 @@ function OrderEditModal({
             <Button type="button" variant="outline" onClick={onClose}>
               Annuler
             </Button>
-            <Button type="submit" className="bg-[#172C41] text-white">
+            <Button type="submit" className="bg-[#141E33] text-white">
               <Save className="mr-2 h-4 w-4" />
               Enregistrer les modifications
             </Button>
@@ -1229,13 +1240,13 @@ function ProductManager({
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[#141E33]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="eyebrow">Catalogue & Stock</p>
           <h1 className="mt-2 font-display text-4xl">Livres & Publications</h1>
           <p className="mt-2 text-xs text-[#52606B]">Gérez les prix, les niveaux de stock et les informations éditoriales.</p>
         </div>
-        <Button onClick={handleNew} className="bg-[#C94E36] text-white hover:bg-[#A93D2D]">
+        <Button onClick={handleNew} className="bg-[#BC3B2C] text-white hover:bg-[#A93D2D]">
           <Plus className="mr-2 h-4 w-4" />
           Ajouter un livre
         </Button>
@@ -1243,7 +1254,7 @@ function ProductManager({
 
       <div className="grid gap-6 xl:grid-cols-[1fr_1.2fr]">
         {/* Left: Book List with Quick Controls */}
-        <aside className="border border-[#172C41]/10 bg-[#FCFAF5] p-4 rounded-xl shadow-xs space-y-3">
+        <aside className="border border-[#141E33]/10 bg-[#FCFAF5] p-4 rounded-xl shadow-xs space-y-3">
           <div className="flex items-center justify-between pb-2">
             <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#52606B]">
               Livres au catalogue ({filteredRows.length})
@@ -1254,7 +1265,7 @@ function ProductManager({
             placeholder="Filtrer par titre ou slug..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="h-9 text-xs bg-white border-[#172C41]/20"
+            className="h-9 text-xs bg-white border-[#141E33]/20"
           />
 
           <div className="space-y-2 max-h-[600px] overflow-y-auto pr-1">
@@ -1262,7 +1273,7 @@ function ProductManager({
               <div
                 key={b.id}
                 className={`w-full border p-3 rounded-lg transition ${
-                  selectedId === b.id ? "border-[#C94E36] bg-[#F9E5E0]" : "border-[#172C41]/10 bg-white hover:border-[#172C41]/30"
+                  selectedId === b.id ? "border-[#BC3B2C] bg-[#F9E5E0]" : "border-[#141E33]/10 bg-white hover:border-[#141E33]/30"
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
@@ -1271,13 +1282,13 @@ function ProductManager({
                     onClick={() => setSelectedId(b.id)}
                     className="text-left flex-1"
                   >
-                    <p className="font-display text-base font-bold text-[#172C41] hover:text-[#C94E36] transition">{b.title}</p>
+                    <p className="font-display text-base font-bold text-[#141E33] hover:text-[#BC3B2C] transition">{b.title}</p>
                     <p className="text-[11px] text-[#52606B]">/{b.slug}</p>
                   </button>
-                  <span className="font-bold text-sm text-[#C94E36] shrink-0">{b.price} DT</span>
+                  <span className="font-bold text-sm text-[#BC3B2C] shrink-0">{b.price} DT</span>
                 </div>
 
-                <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#172C41]/08 text-xs">
+                <div className="mt-3 flex items-center justify-between pt-2 border-t border-[#141E33]/08 text-xs">
                   <div className="flex items-center gap-1.5">
                     <span className="text-[11px] text-[#52606B]">Stock :</span>
                     <span className="font-bold font-mono text-[#141E33]">{b.stockQuantity ?? 100}</span>
@@ -1324,9 +1335,9 @@ function ProductManager({
         </aside>
 
         {/* Right: Full Book Form */}
-        <section className="border border-[#172C41]/10 bg-white p-6 rounded-xl shadow-xs">
+        <section className="border border-[#141E33]/10 bg-white p-6 rounded-xl shadow-xs">
           <div className="flex items-center justify-between border-b pb-4">
-            <h2 className="font-display text-2xl text-[#172C41]">
+            <h2 className="font-display text-2xl text-[#141E33]">
               {selectedId ? "Modifier le livre" : "Nouveau livre"}
             </h2>
             {selectedId && (
@@ -1374,7 +1385,7 @@ function ProductManager({
                   aria-label="Catégorie"
                   value={categoryId ?? ""}
                   onChange={(e) => setCategoryId(e.target.value ? Number(e.target.value) : null)}
-                  className="mt-1 h-10 w-full border border-[#172C41]/20 bg-white px-3 text-sm rounded-md"
+                  className="mt-1 h-10 w-full border border-[#141E33]/20 bg-white px-3 text-sm rounded-md"
                 >
                   <option value="">Sélectionner une catégorie</option>
                   {categories.map((c) => (
@@ -1390,7 +1401,7 @@ function ProductManager({
                   aria-label="Format"
                   value={format}
                   onChange={(e) => setFormat(e.target.value)}
-                  className="mt-1 h-10 w-full border border-[#172C41]/20 bg-white px-3 text-sm rounded-md"
+                  className="mt-1 h-10 w-full border border-[#141E33]/20 bg-white px-3 text-sm rounded-md"
                 >
                   <option value="PHYSICAL_BOOK">Livre physique relié</option>
                   <option value="DIGITAL_BOOK">Guide / Format numérique</option>
@@ -1409,7 +1420,7 @@ function ProductManager({
             </div>
 
             {/* Book Cover Image & Picture Editor */}
-            <div className="rounded-xl border border-[#172C41]/10 bg-slate-50/70 p-4 space-y-3">
+            <div className="rounded-xl border border-[#141E33]/10 bg-slate-50/70 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33] flex items-center gap-1.5">
                   <ImageIcon className="h-4 w-4 text-[#BC3B2C]" />
@@ -1424,7 +1435,7 @@ function ProductManager({
 
               {/* Live Preview */}
               {coverImage && (
-                <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-[#172C41]/10">
+                <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-[#141E33]/10">
                   <div className="h-20 w-16 overflow-hidden rounded border border-gray-200 bg-gray-50 shrink-0 shadow-xs">
                     <img
                       src={coverImage}
@@ -1636,7 +1647,7 @@ function ProductManager({
             </div>
 
             <div className="flex justify-end pt-4 border-t">
-              <Button onClick={handleSave} disabled={saving || !title || !slug} className="bg-[#172C41] text-white">
+              <Button onClick={handleSave} disabled={saving || !title || !slug} className="bg-[#141E33] text-white">
                 <Save className="mr-2 h-4 w-4" />
                 {saving ? "Enregistrement…" : "Enregistrer le livre"}
               </Button>
@@ -1685,25 +1696,25 @@ function CategoryManager({
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[#141E33]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="eyebrow">Taxonomie</p>
           <h1 className="mt-2 font-display text-4xl">Rayons & Catégories</h1>
           <p className="mt-2 text-xs text-[#52606B]">Classement des livres de la librairie.</p>
         </div>
-        <Button onClick={handleNew} className="bg-[#172C41] text-white">
+        <Button onClick={handleNew} className="bg-[#141E33] text-white">
           <Plus className="mr-2 h-4 w-4" />
           Nouvelle catégorie
         </Button>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-        <aside className="border border-[#172C41]/10 bg-[#FCFAF5] p-4 rounded-xl space-y-2">
+        <aside className="border border-[#141E33]/10 bg-[#FCFAF5] p-4 rounded-xl space-y-2">
           {rows.map((c) => (
             <div
               key={c.id}
               className={`flex items-center justify-between p-3 border rounded-lg transition ${
-                selectedId === c.id ? "border-[#C94E36] bg-[#F9E5E0]" : "border-[#172C41]/10 bg-white"
+                selectedId === c.id ? "border-[#BC3B2C] bg-[#F9E5E0]" : "border-[#141E33]/10 bg-white"
               }`}
             >
               <button onClick={() => setSelectedId(c.id)} className="text-left flex-1">
@@ -1724,7 +1735,7 @@ function CategoryManager({
           ))}
         </aside>
 
-        <section className="border border-[#172C41]/10 bg-white p-6 rounded-xl space-y-4">
+        <section className="border border-[#141E33]/10 bg-white p-6 rounded-xl space-y-4">
           <h3 className="font-display text-xl text-[#141E33]">{selectedId ? "Modifier la catégorie" : "Ajouter une catégorie"}</h3>
           <div>
             <Label className="text-xs uppercase font-bold text-[#141E33]">Nom du rayon *</Label>
@@ -1750,7 +1761,7 @@ function CategoryManager({
           <Button
             onClick={() => onSave({ id: selectedId ?? undefined, name, slug, description })}
             disabled={saving || !name || !slug}
-            className="bg-[#172C41] text-white"
+            className="bg-[#141E33] text-white"
           >
             Enregistrer
           </Button>
@@ -1800,25 +1811,25 @@ function AuthorManager({
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[#141E33]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="eyebrow">Éditorial</p>
           <h1 className="mt-2 font-display text-4xl">Auteurs & Experts</h1>
           <p className="mt-2 text-xs text-[#52606B]">Biographies des auteurs contributeurs.</p>
         </div>
-        <Button onClick={handleNew} className="bg-[#172C41] text-white">
+        <Button onClick={handleNew} className="bg-[#141E33] text-white">
           <Plus className="mr-2 h-4 w-4" />
           Nouvel auteur
         </Button>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-        <aside className="border border-[#172C41]/10 bg-[#FCFAF5] p-4 rounded-xl space-y-2">
+        <aside className="border border-[#141E33]/10 bg-[#FCFAF5] p-4 rounded-xl space-y-2">
           {rows.map((a) => (
             <div
               key={a.id}
               className={`flex items-center justify-between p-3 border rounded-lg transition ${
-                selectedId === a.id ? "border-[#C94E36] bg-[#F9E5E0]" : "border-[#172C41]/10 bg-white"
+                selectedId === a.id ? "border-[#BC3B2C] bg-[#F9E5E0]" : "border-[#141E33]/10 bg-white"
               }`}
             >
               <button onClick={() => setSelectedId(a.id)} className="text-left flex-1">
@@ -1839,7 +1850,7 @@ function AuthorManager({
           ))}
         </aside>
 
-        <section className="border border-[#172C41]/10 bg-white p-6 rounded-xl space-y-4">
+        <section className="border border-[#141E33]/10 bg-white p-6 rounded-xl space-y-4">
           <h3 className="font-display text-xl text-[#141E33]">{selectedId ? "Modifier l'auteur" : "Ajouter un auteur"}</h3>
           <div>
             <Label className="text-xs uppercase font-bold text-[#141E33]">Nom de l'auteur *</Label>
@@ -1869,7 +1880,7 @@ function AuthorManager({
           <Button
             onClick={() => onSave({ id: selectedId ?? undefined, name, slug, biography, photo })}
             disabled={saving || !name || !slug}
-            className="bg-[#172C41] text-white"
+            className="bg-[#141E33] text-white"
           >
             Enregistrer
           </Button>
@@ -1926,9 +1937,9 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
       </div>
 
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="border border-[#172C41]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
+        <section className="border border-[#141E33]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
           {/* Active / Inactive Visibility Switch */}
-          <div className="flex items-center justify-between p-4 rounded-xl border border-[#172C41]/10 bg-slate-50">
+          <div className="flex items-center justify-between p-4 rounded-xl border border-[#141E33]/10 bg-slate-50">
             <div>
               <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">Statut de l'offre sur le site</Label>
               <p className="text-xs text-[#52606B]">Si désactivée, la section de l'offre disparaît immédiatement du site.</p>
@@ -1965,13 +1976,13 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
             <Label className="text-xs font-bold uppercase tracking-wider">Support offert / associé</Label>
             <Input value={companion} onChange={(e) => setCompanion(e.target.value)} className="mt-1" />
           </div>
-          <Button onClick={save} disabled={saving} className="bg-[#172C41] text-white hover:bg-[#263f58]">
+          <Button onClick={save} disabled={saving} className="bg-[#141E33] text-white hover:bg-[#263f58]">
             <Save className="mr-2 h-4 w-4" />
             {saving ? "Enregistrement…" : "Enregistrer l'offre"}
           </Button>
         </section>
 
-        <aside className="border border-[#172C41]/10 bg-[#FCFAF5] p-6 rounded-xl space-y-4 shadow-xs">
+        <aside className="border border-[#141E33]/10 bg-[#FCFAF5] p-6 rounded-xl space-y-4 shadow-xs">
           <p className="eyebrow text-[#BC3B2C]">Aperçu en direct pour les clients</p>
           {!active && (
             <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-center gap-2">
@@ -2050,7 +2061,7 @@ function ContentManager({
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+      <div className="flex flex-col gap-4 border-b border-[#141E33]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="eyebrow">Ligne Éditoriale & Landing Page</p>
           <h1 className="mt-2 font-display text-4xl">Publications & Articles</h1>
@@ -2058,14 +2069,14 @@ function ContentManager({
             Publiez des actualités, communiqués de presse ou études de cas qui s’affichent en temps réel sur la page d'accueil.
           </p>
         </div>
-        <Button onClick={handleNew} className="bg-[#C94E36] text-white hover:bg-[#A93D2D]">
+        <Button onClick={handleNew} className="bg-[#BC3B2C] text-white hover:bg-[#A93D2D]">
           <Plus className="mr-2 h-4 w-4" />
           Nouvelle publication
         </Button>
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-        <aside className="border border-[#172C41]/10 p-4 bg-[#FCFAF5] space-y-2 rounded-xl shadow-xs">
+        <aside className="border border-[#141E33]/10 p-4 bg-[#FCFAF5] space-y-2 rounded-xl shadow-xs">
           <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#52606B] pb-1">
             Articles & Blocs enregistrés ({rows.length})
           </p>
@@ -2074,7 +2085,7 @@ function ContentManager({
               key={r.id}
               onClick={() => setSelectedId(r.id)}
               className={`w-full p-3 text-left border rounded-lg transition ${
-                selectedId === r.id ? "border-[#C94E36] bg-[#F9E5E0]" : "border-[#172C41]/10 bg-white hover:border-[#172C41]/30"
+                selectedId === r.id ? "border-[#BC3B2C] bg-[#F9E5E0]" : "border-[#141E33]/10 bg-white hover:border-[#141E33]/30"
               }`}
             >
               <div className="flex items-center justify-between">
@@ -2089,7 +2100,7 @@ function ContentManager({
           ))}
         </aside>
 
-        <section className="border border-[#172C41]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
+        <section className="border border-[#141E33]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
           <div className="grid gap-3 sm:grid-cols-2">
             <div>
               <Label className="text-xs font-bold uppercase tracking-wider">Clé technique (slug)</Label>
@@ -2134,7 +2145,7 @@ function ContentManager({
                 aria-label="Statut"
                 value={status}
                 onChange={(e) => setStatus(e.target.value as any)}
-                className="border border-[#172C41]/20 bg-white px-3 py-1.5 text-xs rounded-md"
+                className="border border-[#141E33]/20 bg-white px-3 py-1.5 text-xs rounded-md"
               >
                 <option value="published">Publié (Visible sur le site)</option>
                 <option value="draft">Brouillon</option>
@@ -2172,7 +2183,7 @@ function ContentManager({
                   status,
                 })}
                 disabled={saving || !key || !title}
-                className="bg-[#172C41] text-white hover:bg-[#263f58]"
+                className="bg-[#141E33] text-white hover:bg-[#263f58]"
               >
                 <Save className="mr-2 h-4 w-4" />
                 {saving ? "Enregistrement…" : "Enregistrer la publication"}
@@ -2202,7 +2213,7 @@ function AudiencePanel({ data }: { data?: any; maxPageViews: number }) {
       </div>
 
       {/* Funnel Graph */}
-      <div className="border border-[#172C41]/10 bg-white p-6 rounded-xl shadow-xs">
+      <div className="border border-[#141E33]/10 bg-white p-6 rounded-xl shadow-xs">
         <h3 className="font-display text-xl text-[#141E33]">Entonnoir d'Engagement & Conversion</h3>
         <p className="text-xs text-[#52606B]">Parcours de la découverte du site jusqu'à la commande confirmée.</p>
 
@@ -2252,13 +2263,13 @@ function Metric({
     <div className={`border p-5 rounded-xl transition ${
       highlight
         ? "border-[#BC3B2C]/30 bg-[#BC3B2C]/05 shadow-xs"
-        : "border-[#172C41]/10 bg-[#FCFAF5]"
+        : "border-[#141E33]/10 bg-[#FCFAF5]"
     }`}>
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#52606B]">{label}</p>
-        <Icon className={`h-4 w-4 ${highlight ? "text-[#BC3B2C]" : "text-[#172C41]"}`} />
+        <Icon className={`h-4 w-4 ${highlight ? "text-[#BC3B2C]" : "text-[#141E33]"}`} />
       </div>
-      <p className={`mt-3 font-display text-3xl font-bold leading-none ${highlight ? "text-[#BC3B2C]" : "text-[#172C41]"}`}>
+      <p className={`mt-3 font-display text-3xl font-bold leading-none ${highlight ? "text-[#BC3B2C]" : "text-[#141E33]"}`}>
         {value}
       </p>
       <p className="mt-2 text-xs text-[#52606B]">{note}</p>
@@ -2283,10 +2294,10 @@ function QuickAction({
     <button
       type="button"
       onClick={onClick}
-      className="border border-[#172C41]/10 bg-[#FCFAF5] p-6 text-left rounded-xl transition hover:-translate-y-0.5 hover:border-[#172C41]/30 hover:shadow-sm"
+      className="border border-[#141E33]/10 bg-[#FCFAF5] p-6 text-left rounded-xl transition hover:-translate-y-0.5 hover:border-[#141E33]/30 hover:shadow-sm"
     >
       <div className="flex items-center justify-between">
-        <Icon className="h-5 w-5 text-[#C94E36]" />
+        <Icon className="h-5 w-5 text-[#BC3B2C]" />
         <ArrowUpRight className="h-4 w-4 text-[#52606B]" />
       </div>
       <p className="mt-4 font-display text-2xl font-bold text-[#141E33]">{title}</p>

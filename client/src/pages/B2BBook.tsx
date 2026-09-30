@@ -2,14 +2,28 @@ import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen } from "lucide-react";
-import { useState, useMemo } from "react";
+import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen, ShieldCheck, Sparkles } from "lucide-react";
+import { useState, useMemo, useRef } from "react";
+import { AnimatePresence, motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { toast } from "sonner";
 
 const A = "/editorial/b2b-launch/";
 
+const BOOK_PHOTOS = [
+  { url: A + "book-angle.jpg", title: "Photo d'angle (Bureau)" },
+  { url: A + "book-front.jpg", title: "Couverture officielle" },
+  { url: A + "book-back.jpg", title: "Quatrième de couverture" },
+  { url: A + "media.jpg", title: "Présentation média" },
+];
+
 export default function B2BBook() {
+  const prefersReduced = useReducedMotion();
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const heroParallax = useTransform(scrollYProgress, [0, 1], prefersReduced ? [0, 0] : [0, 30]);
+
   const [qty, setQty] = useState(1);
+  const [activePhotoIndex, setActivePhotoIndex] = useState(0);
   const [educator, setEducator] = useState(false);
   const [done, setDone] = useState<string | number | null>(null);
   const [f, setF] = useState({ firstName: "", lastName: "", email: "", phone: "", deliveryAddress: "" });
@@ -65,68 +79,114 @@ export default function B2BBook() {
     <div className="min-h-screen bg-[#F6F1E7] text-[#141E33] selection:bg-[#BC3B2C]/20 selection:text-[#141E33]">
       <SiteHeader />
       <main>
-        <section className="container grid gap-12 py-12 lg:grid-cols-[.9fr_1.1fr] lg:py-18">
-          <div className="grid grid-cols-3 gap-3">
-            <div className="col-span-3 overflow-hidden rounded-xl shadow-2xl">
-              <img
-                src={A + "book-angle.jpg"}
-                fetchPriority="high"
-                decoding="async"
-                className="aspect-[4/5] w-full object-cover transition-transform duration-700 hover:scale-105"
-                alt="B2B Brand Management angle"
-              />
-            </div>
-            <div className="overflow-hidden rounded-lg shadow-sm">
-              <img src={A + "book-front.jpg"} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management front" />
-            </div>
-            <div className="overflow-hidden rounded-lg shadow-sm">
-              <img src={A + "book-back.jpg"} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management back" />
-            </div>
-            <div className="overflow-hidden rounded-lg shadow-sm">
-              <img src={A + "media.jpg"} loading="lazy" decoding="async" className="aspect-[3/4] w-full object-cover" alt="B2B Brand Management media" />
-            </div>
-          </div>
+        {/* HERO SECTION WITH AMBIENT GLOW & PARALLAX */}
+        <section ref={heroRef} className="relative overflow-hidden border-b border-[#141E33]/08 bg-[#F6F1E7]">
+          {/* Ambient Glowing Orbs */}
+          <div className="ambient-mesh-glow -left-20 top-20 h-96 w-96 bg-[#BC3B2C]/10 pointer-events-none" />
+          <div className="ambient-mesh-glow -right-20 top-40 h-[450px] w-[450px] bg-[#1E5FC2]/08 pointer-events-none" />
 
-          <div className="lg:pt-5">
-            <p className="text-[11px] font-extrabold uppercase tracking-[.2em] text-[#BC3B2C]">
-              Tunisia Edition
-            </p>
-            <h1 className="mt-4 font-display text-[clamp(2.4rem,6vw,6.5rem)] leading-[.92] sm:leading-[.88] tracking-[-.05em] text-[#141E33]">
-              B2B Brand Management
-            </h1>
-            <p className="mt-5 text-lg font-semibold text-[#141E33]">
-              Philip Kotler · Waldemar Pfoertsch · Walid Kallel
-            </p>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-[#5C574C]">
-              Une édition tunisienne qui relie les fondamentaux internationaux du B2B Brand Management à des études de cas et à la réalité des organisations tunisiennes.
-            </p>
-            <div className="mt-8 rounded-xl border border-[#141E33]/10 bg-white p-6 shadow-xs">
-              <div className="flex items-baseline justify-between">
-                <p className="text-xs font-extrabold uppercase tracking-[.15em] text-[#5C574C]">Prix & Paiement</p>
-                <p className="font-display text-2xl text-[#BC3B2C]">
-                  {mainBook?.priceRange?.min ? `${parseFloat(mainBook.priceRange.min.amount).toFixed(2).replace(".", ",")} DT` : "65,00 DT"}
-                </p>
+          <div className="container relative z-10 grid gap-12 py-12 lg:grid-cols-[0.95fr_1.05fr] lg:py-20 items-center">
+            {/* Interactive Photo Showcase */}
+            <motion.div style={{ y: heroParallax }} className="flex flex-col items-center">
+              <div className="relative w-full max-w-[500px]">
+                {/* Soft warm depth glow behind book */}
+                <div className="absolute -inset-4 -z-10 rounded-full bg-[#BC3B2C]/10 blur-3xl pointer-events-none" />
+                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-white shadow-2xl ring-1 ring-[#141E33]/10">
+                  <AnimatePresence mode="wait">
+                    <motion.img
+                      key={BOOK_PHOTOS[activePhotoIndex].url}
+                      src={BOOK_PHOTOS[activePhotoIndex].url}
+                      alt={BOOK_PHOTOS[activePhotoIndex].title}
+                      fetchPriority="high"
+                      decoding="async"
+                      initial={{ opacity: 0, scale: 0.98 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.98 }}
+                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+                    />
+                  </AnimatePresence>
+                  <div className="glass-panel absolute bottom-4 left-4 z-20 flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[11px] font-bold text-[#141E33] shadow-md backdrop-blur-md bg-white/90">
+                    <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
+                    <span>{BOOK_PHOTOS[activePhotoIndex].title}</span>
+                  </div>
+                </div>
               </div>
-              <p className="mt-2 flex items-center gap-2 font-semibold text-[#141E33]">
-                <Truck className="h-5 w-5 text-[#BC3B2C]" /> Paiement à la livraison
+
+              {/* Photo Selector Thumbnails */}
+              <div className="mt-4 flex flex-wrap justify-center gap-2.5">
+                {BOOK_PHOTOS.map((p, idx) => (
+                  <button
+                    key={p.url}
+                    type="button"
+                    onClick={() => setActivePhotoIndex(idx)}
+                    className={`relative h-16 w-14 overflow-hidden rounded-lg border-2 transition-all duration-300 shadow-xs ${
+                      activePhotoIndex === idx
+                        ? "border-[#BC3B2C] ring-2 ring-[#BC3B2C]/30 scale-105"
+                        : "border-transparent opacity-60 hover:opacity-100 hover:border-[#141E33]/20"
+                    }`}
+                    aria-label={p.title}
+                  >
+                    <img src={p.url} alt="" className="h-full w-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Book Details and Action Area */}
+            <div className="lg:pt-2">
+              <div className="glass-panel inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 shadow-xs">
+                <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
+                <span className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#BC3B2C]">
+                  Tunisia Edition · Ouvrage de Référence
+                </span>
+              </div>
+
+              <h1 className="mt-5 font-display text-[clamp(2.4rem,5.5vw,5.5rem)] leading-[0.95] sm:leading-[0.9] tracking-[-0.04em] text-[#141E33]">
+                B2B Brand Management
+              </h1>
+
+              <p className="mt-4 text-xl font-semibold text-[#141E33]">
+                Philip Kotler · Waldemar Pfoertsch · Walid Kallel
               </p>
-              <p className="mt-2 text-xs text-[#5C574C]">
-                Aucun paiement en ligne. Vos coordonnées servent à confirmer et livrer votre commande.
+
+              <p className="mt-5 max-w-xl text-base leading-7 text-[#5C574C]">
+                Une édition tunisienne qui relie les fondamentaux internationaux du B2B Brand Management à des études de cas concrètes et à la réalité économique des organisations tunisiennes.
               </p>
-            </div>
-            <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
-              <a
-                href="#commander"
-                className="btn-terracotta inline-flex w-full sm:w-auto justify-center items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-white shadow-md"
-              >
-                Commander le livre <ArrowRight className="h-4 w-4" />
-              </a>
-              <a
-                href="#sommaire"
-                className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full border border-[#141E33]/20 bg-white/70 backdrop-blur-xs px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-[#141E33] hover:bg-white transition-all shadow-xs"
-              >
-                <BookOpen className="h-4 w-4 text-[#BC3B2C]" /> Consulter le sommaire
-              </a>
+
+              {/* Price & COD Highlight Card */}
+              <div className="glass-panel mt-7 rounded-2xl p-6 shadow-md border border-white/80">
+                <div className="flex items-baseline justify-between">
+                  <p className="text-xs font-extrabold uppercase tracking-[.15em] text-[#5C574C]">Prix & Paiement</p>
+                  <p className="font-display text-3xl text-[#BC3B2C]">
+                    {mainBook?.priceRange?.min ? `${parseFloat(mainBook.priceRange.min.amount).toFixed(2).replace(".", ",")} DT` : "65,00 DT"}
+                  </p>
+                </div>
+                <div className="mt-3 flex flex-wrap items-center gap-4 text-xs font-semibold text-[#141E33]">
+                  <span className="flex items-center gap-2">
+                    <Truck className="h-4 w-4 text-[#BC3B2C]" /> Paiement à la livraison partout en Tunisie
+                  </span>
+                  <span className="flex items-center gap-2 text-[#5C574C]">
+                    <ShieldCheck className="h-4 w-4 text-[#BC3B2C]" /> Aucun paiement en ligne requis
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="mt-8 flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-3">
+                <a
+                  href="#commander"
+                  className="btn-terracotta inline-flex w-full sm:w-auto justify-center items-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-white shadow-md"
+                >
+                  Commander le livre <ArrowRight className="h-4 w-4" />
+                </a>
+                <a
+                  href="#sommaire"
+                  className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full border border-[#141E33]/20 bg-white/70 backdrop-blur-xs px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-[#141E33] hover:bg-white transition-all shadow-xs"
+                >
+                  <BookOpen className="h-4 w-4 text-[#BC3B2C]" /> Consulter le sommaire
+                </a>
+              </div>
             </div>
           </div>
         </section>
