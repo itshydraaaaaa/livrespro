@@ -1136,8 +1136,18 @@ function ProductManager({
   onDelete: (id: number) => void;
   saving: boolean;
 }) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(rows[0]?.id ?? null);
   const selected = useMemo(() => rows.find((r) => r.id === selectedId), [rows, selectedId]);
+
+  const uploadImageMutation = trpc.admin.products.uploadImage.useMutation({
+    onSuccess: (data) => {
+      setCoverImage(data.url);
+      toast.success("Image hébergée avec succès sur le Cloud !");
+    },
+    onError: (err) => {
+      toast.error(err.message || "Erreur lors du téléversement de l'image");
+    },
+  });
 
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<number | "all">("all");
@@ -1153,6 +1163,12 @@ function ProductManager({
   const [status, setStatus] = useState<any>("published");
   const [featured, setFeatured] = useState(false);
   const [tableOfContentsPdf, setTableOfContentsPdf] = useState("");
+
+  useEffect(() => {
+    if (selectedId === null && rows.length > 0) {
+      setSelectedId(rows[0].id);
+    }
+  }, [rows, selectedId]);
 
   useEffect(() => {
     if (selected) {
@@ -1438,10 +1454,18 @@ function ProductManager({
               {/* Upload file or enter URL */}
               <div className="grid gap-3 sm:grid-cols-2">
                 <div>
-                  <Label className="text-[11px] text-[#5C574C] font-semibold">Téléverser une image locale</Label>
+                  <div className="flex items-center justify-between">
+                    <Label className="text-[11px] text-[#5C574C] font-semibold">Téléverser une image locale</Label>
+                    {uploadImageMutation.isPending && (
+                      <span className="text-[10px] text-[#BC3B2C] font-bold animate-pulse">
+                        Envoi Cloud en cours…
+                      </span>
+                    )}
+                  </div>
                   <Input
                     type="file"
                     accept="image/*"
+                    disabled={uploadImageMutation.isPending}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -1450,10 +1474,19 @@ function ProductManager({
                         return;
                       }
                       const reader = new FileReader();
-                      reader.onload = () => {
+                      reader.onload = async () => {
                         const base64 = reader.result as string;
-                        setCoverImage(base64);
-                        toast.success(`Image "${file.name}" chargée avec succès.`);
+                        setCoverImage(base64); // immediate preview
+                        try {
+                          const res = await uploadImageMutation.mutateAsync({
+                            filename: file.name,
+                            contentType: file.type || "image/jpeg",
+                            base64,
+                          });
+                          setCoverImage(res.url);
+                        } catch {
+                          // base64 fallback is preserved
+                        }
                       };
                       reader.readAsDataURL(file);
                     }}
@@ -1479,6 +1512,7 @@ function ProductManager({
                 <div className="mt-1.5 flex flex-wrap gap-2">
                   {[
                     { label: "Photo d'angle (Bureau)", url: "/editorial/b2b-launch/book-angle.jpg" },
+                    { label: "Livre transparent (The Main Book)", url: "/editorial/b2b-launch/main-book.png" },
                     { label: "Couverture face", url: "/editorial/b2b-launch/book-front.jpg" },
                     { label: "Quatrième de couverture", url: "/editorial/b2b-launch/book-back.jpg" },
                     { label: "Photo presse / média", url: "/editorial/b2b-launch/media.jpg" },
@@ -1492,7 +1526,7 @@ function ProductManager({
                       }}
                       className={`rounded-md border px-2.5 py-1 text-[11px] transition-all ${
                         coverImage === p.url
-                          ? "border-[#BC3B2C] bg-[#BC3B2C]/10 text-[#BC3B2C] font-bold"
+                          ? "border-[#BC3B2C] bg-[#BC3B2C]/10 text-[#BC3B2C] font-bold shadow-xs"
                           : "border-gray-200 bg-white text-gray-700 hover:border-gray-400"
                       }`}
                     >

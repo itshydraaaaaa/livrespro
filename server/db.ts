@@ -516,7 +516,11 @@ export async function updateProduct(
     }
     payload.updated_at = new Date().toISOString();
 
-    await supabase.from("products").update(payload).eq("id", id);
+    const { error: updateErr } = await supabase.from("products").update(payload).eq("id", id);
+    if (updateErr) {
+      console.error("[DB] updateProduct error:", updateErr);
+      throw new Error(`Erreur Supabase: ${updateErr.message}`);
+    }
 
     if (authorIds && authorIds.length > 0) {
       try {
@@ -532,7 +536,8 @@ export async function updateProduct(
       }
     }
   } catch (err) {
-    console.warn("[DB] updateProduct error:", err);
+    console.error("[DB] updateProduct error:", err);
+    throw err;
   }
   return id;
 }

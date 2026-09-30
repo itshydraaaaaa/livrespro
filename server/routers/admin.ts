@@ -26,6 +26,8 @@ import {
   updateProductQuick,
 } from "../db";
 import { adminProcedure, router } from "../_core/trpc";
+import { TRPCError } from "@trpc/server";
+import { getSupabaseAdmin, getSupabaseClient } from "../services/supabase";
 
 const blankToNull = (max: number) =>
   z
@@ -69,10 +71,14 @@ const productInput = z.object({
   slug: z.string().trim().min(2).max(180),
   sku: blankToNull(80),
   shortDescription: blankToNull(500),
-  description: z.string().trim().min(10),
+  description: z.string().trim().default(""),
   productType: z.string().trim().default("Livre"),
   format: z.enum(["PHYSICAL_BOOK", "DIGITAL_BOOK", "EBOOK", "AUDIOBOOK", "OTHER"]).default("PHYSICAL_BOOK"),
-  price: z.string().trim().regex(/^\d+(\.\d{1,2})?$/),
+  price: z
+    .string()
+    .trim()
+    .transform((val) => val.replace(",", "."))
+    .refine((val) => /^\d+(\.\d{1,2})?$/.test(val), "Format de prix invalide (ex: 65.00)"),
   compareAtPrice: blankToNull(32),
   currency: z.string().default("TND"),
   stockQuantity: z.number().int().min(0).default(100),
@@ -81,11 +87,11 @@ const productInput = z.object({
   publisher: blankToNull(180),
   language: z.string().default("Français"),
   pageCount: z.number().int().positive().optional().nullable(),
-  coverImage: blankToNull(1000),
+  coverImage: z.string().trim().optional().nullable().transform((val) => val || null),
   categoryId: z.number().int().positive().optional().nullable(),
   featured: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]).default("published"),
-  tableOfContentsPdf: z.string().optional().nullable(),
+  tableOfContentsPdf: z.string().trim().optional().nullable().transform((val) => val || null),
   authorIds: z.array(z.number().int().positive()).optional(),
   galleryUrls: z.array(z.string().url()).optional(),
 });
@@ -201,6 +207,50 @@ export const adminRouter = router({
         } catch {}
         return { success: true };
       }),
+    uploadImage: adminProcedure
+      .input(
+        z.object({
+          filename: z.string(),
+          contentType: z.string().default("image/jpeg"),
+          base64: z.string(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const supabase = getSupabaseAdmin() || getSupabaseClient();
+        if (!supabase) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Stockage Supabase non accessible.",
+          });
+        }
+        try {
+          const base64Data = input.base64.replace(/^data:[^;]+;base64,/, "");
+          const buffer = Buffer.from(base64Data, "base64");
+          const ext = input.filename.split(".").pop()?.toLowerCase() || "jpg";
+          const uniqueName = `book-covers/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+
+          const { error: uploadError } = await supabase.storage
+            .from("media")
+            .upload(uniqueName, buffer, {
+              contentType: input.contentType,
+              upsert: true,
+            });
+
+          if (uploadError) {
+            console.error("[Storage] upload error:", uploadError);
+            throw new Error(uploadError.message);
+          }
+
+          const { data: pubData } = supabase.storage.from("media").getPublicUrl(uniqueName);
+          return { url: pubData.publicUrl };
+        } catch (err: any) {
+          console.error("[Storage] upload exception:", err);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: err?.message || "Échec de l'envoi de l'image.",
+          });
+        }
+      }),
     save: adminProcedure.input(productInput).mutation(async ({ input }) => {
       const { id, authorIds, galleryUrls, featured, ...data } = input;
       const images = galleryUrls?.map((url) => ({ url })) ?? [];
@@ -232,8 +282,12 @@ export const adminRouter = router({
           images
         );
         return { id: newId };
-      } catch {
-        return { id: id ?? 1 };
+      } catch (err: any) {
+        console.error("[Admin] save product error:", err);
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err?.message || "Erreur lors de l'enregistrement du livre",
+        });
       }
     }),
   }),

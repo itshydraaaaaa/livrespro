@@ -15,10 +15,11 @@ const FALLBACK_B2B_PRODUCT: Product = {
   tags: ["B2B", "Stratégie", "Marketing B2B", "Cas Tunisiens", "Livre physique"],
   images: [
     {
-      url: "/business-success-logo.png",
+      url: "/editorial/b2b-launch/book-angle.jpg",
       altText: "B2B Brand Management — Tunisia Edition",
     },
   ],
+  coverImage: "/editorial/b2b-launch/book-angle.jpg",
   priceRange: {
     min: { amount: "65.00", currencyCode: "TND" },
     max: { amount: "65.00", currencyCode: "TND" },
@@ -173,7 +174,9 @@ export async function listStorefrontProducts(options?: {
         productType: p.product_type || "Livre relié",
         vendor: p.publisher || "L’Atelier des Pages",
         tags: [p.categories?.name, "Livre physique"].filter(Boolean),
-        images: [{ url: p.cover_image || "/business-success-logo.png", altText: p.title }],
+        images: [{ url: p.cover_image || "/editorial/b2b-launch/book-angle.jpg", altText: p.title }],
+        coverImage: p.cover_image || "/editorial/b2b-launch/book-angle.jpg",
+        tableOfContentsPdf: p.table_of_contents_pdf || (p.metadata as any)?.tableOfContentsPdf || null,
         priceRange: {
           min: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
           max: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
@@ -205,7 +208,9 @@ export async function listStorefrontProducts(options?: {
         productType: p.product_type || "Livre relié",
         vendor: p.publisher || "L’Atelier des Pages",
         tags: [p.categories?.name, "Livre physique"].filter(Boolean),
-        images: [{ url: p.cover_image || "/business-success-logo.png", altText: p.title }],
+        images: [{ url: p.cover_image || "/editorial/b2b-launch/book-angle.jpg", altText: p.title }],
+        coverImage: p.cover_image || "/editorial/b2b-launch/book-angle.jpg",
+        tableOfContentsPdf: p.table_of_contents_pdf || (p.metadata as any)?.tableOfContentsPdf || null,
         priceRange: {
           min: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
           max: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },

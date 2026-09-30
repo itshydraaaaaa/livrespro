@@ -269,26 +269,27 @@ export default function Home() {
             {/* Book Cover with subtle 3D hover & scroll parallax */}
             <motion.div
               style={{ y: heroParallaxY }}
-              className="relative mx-auto w-full max-w-[560px]"
+              className="relative mx-auto w-full max-w-[540px] flex justify-center items-center"
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
             >
-              <div className="absolute -inset-5 -z-10 translate-x-5 translate-y-5 rounded-3xl bg-[#E9DFCF]/80 backdrop-blur-xl shadow-lg border border-white/40" />
+              {/* Soft warm ambient shadow behind the book, eliminating the awkward stacked card */}
+              <div className="absolute -inset-4 -z-10 rounded-full bg-[#BC3B2C]/10 blur-3xl pointer-events-none" />
               <motion.div
                 whileHover={{ scale: 1.015, translateY: -4 }}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                className="relative overflow-hidden rounded-2xl shadow-2xl ring-1 ring-[#141E33]/10"
+                className="relative w-full overflow-hidden rounded-2xl shadow-[0_25px_60px_-15px_rgba(20,30,51,0.22)] ring-1 ring-[#141E33]/10 bg-white"
               >
                 <img
                   src={mainBook?.coverImage || `${A}book-angle.jpg`}
                   alt={mainBook?.title || "B2B Brand Management Tunisia Edition"}
                   fetchPriority="high"
                   decoding="async"
-                  className="h-[360px] sm:h-[480px] lg:h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                  className="h-[380px] sm:h-[480px] lg:h-[600px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
                 />
                 {/* Floating Glassmorphic Pill on Book Cover */}
-                <div className="glass-panel absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex items-center gap-2.5 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-[#141E33] shadow-lg">
+                <div className="glass-panel absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex items-center gap-2.5 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-[#141E33] shadow-lg backdrop-blur-md bg-white/90">
                   <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
                   <span>
                     Édition Reliée · {mainBook?.priceRange?.min ? `${parseFloat(mainBook.priceRange.min.amount).toFixed(2).replace(".", ",")} DT` : "65,00 DT"}

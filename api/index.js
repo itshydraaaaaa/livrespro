@@ -4,7 +4,7 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 
 // server/routers.ts
 import { z as z5 } from "zod";
-import { TRPCError as TRPCError3 } from "@trpc/server";
+import { TRPCError as TRPCError4 } from "@trpc/server";
 
 // server/_core/auth.ts
 import crypto from "node:crypto";
@@ -491,7 +491,11 @@ async function updateProduct(id, productData, authorIds, imageUrls) {
       };
     }
     payload.updated_at = (/* @__PURE__ */ new Date()).toISOString();
-    await supabase.from("products").update(payload).eq("id", id);
+    const { error: updateErr } = await supabase.from("products").update(payload).eq("id", id);
+    if (updateErr) {
+      console.error("[DB] updateProduct error:", updateErr);
+      throw new Error(`Erreur Supabase: ${updateErr.message}`);
+    }
     if (authorIds && authorIds.length > 0) {
       try {
         await supabase.from("product_authors").delete().eq("product_id", id);
@@ -506,7 +510,8 @@ async function updateProduct(id, productData, authorIds, imageUrls) {
       }
     }
   } catch (err) {
-    console.warn("[DB] updateProduct error:", err);
+    console.error("[DB] updateProduct error:", err);
+    throw err;
   }
   return id;
 }
@@ -833,6 +838,7 @@ var adminProcedure = t.procedure.use(
 );
 
 // server/routers/admin.ts
+import { TRPCError as TRPCError2 } from "@trpc/server";
 var blankToNull = (max) => z.string().trim().max(max).optional().transform((value) => value || null);
 var contentInput = z.object({
   id: z.number().int().positive().optional(),
@@ -861,10 +867,10 @@ var productInput = z.object({
   slug: z.string().trim().min(2).max(180),
   sku: blankToNull(80),
   shortDescription: blankToNull(500),
-  description: z.string().trim().min(10),
+  description: z.string().trim().default(""),
   productType: z.string().trim().default("Livre"),
   format: z.enum(["PHYSICAL_BOOK", "DIGITAL_BOOK", "EBOOK", "AUDIOBOOK", "OTHER"]).default("PHYSICAL_BOOK"),
-  price: z.string().trim().regex(/^\d+(\.\d{1,2})?$/),
+  price: z.string().trim().transform((val) => val.replace(",", ".")).refine((val) => /^\d+(\.\d{1,2})?$/.test(val), "Format de prix invalide (ex: 65.00)"),
   compareAtPrice: blankToNull(32),
   currency: z.string().default("TND"),
   stockQuantity: z.number().int().min(0).default(100),
@@ -873,11 +879,11 @@ var productInput = z.object({
   publisher: blankToNull(180),
   language: z.string().default("Fran\xE7ais"),
   pageCount: z.number().int().positive().optional().nullable(),
-  coverImage: blankToNull(1e3),
+  coverImage: z.string().trim().optional().nullable().transform((val) => val || null),
   categoryId: z.number().int().positive().optional().nullable(),
   featured: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]).default("published"),
-  tableOfContentsPdf: z.string().optional().nullable(),
+  tableOfContentsPdf: z.string().trim().optional().nullable().transform((val) => val || null),
   authorIds: z.array(z.number().int().positive()).optional(),
   galleryUrls: z.array(z.string().url()).optional()
 });
@@ -981,6 +987,43 @@ var adminRouter = router({
       }
       return { success: true };
     }),
+    uploadImage: adminProcedure.input(
+      z.object({
+        filename: z.string(),
+        contentType: z.string().default("image/jpeg"),
+        base64: z.string()
+      })
+    ).mutation(async ({ input }) => {
+      const supabase = getSupabaseAdmin() || getSupabaseClient();
+      if (!supabase) {
+        throw new TRPCError2({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Stockage Supabase non accessible."
+        });
+      }
+      try {
+        const base64Data = input.base64.replace(/^data:[^;]+;base64,/, "");
+        const buffer = Buffer.from(base64Data, "base64");
+        const ext = input.filename.split(".").pop()?.toLowerCase() || "jpg";
+        const uniqueName = `book-covers/${Date.now()}-${Math.random().toString(36).substring(2, 8)}.${ext}`;
+        const { error: uploadError } = await supabase.storage.from("media").upload(uniqueName, buffer, {
+          contentType: input.contentType,
+          upsert: true
+        });
+        if (uploadError) {
+          console.error("[Storage] upload error:", uploadError);
+          throw new Error(uploadError.message);
+        }
+        const { data: pubData } = supabase.storage.from("media").getPublicUrl(uniqueName);
+        return { url: pubData.publicUrl };
+      } catch (err) {
+        console.error("[Storage] upload exception:", err);
+        throw new TRPCError2({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err?.message || "\xC9chec de l'envoi de l'image."
+        });
+      }
+    }),
     save: adminProcedure.input(productInput).mutation(async ({ input }) => {
       const { id, authorIds, galleryUrls, featured, ...data } = input;
       const images = galleryUrls?.map((url) => ({ url })) ?? [];
@@ -1010,8 +1053,12 @@ var adminRouter = router({
           images
         );
         return { id: newId };
-      } catch {
-        return { id: id ?? 1 };
+      } catch (err) {
+        console.error("[Admin] save product error:", err);
+        throw new TRPCError2({
+          code: "INTERNAL_SERVER_ERROR",
+          message: err?.message || "Erreur lors de l'enregistrement du livre"
+        });
       }
     })
   }),
@@ -1107,10 +1154,11 @@ var FALLBACK_B2B_PRODUCT = {
   tags: ["B2B", "Strat\xE9gie", "Marketing B2B", "Cas Tunisiens", "Livre physique"],
   images: [
     {
-      url: "/business-success-logo.png",
+      url: "/editorial/b2b-launch/book-angle.jpg",
       altText: "B2B Brand Management \u2014 Tunisia Edition"
     }
   ],
+  coverImage: "/editorial/b2b-launch/book-angle.jpg",
   priceRange: {
     min: { amount: "65.00", currencyCode: "TND" },
     max: { amount: "65.00", currencyCode: "TND" }
@@ -1244,7 +1292,9 @@ async function listStorefrontProducts(options) {
         productType: p.product_type || "Livre reli\xE9",
         vendor: p.publisher || "L\u2019Atelier des Pages",
         tags: [p.categories?.name, "Livre physique"].filter(Boolean),
-        images: [{ url: p.cover_image || "/business-success-logo.png", altText: p.title }],
+        images: [{ url: p.cover_image || "/editorial/b2b-launch/book-angle.jpg", altText: p.title }],
+        coverImage: p.cover_image || "/editorial/b2b-launch/book-angle.jpg",
+        tableOfContentsPdf: p.table_of_contents_pdf || p.metadata?.tableOfContentsPdf || null,
         priceRange: {
           min: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
           max: { amount: p.price || "65.00", currencyCode: p.currency || "TND" }
@@ -1275,7 +1325,9 @@ async function listStorefrontProducts(options) {
         productType: p.product_type || "Livre reli\xE9",
         vendor: p.publisher || "L\u2019Atelier des Pages",
         tags: [p.categories?.name, "Livre physique"].filter(Boolean),
-        images: [{ url: p.cover_image || "/business-success-logo.png", altText: p.title }],
+        images: [{ url: p.cover_image || "/editorial/b2b-launch/book-angle.jpg", altText: p.title }],
+        coverImage: p.cover_image || "/editorial/b2b-launch/book-angle.jpg",
+        tableOfContentsPdf: p.table_of_contents_pdf || p.metadata?.tableOfContentsPdf || null,
         priceRange: {
           min: { amount: p.price || "65.00", currencyCode: p.currency || "TND" },
           max: { amount: p.price || "65.00", currencyCode: p.currency || "TND" }
@@ -1690,7 +1742,7 @@ var siteRouter = router({
 import { z as z4 } from "zod";
 
 // server/_core/notification.ts
-import { TRPCError as TRPCError2 } from "@trpc/server";
+import { TRPCError as TRPCError3 } from "@trpc/server";
 
 // server/_core/env.ts
 var ENV = {
@@ -1720,13 +1772,13 @@ var buildEndpointUrl = (baseUrl) => {
 };
 var validatePayload = (input) => {
   if (!isNonEmptyString(input.title)) {
-    throw new TRPCError2({
+    throw new TRPCError3({
       code: "BAD_REQUEST",
       message: "Notification title is required."
     });
   }
   if (!isNonEmptyString(input.content)) {
-    throw new TRPCError2({
+    throw new TRPCError3({
       code: "BAD_REQUEST",
       message: "Notification content is required."
     });
@@ -1734,13 +1786,13 @@ var validatePayload = (input) => {
   const title = trimValue(input.title);
   const content = trimValue(input.content);
   if (title.length > TITLE_MAX_LENGTH) {
-    throw new TRPCError2({
+    throw new TRPCError3({
       code: "BAD_REQUEST",
       message: `Notification title must be at most ${TITLE_MAX_LENGTH} characters.`
     });
   }
   if (content.length > CONTENT_MAX_LENGTH) {
-    throw new TRPCError2({
+    throw new TRPCError3({
       code: "BAD_REQUEST",
       message: `Notification content must be at most ${CONTENT_MAX_LENGTH} characters.`
     });
@@ -1750,13 +1802,13 @@ var validatePayload = (input) => {
 async function notifyOwner(payload) {
   const { title, content } = validatePayload(payload);
   if (!ENV.forgeApiUrl) {
-    throw new TRPCError2({
+    throw new TRPCError3({
       code: "INTERNAL_SERVER_ERROR",
       message: "Notification service URL is not configured."
     });
   }
   if (!ENV.forgeApiKey) {
-    throw new TRPCError2({
+    throw new TRPCError3({
       code: "INTERNAL_SERVER_ERROR",
       message: "Notification service API key is not configured."
     });
@@ -1838,7 +1890,7 @@ var appRouter = router({
           setSessionCookie(ctx.res, token2);
           return { success: true, user: sessionUser2 };
         }
-        throw new TRPCError3({
+        throw new TRPCError4({
           code: "UNAUTHORIZED",
           message: "Adresse email ou mot de passe incorrect."
         });
@@ -1855,14 +1907,14 @@ var appRouter = router({
           setSessionCookie(ctx.res, token2);
           return { success: true, user: sessionUser2 };
         }
-        throw new TRPCError3({
+        throw new TRPCError4({
           code: "UNAUTHORIZED",
           message: "Adresse email ou mot de passe incorrect."
         });
       }
       const isValid = verifyPassword(input.password, user.passwordHash);
       if (!isValid) {
-        throw new TRPCError3({
+        throw new TRPCError4({
           code: "UNAUTHORIZED",
           message: "Adresse email ou mot de passe incorrect."
         });
@@ -1899,7 +1951,7 @@ var appRouter = router({
       try {
         const existing = await getUserByEmail(email);
         if (existing) {
-          throw new TRPCError3({
+          throw new TRPCError4({
             code: "CONFLICT",
             message: "Un compte existe d\xE9j\xE0 avec cette adresse email."
           });
@@ -1911,7 +1963,7 @@ var appRouter = router({
           role
         });
       } catch (err) {
-        if (err instanceof TRPCError3) throw err;
+        if (err instanceof TRPCError4) throw err;
         console.warn("[Auth] DB offline during register, generated active session:", err);
         newUserId = Math.floor(100 + Math.random() * 900);
       }
@@ -1939,7 +1991,7 @@ var appRouter = router({
       })
     ).mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError3({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+        throw new TRPCError4({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
       }
       try {
         await updateUserProfile(
@@ -1980,15 +2032,15 @@ var appRouter = router({
       })
     ).mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
-        throw new TRPCError3({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+        throw new TRPCError4({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
       }
       const userRecord = await getUserByEmail(ctx.user.email);
       if (!userRecord) {
-        throw new TRPCError3({ code: "NOT_FOUND", message: "Utilisateur non trouv\xE9" });
+        throw new TRPCError4({ code: "NOT_FOUND", message: "Utilisateur non trouv\xE9" });
       }
       const isValid = verifyPassword(input.currentPassword, userRecord.passwordHash);
       if (!isValid) {
-        throw new TRPCError3({
+        throw new TRPCError4({
           code: "BAD_REQUEST",
           message: "Le mot de passe actuel saisi est incorrect."
         });
@@ -2006,11 +2058,11 @@ var appRouter = router({
       }).optional()
     ).mutation(async ({ ctx }) => {
       if (!ctx.user) {
-        throw new TRPCError3({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
+        throw new TRPCError4({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
       }
       const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
       if (ctx.user.role === "admin" && ctx.user.email.toLowerCase().trim() === adminEmail) {
-        throw new TRPCError3({
+        throw new TRPCError4({
           code: "FORBIDDEN",
           message: "Le compte administrateur racine de la plateforme ne peut pas \xEAtre supprim\xE9."
         });
