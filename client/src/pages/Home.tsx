@@ -198,16 +198,9 @@ export default function Home() {
               animate="visible"
               variants={staggerContainer}
             >
-              <motion.div variants={kickerReveal} className="glass-panel inline-flex items-center gap-2.5 rounded-full px-4 py-1.5 shadow-xs">
-                <span className="h-2 w-2 rounded-full bg-[#BC3B2C] animate-pulse" />
-                <span className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#BC3B2C]">
-                  Tunisia Edition · B2B Brand Management
-                </span>
-              </motion.div>
-
               <motion.h1
                 variants={fadeInUp}
-                className="mt-6 font-display text-[clamp(2.1rem,4.6vw,4.9rem)] leading-[1.05] sm:leading-[0.98] tracking-[-0.035em] text-[#141E33]"
+                className="font-display text-[clamp(2.1rem,4.6vw,4.9rem)] leading-[1.05] sm:leading-[0.98] tracking-[-0.035em] text-[#141E33]"
               >
                 B2B Branding Management : les études de cas de Kotler et Pfoertsch, par Walid Kallel,{" "}
                 <span className="italic bg-gradient-to-r from-[#BC3B2C] via-[#BC3B2C] to-[#1E5FC2] bg-clip-text text-transparent">
@@ -252,24 +245,6 @@ export default function Home() {
                 >
                   Découvrir le livre
                 </Link>
-              </motion.div>
-
-              <motion.div
-                variants={fadeInUp}
-                className="mt-9 flex flex-wrap gap-x-4 gap-y-2.5 text-xs font-semibold text-[#5C574C]"
-              >
-                <span className="glass-panel flex items-center gap-2 rounded-full px-3.5 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
-                  Édition tunisienne
-                </span>
-                <span className="glass-panel flex items-center gap-2 rounded-full px-3.5 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
-                  Études de cas tunisiennes
-                </span>
-                <span className="glass-panel flex items-center gap-2 rounded-full px-3.5 py-1.5">
-                  <span className="h-1.5 w-1.5 rounded-full bg-[#BC3B2C]" />
-                  Disponible maintenant
-                </span>
               </motion.div>
             </motion.div>
 
