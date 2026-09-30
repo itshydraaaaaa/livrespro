@@ -1,5 +1,6 @@
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
+import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -120,6 +121,12 @@ export default function B2BBook() {
               >
                 Commander le livre <ArrowRight className="h-4 w-4" />
               </a>
+              <a
+                href="#sommaire"
+                className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full border border-[#141E33]/20 bg-white/70 backdrop-blur-xs px-6 py-4 text-[11px] font-extrabold uppercase tracking-[.15em] text-[#141E33] hover:bg-white transition-all shadow-xs"
+              >
+                <BookOpen className="h-4 w-4 text-[#BC3B2C]" /> Consulter le sommaire
+              </a>
             </div>
           </div>
         </section>
@@ -185,6 +192,24 @@ export default function B2BBook() {
             </div>
           </section>
         )}
+
+        <section id="sommaire" className="border-t border-[#141E33]/10 bg-white py-16">
+          <div className="container">
+            <div className="mb-8">
+              <p className="eyebrow text-[#BC3B2C]">Structure de l'ouvrage</p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl lg:text-5xl text-[#141E33]">
+                Sommaire & Extraits Protégés
+              </h2>
+              <p className="mt-3 text-xs sm:text-sm text-[#5C574C] max-w-2xl">
+                Consultez le sommaire officiel et l’organisation pédagogique de <em>{mainBook?.title || "B2B Brand Management — Tunisia Edition"}</em> en lecture sécurisée anti-copie.
+              </p>
+            </div>
+            <ProtectedBookTableOfContents
+              pdfUrl={mainBook?.tableOfContentsPdf || undefined}
+              bookTitle={mainBook?.title || "B2B Brand Management — Tunisia Edition"}
+            />
+          </div>
+        </section>
 
         <section id="commander" className="border-t border-[#141E33]/10 bg-[#141E33] py-16 text-white">
           <div className="container grid gap-12 lg:grid-cols-[.8fr_1.2fr]">

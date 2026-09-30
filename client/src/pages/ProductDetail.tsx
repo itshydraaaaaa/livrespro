@@ -1,4 +1,5 @@
 import { ProductCard } from "@/components/storefront/ProductCard";
+import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trackBehavior } from "@/components/AnalyticsManager";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
@@ -121,15 +122,25 @@ export default function ProductDetail() {
               <div className="prose prose-sm max-w-none text-[#5C574C] prose-p:leading-7" dangerouslySetInnerHTML={{ __html: product.descriptionHtml || `<p>${product.description}</p>` }} />
               {variant ? (
                 <div className="mt-8">
-                  <button
-                    type="button"
-                    disabled={!variant.availableForSale || cartLoading}
-                    onClick={onAddToCart}
-                    className="btn-terracotta inline-flex w-full items-center justify-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[0.15em] text-white shadow-md disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
-                  >
-                    <ShoppingBag className="h-4 w-4" />
-                    {!variant.availableForSale ? "Indisponible" : cartLoading ? "Ajout en cours…" : "Ajouter à ma sélection"}
-                  </button>
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <button
+                      type="button"
+                      disabled={!variant.availableForSale || cartLoading}
+                      onClick={onAddToCart}
+                      className="btn-terracotta inline-flex w-full items-center justify-center gap-3 rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[0.15em] text-white shadow-md disabled:cursor-not-allowed disabled:opacity-45 sm:w-auto"
+                    >
+                      <ShoppingBag className="h-4 w-4" />
+                      {!variant.availableForSale ? "Indisponible" : cartLoading ? "Ajout en cours…" : "Ajouter à ma sélection"}
+                    </button>
+                    {Boolean(product.tableOfContentsPdf || product.handle.includes("b2b") || product.title.toLowerCase().includes("b2b brand")) && (
+                      <a
+                        href="#sommaire"
+                        className="inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full border border-[#141E33]/20 bg-white/70 backdrop-blur-xs px-6 py-4 text-[11px] font-extrabold uppercase tracking-[0.15em] text-[#141E33] hover:bg-white transition-all shadow-xs"
+                      >
+                        <BookOpen className="h-4 w-4 text-[#BC3B2C]" /> Consulter le sommaire
+                      </a>
+                    )}
+                  </div>
                   <p className="mt-4 flex items-center gap-2 text-xs text-[#5C574C]">
                     <Check className="h-4 w-4 text-[#BC3B2C]" /> Commande directe et paiement à la livraison (règlement en espèces à réception).
                   </p>
@@ -157,6 +168,25 @@ export default function ProductDetail() {
                 <p className="mt-3 text-xs leading-5 text-[#5C574C]">Version numérique · avec achat du livre + statut {educatorOffer.audience.toLowerCase()} éligible.</p>
               </div>
             </div>
+          </section>
+        )}
+
+        {/* TABLE OF CONTENTS FOR THIS BOOK */}
+        {Boolean(product.tableOfContentsPdf || product.handle.includes("b2b") || product.title.toLowerCase().includes("b2b brand")) && (
+          <section id="sommaire" className="container py-12 md:py-16 border-t border-[#141E33]/08">
+            <div className="mb-8">
+              <p className="eyebrow text-[#BC3B2C]">Structure de l'ouvrage</p>
+              <h2 className="mt-2 font-display text-3xl sm:text-4xl text-[#141E33]">
+                Sommaire & Extraits Protégés
+              </h2>
+              <p className="mt-2 text-xs sm:text-sm text-[#5C574C]">
+                Consultez le sommaire officiel et l'organisation détaillée de <em>{product.title}</em> en lecture sécurisée anti-copie.
+              </p>
+            </div>
+            <ProtectedBookTableOfContents
+              pdfUrl={product.tableOfContentsPdf || undefined}
+              bookTitle={product.title}
+            />
           </section>
         )}
 
