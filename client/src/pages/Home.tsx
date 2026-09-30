@@ -1,7 +1,6 @@
 import { useRef, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { AnimatedCounter } from "@/components/storefront/AnimatedCounter";
-import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { ArrowRight, BookOpen, GraduationCap, ShieldCheck } from "lucide-react";
@@ -138,6 +137,7 @@ export default function Home() {
       discount: "50",
       audience: "Enseignants et Formateurs",
       companion: "Educator’s Guide & Case Study Companion — Tunisia Edition 2026",
+      active: true,
     };
     if (educatorSection?.body) {
       try {
@@ -146,6 +146,7 @@ export default function Home() {
         if (parsed.discount) offer.discount = parsed.discount;
         if (parsed.audience) offer.audience = parsed.audience;
         if (parsed.companion) offer.companion = parsed.companion;
+        if (parsed.active !== undefined) offer.active = Boolean(parsed.active);
       } catch {
         // Body was plain text fallback
       }
@@ -238,12 +239,12 @@ export default function Home() {
                 >
                   Commander le livre <ArrowRight className="h-4 w-4" />
                 </Link>
-                <a
-                  href="#decouvrir"
+                <Link
+                  href="/livres/b2b-brand-management"
                   className="glass-panel inline-flex w-full sm:w-auto items-center justify-center rounded-full px-8 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] shadow-xs transition-all duration-300 hover:border-[#141E33] hover:bg-white hover:-translate-y-0.5"
                 >
                   Découvrir le livre
-                </a>
+                </Link>
               </motion.div>
 
               <motion.div
@@ -280,11 +281,11 @@ export default function Home() {
                 className="relative overflow-hidden rounded-2xl shadow-2xl ring-1 ring-[#141E33]/10"
               >
                 <img
-                  src={mainBook?.images?.[0]?.url || "/editorial/b2b-launch/main-book.png"}
-                  alt={mainBook?.title || "B2B Brand Management Tunisia Edition - The Main Book"}
+                  src={mainBook?.coverImage || `${A}book-angle.jpg`}
+                  alt={mainBook?.title || "B2B Brand Management Tunisia Edition"}
                   fetchPriority="high"
                   decoding="async"
-                  className="h-[380px] sm:h-[500px] lg:h-[620px] w-full object-contain object-center transition-transform duration-700 hover:scale-105 drop-shadow-2xl"
+                  className="h-[360px] sm:h-[480px] lg:h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
                 />
                 {/* Floating Glassmorphic Pill on Book Cover */}
                 <div className="glass-panel absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex items-center gap-2.5 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-[#141E33] shadow-lg">
@@ -550,72 +551,69 @@ export default function Home() {
           </div>
         </section>
 
-        {/* SECTION: SOMMAIRE & STRUCTURE DE L'OUVRAGE (LECTURE PROTÉGÉE) */}
-        <section id="decouvrir" className="container py-12 md:py-16">
-          <ProtectedBookTableOfContents
-            pdfUrl={mainBook?.tableOfContentsPdf || undefined}
-            bookTitle={mainBook?.title || "B2B Brand Management — Tunisia Edition"}
-          />
-        </section>
-
-        {/* SECTION 8: EDUCATOR OFFER */}
-        <section id="educator" className="container py-20 md:py-28">
-          <div className="glass-panel grid overflow-hidden rounded-3xl shadow-xl lg:grid-cols-[.9fr_1.1fr]">
-            <div className="flex flex-col justify-between p-6 sm:p-8 md:p-12">
+        {/* SECTION 8: EDUCATOR OFFER (Visible only when offer is active in Admin) */}
+        {educatorSection && educatorSection.status === "published" && educatorOffer.active !== false && (
+          <section id="educator" className="container py-20 md:py-28">
+            <div className="grid gap-10 lg:grid-cols-[1.1fr_1.1fr] lg:items-center">
+              {/* Left Column: Heading, Subtitle & Callout Box */}
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full bg-[#BC3B2C] px-4 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white shadow-xs">
-                  <GraduationCap className="h-4 w-4" /> Offre Educator
-                </div>
-                <h2 className="mt-6 font-display text-3xl sm:text-4xl lg:text-5xl leading-[1.05] sm:leading-[.92] text-[#141E33]">
-                  Vous enseignez ou formez au marketing ?
+                <h2 className="font-display text-[clamp(2.4rem,5.5vw,4.6rem)] leading-[0.96] tracking-[-0.035em] text-[#141E33]">
+                  Transformez le livre en expérience pédagogique.
                 </h2>
-                <p className="mt-5 text-base leading-7 text-[#5C574C]">
-                  À l’achat de <strong>{educatorOffer.trigger}</strong>, les {educatorOffer.audience.toLowerCase()} éligibles bénéficient de <strong>{educatorOffer.discount} % de remise</strong> sur la version numérique de l’<em>{educatorOffer.companion}</em>.
+                <p className="mt-6 text-base sm:text-lg leading-relaxed text-[#5C574C]">
+                  <strong>{educatorOffer.companion}</strong> est une ressource numérique réservée aux {educatorOffer.audience.toLowerCase()}.
                 </p>
 
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <Link
-                    href="/educators"
-                    className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-full bg-[#141E33] px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-white transition-all duration-300 hover:bg-[#BC3B2C] hover:shadow-md"
-                  >
-                    Découvrir l’offre Educator <ArrowRight className="h-4 w-4" />
-                  </Link>
+                {/* Left Terracotta Callout Box matching screenshot */}
+                <div className="mt-8 sm:mt-10 overflow-hidden rounded-2xl border border-[#141E33]/10 bg-white p-6 sm:p-7 shadow-xs relative">
+                  <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-[#BC3B2C]" />
+                  <p className="font-display text-3xl sm:text-4xl text-[#BC3B2C] font-semibold">
+                    −{educatorOffer.discount} %
+                  </p>
+                  <p className="mt-2 text-xs sm:text-sm text-[#141E33] leading-relaxed">
+                    à l’achat de <strong>{educatorOffer.trigger}</strong>, pour les {educatorOffer.audience.toLowerCase()} éligibles.
+                  </p>
                 </div>
               </div>
 
-              <div className="mt-8 flex items-start gap-3 text-xs leading-5 text-[#5C574C]">
-                <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-[#BC3B2C]" />
-                Avantage réservé aux {educatorOffer.audience.toLowerCase()}, conditionné à l’achat du livre.
-              </div>
-            </div>
+              {/* Right Column: Warm Container with Book Photo & Dark Navy Card matching screenshot */}
+              <div className="rounded-3xl bg-[#EFE9DD] p-4 sm:p-6 shadow-md grid grid-cols-1 sm:grid-cols-2 gap-4 items-stretch">
+                {/* Book photo */}
+                <div className="overflow-hidden rounded-2xl shadow-md bg-white">
+                  <img
+                    src={`${A}book-angle.jpg`}
+                    alt={educatorOffer.trigger}
+                    loading="lazy"
+                    decoding="async"
+                    className="h-full w-full object-cover object-center transition-transform duration-500 hover:scale-105 min-h-[300px]"
+                  />
+                </div>
 
-            <div className="grid min-h-[400px] grid-cols-1 sm:grid-cols-2 gap-4 bg-[#E9DFCF] p-5 sm:p-8">
-              <div className="overflow-hidden rounded-2xl shadow-xl ring-1 ring-[#141E33]/10">
-                <img
-                  src={`${A}book-front.jpg`}
-                  alt={educatorOffer.trigger}
-                  loading="lazy"
-                  decoding="async"
-                  className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
-                />
-              </div>
-              <div className="flex flex-col justify-center rounded-2xl bg-[#141E33] p-5 sm:p-7 text-white shadow-xl">
-                <GraduationCap className="h-8 w-8 text-[#E9DFCF]" />
-                <p className="mt-7 text-[10px] font-extrabold uppercase tracking-[.18em] text-[#E9DFCF]">
-                  Digital companion
-                </p>
-                <h3 className="mt-3 font-display text-2xl sm:text-3xl">
-                  {educatorOffer.companion}
-                </h3>
-                <p className="mt-4 text-sm text-white/60">{educatorOffer.trigger}</p>
-                <p className="mt-8 font-display text-4xl sm:text-5xl text-[#E9DFCF]">−{educatorOffer.discount}%</p>
-                <p className="mt-2 text-xs text-white/60">
-                  avec achat du livre + statut {educatorOffer.audience} éligible
-                </p>
+                {/* Dark Navy Card */}
+                <div className="flex flex-col justify-between rounded-2xl bg-[#141E33] p-6 sm:p-7 text-white shadow-xl min-h-[340px]">
+                  <div>
+                    <GraduationCap className="h-7 w-7 text-white/90" />
+                    <p className="mt-6 text-[10px] font-extrabold uppercase tracking-[.2em] text-white/70">
+                      TUNISIA EDITION 2026
+                    </p>
+                    <h3 className="mt-2 font-display text-2xl sm:text-3xl leading-snug text-white">
+                      {educatorOffer.companion}
+                    </h3>
+                  </div>
+
+                  <div className="mt-8">
+                    <p className="font-display text-5xl sm:text-6xl text-white">
+                      −{educatorOffer.discount}%
+                    </p>
+                    <p className="mt-3 text-[11px] leading-relaxed text-white/60">
+                      Version numérique · avantage conditionné à l’achat du livre.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         {/* DYNAMIC POSTS & EDITORIAL PUBLICATIONS (Managed via Admin Dashboard) */}
         {posts && posts.length > 0 && (

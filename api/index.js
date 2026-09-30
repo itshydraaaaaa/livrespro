@@ -1213,6 +1213,7 @@ function normalizeDbProduct(p) {
         ]
       }
     ],
+    coverImage: p.coverImage ?? null,
     tableOfContentsPdf: p.tableOfContentsPdf ?? p.metadata?.tableOfContentsPdf ?? null,
     pageCount: p.pageCount ?? null
   };

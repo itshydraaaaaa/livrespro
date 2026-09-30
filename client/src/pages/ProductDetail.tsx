@@ -1,5 +1,4 @@
 import { ProductCard } from "@/components/storefront/ProductCard";
-import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trackBehavior } from "@/components/AnalyticsManager";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { SiteHeader } from "@/components/storefront/SiteHeader";
@@ -30,6 +29,7 @@ export default function ProductDetail() {
       discount: "50",
       audience: "Enseignants et Formateurs",
       companion: "Educator’s Guide & Case Study Companion — Tunisia Edition 2026",
+      active: true,
     };
     if (educatorSection?.body) {
       try {
@@ -38,6 +38,7 @@ export default function ProductDetail() {
         if (parsed.discount) offer.discount = parsed.discount;
         if (parsed.audience) offer.audience = parsed.audience;
         if (parsed.companion) offer.companion = parsed.companion;
+        if (parsed.active !== undefined) offer.active = Boolean(parsed.active);
       } catch {}
     }
     return offer;
@@ -138,7 +139,7 @@ export default function ProductDetail() {
           </div>
         </section>
 
-        {product.title.toLowerCase().includes("b2b brand") && (
+        {educatorSection && educatorSection.status === "published" && educatorOffer.active !== false && product.title.toLowerCase().includes("b2b brand") && (
           <section className="border-y border-[#BC3B2C]/20 bg-white py-14">
             <div className="container grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:items-center">
               <div>
@@ -156,15 +157,6 @@ export default function ProductDetail() {
                 <p className="mt-3 text-xs leading-5 text-[#5C574C]">Version numérique · avec achat du livre + statut {educatorOffer.audience.toLowerCase()} éligible.</p>
               </div>
             </div>
-          </section>
-        )}
-
-        {Boolean(product.tableOfContentsPdf || product.title.toLowerCase().includes("b2b brand") || product.handle.includes("b2b")) && (
-          <section className="container py-10 md:py-16">
-            <ProtectedBookTableOfContents
-              pdfUrl={product.tableOfContentsPdf || undefined}
-              bookTitle={product.title}
-            />
           </section>
         )}
 

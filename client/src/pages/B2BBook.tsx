@@ -1,6 +1,5 @@
 import { SiteHeader } from "@/components/storefront/SiteHeader";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
-import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen } from "lucide-react";
 import { useState, useMemo } from "react";
@@ -26,6 +25,7 @@ export default function B2BBook() {
       discount: "50",
       audience: "Enseignants et Formateurs",
       companion: "Educator’s Guide & Case Study Companion — Tunisia Edition 2026",
+      active: true,
     };
     if (educatorSection?.body) {
       try {
@@ -34,6 +34,7 @@ export default function B2BBook() {
         if (parsed.discount) offer.discount = parsed.discount;
         if (parsed.audience) offer.audience = parsed.audience;
         if (parsed.companion) offer.companion = parsed.companion;
+        if (parsed.active !== undefined) offer.active = Boolean(parsed.active);
       } catch {}
     }
     return offer;
@@ -119,21 +120,8 @@ export default function B2BBook() {
               >
                 Commander le livre <ArrowRight className="h-4 w-4" />
               </a>
-              <a
-                href="#sommaire"
-                className="glass-panel inline-flex w-full sm:w-auto justify-center items-center gap-2 rounded-full px-7 py-4 text-[11px] font-extrabold uppercase tracking-[.14em] text-[#141E33] hover:bg-white transition shadow-xs"
-              >
-                <BookOpen className="h-4 w-4 text-[#BC3B2C]" /> Consulter le sommaire protégé
-              </a>
             </div>
           </div>
-        </section>
-
-        <section id="sommaire" className="container py-8">
-          <ProtectedBookTableOfContents
-            pdfUrl={mainBook?.tableOfContentsPdf || undefined}
-            bookTitle={mainBook?.title || "B2B Brand Management — Tunisia Edition"}
-          />
         </section>
 
         <section className="border-y border-[#141E33]/10 bg-white py-16">
@@ -174,27 +162,29 @@ export default function B2BBook() {
           </div>
         </section>
 
-        <section className="container py-16">
-          <div className="grid overflow-hidden rounded-2xl border border-[#BC3B2C]/20 bg-white shadow-lg lg:grid-cols-2">
-            <div className="p-8 md:p-12">
-              <div className="inline-flex items-center gap-2 rounded-full bg-[#BC3B2C] px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white">
-                <GraduationCap className="h-4 w-4" /> Offre Educator
+        {educatorSection && educatorSection.status === "published" && educatorOffer.active !== false && (
+          <section className="container py-16">
+            <div className="grid overflow-hidden rounded-2xl border border-[#BC3B2C]/20 bg-white shadow-lg lg:grid-cols-2">
+              <div className="p-8 md:p-12">
+                <div className="inline-flex items-center gap-2 rounded-full bg-[#BC3B2C] px-3.5 py-1.5 text-[10px] font-extrabold uppercase tracking-[.16em] text-white">
+                  <GraduationCap className="h-4 w-4" /> Offre Educator
+                </div>
+                <h2 className="mt-5 font-display text-4xl text-[#141E33]">
+                  Vous êtes {educatorOffer.audience.toLowerCase()} ?
+                </h2>
+                <p className="mt-4 text-sm leading-7 text-[#5C574C]">
+                  À l’achat de <strong>{educatorOffer.trigger}</strong>, les {educatorOffer.audience.toLowerCase()} éligibles bénéficient de <strong>{educatorOffer.discount} % de remise</strong> sur la version numérique de l’<em>{educatorOffer.companion}</em>.
+                </p>
               </div>
-              <h2 className="mt-5 font-display text-4xl text-[#141E33]">
-                Vous êtes {educatorOffer.audience.toLowerCase()} ?
-              </h2>
-              <p className="mt-4 text-sm leading-7 text-[#5C574C]">
-                À l’achat de <strong>{educatorOffer.trigger}</strong>, les {educatorOffer.audience.toLowerCase()} éligibles bénéficient de <strong>{educatorOffer.discount} % de remise</strong> sur la version numérique de l’<em>{educatorOffer.companion}</em>.
-              </p>
+              <div className="bg-[#141E33] p-10 text-white flex flex-col justify-center">
+                <p className="font-display text-7xl text-[#E9DFCF]">−{educatorOffer.discount}%</p>
+                <p className="mt-4 text-sm text-white/65">
+                  Avantage professionnel conditionné à l’achat du livre et au statut {educatorOffer.audience.toLowerCase()}.
+                </p>
+              </div>
             </div>
-            <div className="bg-[#141E33] p-10 text-white flex flex-col justify-center">
-              <p className="font-display text-7xl text-[#E9DFCF]">−{educatorOffer.discount}%</p>
-              <p className="mt-4 text-sm text-white/65">
-                Avantage professionnel conditionné à l’achat du livre et au statut {educatorOffer.audience.toLowerCase()}.
-              </p>
-            </div>
-          </div>
-        </section>
+          </section>
+        )}
 
         <section id="commander" className="border-t border-[#141E33]/10 bg-[#141E33] py-16 text-white">
           <div className="container grid gap-12 lg:grid-cols-[.8fr_1.2fr]">

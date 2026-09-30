@@ -17,7 +17,7 @@ export function SiteHeader() {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 24);
 
-      const sections = ["livre", "decouvrir", "cas", "educator", "lancement"];
+      const sections = ["livre", "cas", "educator", "lancement"];
       const scrollPosition = window.scrollY + 220;
 
       for (const sectionId of sections) {

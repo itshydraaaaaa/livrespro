@@ -18,6 +18,7 @@ import {
   Edit,
   Eye,
   FileSearch,
+  Image as ImageIcon,
   Filter,
   Globe2,
   GraduationCap,
@@ -1391,14 +1392,115 @@ function ProductManager({
               />
             </div>
 
-            <div>
-              <Label className="text-xs font-bold uppercase tracking-wider">URL Image de couverture</Label>
-              <Input
-                value={coverImage}
-                onChange={(e) => setCoverImage(e.target.value)}
-                placeholder="/editorial/b2b-launch/book-front.jpg"
-                className="mt-1"
-              />
+            {/* Book Cover Image & Picture Editor */}
+            <div className="rounded-xl border border-[#172C41]/10 bg-slate-50/70 p-4 space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33] flex items-center gap-1.5">
+                  <ImageIcon className="h-4 w-4 text-[#BC3B2C]" />
+                  Image du livre (Couverture principale)
+                </Label>
+                {coverImage && (
+                  <Badge variant="outline" className="text-[10px] text-emerald-700 bg-emerald-50 border-emerald-300 font-semibold">
+                    Image définie
+                  </Badge>
+                )}
+              </div>
+
+              {/* Live Preview */}
+              {coverImage && (
+                <div className="flex items-center gap-4 bg-white p-3 rounded-lg border border-[#172C41]/10">
+                  <div className="h-20 w-16 overflow-hidden rounded border border-gray-200 bg-gray-50 shrink-0 shadow-xs">
+                    <img
+                      src={coverImage}
+                      alt="Aperçu couverture"
+                      className="h-full w-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLElement).style.display = "none";
+                      }}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-bold text-[#141E33] truncate">{title || "Livre"}</p>
+                    <p className="text-[11px] text-[#5C574C] truncate font-mono mt-0.5">{coverImage}</p>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setCoverImage("")}
+                      className="mt-1 h-6 px-2 text-[10px] text-red-600 hover:bg-red-50 hover:text-red-700"
+                    >
+                      Supprimer l'image
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Upload file or enter URL */}
+              <div className="grid gap-3 sm:grid-cols-2">
+                <div>
+                  <Label className="text-[11px] text-[#5C574C] font-semibold">Téléverser une image locale</Label>
+                  <Input
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      if (file.size > 10 * 1024 * 1024) {
+                        toast.error("L'image ne doit pas dépasser 10 Mo.");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const base64 = reader.result as string;
+                        setCoverImage(base64);
+                        toast.success(`Image "${file.name}" chargée avec succès.`);
+                      };
+                      reader.readAsDataURL(file);
+                    }}
+                    className="mt-1 text-xs file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-[11px] file:font-semibold file:bg-[#141E33] file:text-white hover:file:bg-[#BC3B2C]"
+                  />
+                </div>
+                <div>
+                  <Label className="text-[11px] text-[#5C574C] font-semibold">Ou coller l'URL de l'image</Label>
+                  <Input
+                    value={coverImage}
+                    onChange={(e) => setCoverImage(e.target.value)}
+                    placeholder="/editorial/b2b-launch/book-angle.jpg"
+                    className="mt-1 text-xs"
+                  />
+                </div>
+              </div>
+
+              {/* Presets for authentic book pictures */}
+              <div>
+                <Label className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C]">
+                  Photos authentiques disponibles
+                </Label>
+                <div className="mt-1.5 flex flex-wrap gap-2">
+                  {[
+                    { label: "Photo d'angle (Bureau)", url: "/editorial/b2b-launch/book-angle.jpg" },
+                    { label: "Couverture face", url: "/editorial/b2b-launch/book-front.jpg" },
+                    { label: "Quatrième de couverture", url: "/editorial/b2b-launch/book-back.jpg" },
+                    { label: "Photo presse / média", url: "/editorial/b2b-launch/media.jpg" },
+                  ].map((p) => (
+                    <button
+                      key={p.url}
+                      type="button"
+                      onClick={() => {
+                        setCoverImage(p.url);
+                        toast.info(`Photo sélectionnée : ${p.label}`);
+                      }}
+                      className={`rounded-md border px-2.5 py-1 text-[11px] transition-all ${
+                        coverImage === p.url
+                          ? "border-[#BC3B2C] bg-[#BC3B2C]/10 text-[#BC3B2C] font-bold"
+                          : "border-gray-200 bg-white text-gray-700 hover:border-gray-400"
+                      }`}
+                    >
+                      {p.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
             </div>
 
             <div>
@@ -1747,21 +1849,26 @@ function AuthorManager({
 // Educator, Content, SEO, Audience Subcomponents
 // -----------------------------------------------------------------------------
 function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => void; saving: boolean }) {
-  const [trigger, setTrigger] = useState("B2B Brand Management — Tunisie");
-  const [discount, setDiscount] = useState("30");
+  const [trigger, setTrigger] = useState("B2B Brand Management — Tunisia Edition");
+  const [discount, setDiscount] = useState("50");
   const [audience, setAudience] = useState("Enseignants et Formateurs");
-  const [companion, setCompanion] = useState("Guide Pédagogique Numérique");
+  const [companion, setCompanion] = useState("Educator’s Guide & Case Study Companion — Tunisia Edition 2026");
+  const [active, setActive] = useState(true);
 
   useEffect(() => {
-    if (row?.body) {
-      try {
-        const parsed = JSON.parse(row.body);
-        if (parsed.trigger) setTrigger(parsed.trigger);
-        if (parsed.discount) setDiscount(parsed.discount);
-        if (parsed.audience) setAudience(parsed.audience);
-        if (parsed.companion) setCompanion(parsed.companion);
-      } catch {
-        // Body was plain text
+    if (row) {
+      setActive(row.status === "published");
+      if (row.body) {
+        try {
+          const parsed = JSON.parse(row.body);
+          if (parsed.trigger) setTrigger(parsed.trigger);
+          if (parsed.discount) setDiscount(parsed.discount);
+          if (parsed.audience) setAudience(parsed.audience);
+          if (parsed.companion) setCompanion(parsed.companion);
+          if (parsed.active !== undefined) setActive(Boolean(parsed.active));
+        } catch {
+          // Body was plain text
+        }
       }
     }
   }, [row]);
@@ -1771,8 +1878,8 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
       id: row?.id ?? undefined,
       key: "educator-offer",
       title: "Offre Educator & Académique",
-      body: JSON.stringify({ trigger, discount, audience, companion }),
-      status: "published",
+      body: JSON.stringify({ trigger, discount, audience, companion, active }),
+      status: active ? "published" : "draft",
     });
   };
 
@@ -1786,6 +1893,28 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
 
       <div className="grid gap-6 xl:grid-cols-2">
         <section className="border border-[#172C41]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
+          {/* Active / Inactive Visibility Switch */}
+          <div className="flex items-center justify-between p-4 rounded-xl border border-[#172C41]/10 bg-slate-50">
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33]">Statut de l'offre sur le site</Label>
+              <p className="text-xs text-[#52606B]">Si désactivée, la section de l'offre disparaît immédiatement du site.</p>
+            </div>
+            <div className="flex items-center gap-2.5">
+              <Badge className={active ? "bg-emerald-600 text-white font-bold" : "bg-gray-400 text-white font-bold"}>
+                {active ? "Actif (Visible)" : "Inactif (Masqué)"}
+              </Badge>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setActive(!active)}
+                className={active ? "text-amber-700 border-amber-300 hover:bg-amber-50" : "text-emerald-700 border-emerald-300 hover:bg-emerald-50"}
+              >
+                {active ? "Désactiver l'offre" : "Activer l'offre"}
+              </Button>
+            </div>
+          </div>
+
           <div>
             <Label className="text-xs font-bold uppercase tracking-wider">Livre déclencheur</Label>
             <Input value={trigger} onChange={(e) => setTrigger(e.target.value)} className="mt-1" />
@@ -1810,6 +1939,12 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
 
         <aside className="border border-[#172C41]/10 bg-[#FCFAF5] p-6 rounded-xl space-y-4 shadow-xs">
           <p className="eyebrow text-[#BC3B2C]">Aperçu en direct pour les clients</p>
+          {!active && (
+            <div className="rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800 flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 shrink-0 text-amber-600" />
+              <span>L'offre est actuellement <strong>inactive</strong> : la section est masquée sur la landing page.</span>
+            </div>
+          )}
           <div className="rounded-xl border-l-4 border-[#BC3B2C] bg-white p-6 shadow-md space-y-3">
             <span className="inline-block rounded-full bg-[#BC3B2C]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#BC3B2C]">
               Avantage Spécial Educator

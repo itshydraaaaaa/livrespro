@@ -134,6 +134,7 @@ function normalizeDbProduct(p: db.FullProduct): Product {
         ],
       },
     ],
+    coverImage: p.coverImage ?? null,
     tableOfContentsPdf: p.tableOfContentsPdf ?? (p.metadata as any)?.tableOfContentsPdf ?? null,
     pageCount: p.pageCount ?? null,
   };
