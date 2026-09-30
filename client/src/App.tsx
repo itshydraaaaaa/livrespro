@@ -1,7 +1,6 @@
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { CheckoutModal } from "@/components/storefront/CheckoutModal";
 import { AnalyticsManager } from "@/components/AnalyticsManager";
-import { SeoManager } from "@/components/SeoManager";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Admin from "@/pages/Admin";
@@ -46,7 +45,6 @@ function Router() {
       <Route path="/admin/commandes" component={() => <Admin tab="orders" />} />
       <Route path="/admin/offre-educator" component={() => <Admin tab="educator" />} />
       <Route path="/admin/contenu" component={() => <Admin tab="content" />} />
-      <Route path="/admin/seo" component={() => <Admin tab="seo" />} />
       <Route path="/admin/audience" component={() => <Admin tab="audience" />} />
       
       <Route path="/404" component={NotFound} />
@@ -62,7 +60,6 @@ function App() {
         <TooltipProvider>
           <CartProvider>
             <Toaster />
-            <SeoManager />
             <AnalyticsManager />
             <Router />
             <CartDrawer />

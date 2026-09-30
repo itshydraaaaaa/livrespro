@@ -42,7 +42,7 @@ function context(role: "user" | "admin" | null): TrpcContext {
 describe("back-office tRPC", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    dbMocks.getAdminOverview.mockResolvedValue({ contentSections: 2, publishedSections: 1, seoPages: 3, analytics: { uniqueVisitors: 12 } });
+    dbMocks.getAdminOverview.mockResolvedValue({ contentSections: 2, publishedSections: 1, analytics: { uniqueVisitors: 12 } });
     dbMocks.recordAnalyticsEvent.mockResolvedValue(undefined);
   });
 
@@ -54,7 +54,7 @@ describe("back-office tRPC", () => {
 
   it("returns metrics only to the admin role", async () => {
     const caller = appRouter.createCaller(context("admin"));
-    await expect(caller.admin.overview({ days: 14 })).resolves.toMatchObject({ seoPages: 3, analytics: { uniqueVisitors: 12 } });
+    await expect(caller.admin.overview({ days: 14 })).resolves.toMatchObject({ contentSections: 2, analytics: { uniqueVisitors: 12 } });
     expect(dbMocks.getAdminOverview).toHaveBeenCalledWith(14);
   });
 

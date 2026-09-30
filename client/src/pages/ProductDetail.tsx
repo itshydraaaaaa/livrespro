@@ -137,9 +137,12 @@ export default function ProductDetail() {
           </section>
         )}
 
-        {(product.title.toLowerCase().includes("b2b brand") || product.handle.includes("b2b")) && (
+        {((product as any).tableOfContentsPdf || product.title.toLowerCase().includes("b2b brand") || product.handle.includes("b2b")) && (
           <section className="container py-10 md:py-16">
-            <ProtectedBookTableOfContents />
+            <ProtectedBookTableOfContents
+              pdfUrl={(product as any).tableOfContentsPdf}
+              bookTitle={product.title}
+            />
           </section>
         )}
 

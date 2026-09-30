@@ -635,8 +635,21 @@ const PAGES_DATA: PageRenderData[] = [
   },
 ];
 
-export function ProtectedBookTableOfContents() {
-  const [currentPage, setCurrentPage] = useState<number>(17); // Default to Agenda (p. 17)
+export interface ProtectedBookTableOfContentsProps {
+  pdfUrl?: string | null;
+  bookTitle?: string;
+  initialChapters?: BookChapterMeta[];
+}
+
+export function ProtectedBookTableOfContents({
+  pdfUrl,
+  bookTitle = "B2B Brand Management — Tunisia Edition",
+  initialChapters,
+}: ProtectedBookTableOfContentsProps = {}) {
+  const [currentPage, setCurrentPage] = useState<number>(pdfUrl ? 1 : 17);
+  const [pdfDoc, setPdfDoc] = useState<any>(null);
+  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
+  const [totalPdfPages, setTotalPdfPages] = useState<number>(21);
   const [zoom, setZoom] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<"reader" | "outline">("reader");
@@ -645,6 +658,50 @@ export function ProtectedBookTableOfContents() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  // Load PDF dynamically when pdfUrl is provided
+  useEffect(() => {
+    if (!pdfUrl) {
+      setPdfDoc(null);
+      setTotalPdfPages(21);
+      setCurrentPage(17);
+      return;
+    }
+
+    let isCancelled = false;
+    setPdfLoading(true);
+
+    const loadPdf = async () => {
+      try {
+        const pdfjs = (window as any).pdfjsLib;
+        if (!pdfjs) {
+          console.warn("pdfjsLib not yet available");
+          setPdfLoading(false);
+          return;
+        }
+        const loadingTask = pdfjs.getDocument(pdfUrl);
+        const doc = await loadingTask.promise;
+        if (!isCancelled) {
+          setPdfDoc(doc);
+          setTotalPdfPages(doc.numPages);
+          setCurrentPage(1);
+          setPdfLoading(false);
+        }
+      } catch (err) {
+        console.error("Erreur de chargement du PDF de sommaire:", err);
+        if (!isCancelled) {
+          setPdfLoading(false);
+          toast.error("Impossible de charger le document PDF du sommaire.");
+        }
+      }
+    };
+
+    loadPdf();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [pdfUrl]);
 
   // Security layer: Anti-Screenshot on window blur / tab focus switch
   useEffect(() => {
@@ -847,12 +904,68 @@ export function ProtectedBookTableOfContents() {
     );
   }, [currentPage]);
 
+  // Canvas PDF drawing routine for uploaded PDF tables of contents (>250 books)
+  const renderPdfPage = useCallback(async () => {
+    if (!pdfDoc) return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    try {
+      const page = await pdfDoc.getPage(currentPage);
+      const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      const viewport = page.getViewport({ scale: dpr * zoom * 1.35 });
+
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+
+      // Render PDF onto canvas
+      await page.render({ canvasContext: ctx, viewport }).promise;
+
+      // Apply DRM watermark overlay
+      ctx.save();
+      ctx.translate(viewport.width / 2, viewport.height / 2);
+      ctx.rotate(-Math.PI / 6);
+      ctx.font = `bold ${Math.round(22 * zoom * dpr)}px 'Plus Jakarta Sans', system-ui, sans-serif`;
+      ctx.fillStyle = "rgba(188, 59, 44, 0.07)";
+      ctx.textAlign = "center";
+      ctx.fillText("LIVRESPRO.TN · LECTURE SÉCURISÉE · REPRODUCTION INTERDITE", 0, -80);
+      ctx.fillText(`TUNISIA EDITION · ${bookTitle.toUpperCase()}`, 0, 0);
+      ctx.fillText("DOCUMENT PROTÉGÉ CONTRE LA COPIE ET LE TÉLÉCHARGEMENT", 0, 80);
+      ctx.restore();
+
+      // Outer protective border
+      ctx.strokeStyle = "rgba(20, 30, 51, 0.12)";
+      ctx.lineWidth = 2 * dpr;
+      ctx.strokeRect(2, 2, viewport.width - 4, viewport.height - 4);
+
+      // Running Footer
+      ctx.font = `${Math.round(11 * dpr)}px 'Plus Jakarta Sans', system-ui, sans-serif`;
+      ctx.fillStyle = "#A89F91";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        `LivresPro.tn · Sommaire sous licence exclusive — Page ${currentPage} / ${totalPdfPages}`,
+        viewport.width / 2,
+        viewport.height - 15 * dpr
+      );
+    } catch (err) {
+      console.error("Erreur de rendu canvas PDF:", err);
+    }
+  }, [pdfDoc, currentPage, zoom, bookTitle, totalPdfPages]);
+
   useEffect(() => {
-    renderCanvasPage();
-  }, [renderCanvasPage, zoom]);
+    if (pdfDoc) {
+      renderPdfPage();
+    } else {
+      renderCanvasPage();
+    }
+  }, [pdfDoc, renderPdfPage, renderCanvasPage, zoom]);
+
+  const maxPages = pdfDoc ? totalPdfPages : 21;
 
   const handleNextPage = () => {
-    if (currentPage < 21) setCurrentPage((p) => p + 1);
+    if (currentPage < maxPages) setCurrentPage((p) => p + 1);
   };
 
   const handlePrevPage = () => {
@@ -860,6 +973,12 @@ export function ProtectedBookTableOfContents() {
   };
 
   const handleSelectChapterPage = (pg: number) => {
+    if (pdfDoc) {
+      const target = Math.min(Math.max(1, pg), maxPages);
+      setCurrentPage(target);
+      setActiveTab("reader");
+      return;
+    }
     // Map chapter page to corresponding PDF TOC page (17, 18, 19, 20, 21)
     let target = 17;
     if (pg === 1) target = 1;
@@ -962,71 +1081,73 @@ export function ProtectedBookTableOfContents() {
           <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#F6F1E7] p-3 text-xs border border-[#141E33]/05">
             <div className="flex flex-wrap items-center gap-1.5">
               <span className="font-extrabold uppercase tracking-wider text-[#5C574C] mr-2">Accès direct :</span>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(1)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage === 1 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                Titre (p. 1)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(3)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage === 3 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                ISBN & Auteurs (p. 3)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(5)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage === 5 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                Préface (p. 5)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(9)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage === 9 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                Avant-propos (p. 9)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(11)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage === 11 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                Auteurs (p. 11)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(17)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage === 17 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                Agenda (p. 17)
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentPage(18)}
-                className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                  currentPage >= 18 && currentPage <= 21
-                    ? "bg-[#BC3B2C] text-white"
-                    : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                }`}
-              >
-                Sommaire Détaillé (p. 18-21)
-              </button>
+              {!pdfDoc ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(1)}
+                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
+                      currentPage === 1 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
+                    }`}
+                  >
+                    Titre (p. 1)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(3)}
+                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
+                      currentPage === 3 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
+                    }`}
+                  >
+                    ISBN & Auteurs (p. 3)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(5)}
+                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
+                      currentPage === 5 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
+                    }`}
+                  >
+                    Préface (p. 5)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(17)}
+                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
+                      currentPage === 17 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
+                    }`}
+                  >
+                    Agenda (p. 17)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setCurrentPage(18)}
+                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
+                      currentPage >= 18 && currentPage <= 21
+                        ? "bg-[#BC3B2C] text-white"
+                        : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
+                    }`}
+                  >
+                    Sommaire Détaillé (p. 18-21)
+                  </button>
+                </>
+              ) : (
+                Array.from({ length: Math.min(maxPages, 8) }).map((_, idx) => {
+                  const pNum = idx + 1;
+                  return (
+                    <button
+                      key={pNum}
+                      type="button"
+                      onClick={() => setCurrentPage(pNum)}
+                      className={`rounded-lg px-2.5 py-1 font-semibold transition ${
+                        currentPage === pNum ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
+                      }`}
+                    >
+                      Page {pNum}
+                    </button>
+                  );
+                })
+              )}
             </div>
 
             {/* Page navigation controls */}
@@ -1041,11 +1162,11 @@ export function ProtectedBookTableOfContents() {
                 <ChevronLeft className="h-4 w-4" />
               </button>
               <span className="font-bold text-[#141E33] min-w-16 text-center">
-                {currentPage} / 21
+                {currentPage} / {maxPages}
               </span>
               <button
                 type="button"
-                disabled={currentPage >= 21}
+                disabled={currentPage >= maxPages}
                 onClick={handleNextPage}
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#141E33] shadow-xs disabled:opacity-40 hover:bg-[#E9DFCF]"
                 title="Page suivante"
@@ -1090,6 +1211,14 @@ export function ProtectedBookTableOfContents() {
                 if (e.detail > 1) e.preventDefault(); // prevent double-click select
               }}
             />
+
+            {/* Loading state for dynamic PDF rendering */}
+            {pdfLoading && (
+              <div className="absolute inset-0 z-25 flex flex-col items-center justify-center bg-white/85 backdrop-blur-xs">
+                <div className="h-9 w-9 animate-spin rounded-full border-3 border-[#BC3B2C] border-t-transparent" />
+                <p className="mt-3 text-xs font-bold text-[#141E33]">Sécurisation et rendu du sommaire...</p>
+              </div>
+            )}
 
             {/* The High-DPI Canvas Rendering Engine */}
             <div

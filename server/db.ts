@@ -419,6 +419,7 @@ function normalizeSupabaseProduct(row: any): FullProduct {
       alt: img.alt ?? null,
       isPrimary: img.is_primary ? 1 : 0,
     })),
+    tableOfContentsPdf: row.metadata?.tableOfContentsPdf ?? row.table_of_contents_pdf ?? null,
     category: row.categories ?? null,
   } as unknown as FullProduct;
 }
@@ -428,7 +429,58 @@ export async function createProduct(
   authorIds?: number[],
   imageUrls?: Array<{ url: string; alt?: string | null; isPrimary?: boolean }>
 ): Promise<number> {
-  return 1;
+  const supabase = sb();
+  const payload: any = {
+    title: productData.title,
+    slug: productData.slug,
+    sku: productData.sku ?? null,
+    short_description: productData.shortDescription ?? null,
+    description: productData.description,
+    description_html: productData.descriptionHtml ?? null,
+    product_type: productData.productType ?? "Livre relié",
+    format: productData.format ?? "PHYSICAL_BOOK",
+    price: productData.price || "65.00",
+    compare_at_price: productData.compareAtPrice ?? null,
+    currency: productData.currency ?? "TND",
+    stock_quantity: typeof productData.stockQuantity === "number" ? productData.stockQuantity : 100,
+    availability_status: productData.availabilityStatus ?? "in_stock",
+    isbn: productData.isbn ?? null,
+    publisher: productData.publisher ?? null,
+    language: productData.language ?? "Français",
+    page_count: productData.pageCount ?? null,
+    cover_image: productData.coverImage ?? null,
+    category_id: productData.categoryId ?? null,
+    featured: productData.featured ? 1 : 0,
+    status: productData.status ?? "published",
+    metadata: {
+      tableOfContentsPdf: productData.tableOfContentsPdf ?? null,
+    },
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase.from("products").insert([payload]).select("id").single();
+  if (error) {
+    console.error("[DB] createProduct error:", error);
+    throw new Error(error.message);
+  }
+
+  const productId = data.id;
+
+  if (authorIds && authorIds.length > 0) {
+    try {
+      const authorRows = authorIds.map((author_id) => ({
+        product_id: productId,
+        author_id,
+        role: "author",
+      }));
+      await supabase.from("product_authors").insert(authorRows);
+    } catch (e) {
+      console.warn("[DB] product_authors insert warning:", e);
+    }
+  }
+
+  return productId;
 }
 
 export async function updateProduct(
@@ -442,17 +494,42 @@ export async function updateProduct(
     const payload: any = {};
     if (productData.title !== undefined) payload.title = productData.title;
     if (productData.slug !== undefined) payload.slug = productData.slug;
+    if (productData.sku !== undefined) payload.sku = productData.sku;
+    if (productData.shortDescription !== undefined) payload.short_description = productData.shortDescription;
     if (productData.price !== undefined) payload.price = productData.price;
+    if (productData.compareAtPrice !== undefined) payload.compare_at_price = productData.compareAtPrice;
     if (productData.stockQuantity !== undefined) payload.stock_quantity = productData.stockQuantity;
     if (productData.format !== undefined) payload.format = productData.format;
     if (productData.coverImage !== undefined) payload.cover_image = productData.coverImage;
     if (productData.description !== undefined) payload.description = productData.description;
     if (productData.categoryId !== undefined) payload.category_id = productData.categoryId;
+    if (productData.pageCount !== undefined) payload.page_count = productData.pageCount;
+    if (productData.isbn !== undefined) payload.isbn = productData.isbn;
+    if (productData.publisher !== undefined) payload.publisher = productData.publisher;
     if (productData.status !== undefined) payload.status = productData.status;
     if (productData.featured !== undefined) payload.featured = productData.featured ? 1 : 0;
+    if (productData.tableOfContentsPdf !== undefined) {
+      payload.metadata = {
+        tableOfContentsPdf: productData.tableOfContentsPdf,
+      };
+    }
     payload.updated_at = new Date().toISOString();
 
     await supabase.from("products").update(payload).eq("id", id);
+
+    if (authorIds && authorIds.length > 0) {
+      try {
+        await supabase.from("product_authors").delete().eq("product_id", id);
+        const authorRows = authorIds.map((author_id) => ({
+          product_id: id,
+          author_id,
+          role: "author",
+        }));
+        await supabase.from("product_authors").insert(authorRows);
+      } catch (e) {
+        console.warn("[DB] product_authors update warning:", e);
+      }
+    }
   } catch (err) {
     console.warn("[DB] updateProduct error:", err);
   }
@@ -582,6 +659,10 @@ export async function saveContentSection(input: ContentSectionInput): Promise<nu
   return data.id;
 }
 
+export async function deleteContentSection(id: number): Promise<void> {
+  await sb().from("content_sections").delete().eq("id", id);
+}
+
 // ─── SEO Pages ────────────────────────────────────────────────────────────────
 
 export async function listSeoPages(): Promise<SeoPage[]> {
@@ -642,20 +723,34 @@ export async function recordAnalyticsEvent(input: AnalyticsEventInput): Promise<
 export async function getAnalyticsSummary(days: number) {
   try {
     const supabase = sb();
+    const startDate = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
     const { data: events } = await supabase
       .from("analytics_events")
       .select("*")
+      .gte("created_at", startDate)
       .order("created_at", { ascending: false })
-      .limit(500);
+      .limit(1000);
 
     const eventList = events ?? [];
-    const totalEvents = Math.max(eventList.length, 64);
-    const uniqueVisitors = Math.max(new Set(eventList.map((e: any) => e.visitor_id || e.visitorId)).size, 26);
-    const pageViews = Math.max(eventList.filter((e: any) => (e.event_type || e.eventType) === "page_view").length, 88);
-    const bookViews = Math.max(eventList.filter((e: any) => (e.event_type || e.eventType) === "view_book").length, 47);
-    const cartAdds = Math.max(eventList.filter((e: any) => (e.event_type || e.eventType) === "add_to_cart").length, 19);
-    const checkoutInitiations = Math.max(eventList.filter((e: any) => (e.event_type || e.eventType) === "initiate_checkout").length, 9);
-    const cartRate = Math.round((cartAdds / bookViews) * 1000) / 10;
+    const totalEvents = eventList.length;
+    const uniqueVisitors = new Set(eventList.map((e: any) => e.visitor_id || e.visitorId).filter(Boolean)).size;
+    const pageViews = eventList.filter((e: any) => (e.event_type || e.eventType) === "page_view").length;
+    const bookViews = eventList.filter((e: any) => (e.event_type || e.eventType) === "view_book").length;
+    const cartAdds = eventList.filter((e: any) => (e.event_type || e.eventType) === "add_to_cart").length;
+    const checkoutInitiations = eventList.filter((e: any) => (e.event_type || e.eventType) === "initiate_checkout").length;
+    const cartRate = bookViews > 0 ? Math.round((cartAdds / bookViews) * 1000) / 10 : 0;
+
+    // Group actual page visits dynamically
+    const pageCounts: Record<string, number> = {};
+    eventList.forEach((e: any) => {
+      const p = e.path || "/";
+      pageCounts[p] = (pageCounts[p] || 0) + 1;
+    });
+
+    const topPages = Object.entries(pageCounts)
+      .map(([path, total]) => ({ path, total }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 5);
 
     return {
       days,
@@ -665,12 +760,7 @@ export async function getAnalyticsSummary(days: number) {
       bookViews,
       cartAdds,
       cartRate,
-      topPages: [
-        { path: "/", total: Math.round(pageViews * 0.45) },
-        { path: "/librairie", total: Math.round(pageViews * 0.32) },
-        { path: "/b2b-brand-management-tunisie", total: bookViews },
-        { path: "/mon-compte", total: Math.round(pageViews * 0.12) },
-      ],
+      topPages,
       funnel: [
         { stage: "Visiteurs", count: pageViews, fill: "#141E33" },
         { stage: "Fiches Livres", count: bookViews, fill: "#1E5FC2" },
@@ -684,32 +774,24 @@ export async function getAnalyticsSummary(days: number) {
         { eventType: "initiate_checkout", total: checkoutInitiations },
       ],
     };
-  } catch {
+  } catch (err) {
+    console.warn("[DB] getAnalyticsSummary error:", err);
     return {
       days,
-      totalEvents: 64,
-      uniqueVisitors: 26,
-      pageViews: 88,
-      bookViews: 47,
-      cartAdds: 19,
-      cartRate: 40.4,
-      topPages: [
-        { path: "/", total: 40 },
-        { path: "/librairie", total: 28 },
-        { path: "/b2b-brand-management-tunisie", total: 47 },
-        { path: "/mon-compte", total: 11 },
-      ],
+      totalEvents: 0,
+      uniqueVisitors: 0,
+      pageViews: 0,
+      bookViews: 0,
+      cartAdds: 0,
+      cartRate: 0,
+      topPages: [],
       funnel: [
-        { stage: "Visiteurs", count: 88, fill: "#141E33" },
-        { stage: "Fiches Livres", count: 47, fill: "#1E5FC2" },
-        { stage: "Ajouts Panier", count: 19, fill: "#BC3B2C" },
-        { stage: "Commandes COD", count: 9, fill: "#10B981" },
+        { stage: "Visiteurs", count: 0, fill: "#141E33" },
+        { stage: "Fiches Livres", count: 0, fill: "#1E5FC2" },
+        { stage: "Ajouts Panier", count: 0, fill: "#BC3B2C" },
+        { stage: "Commandes COD", count: 0, fill: "#10B981" },
       ],
-      eventMix: [
-        { eventType: "page_view", total: 88 },
-        { eventType: "view_book", total: 47 },
-        { eventType: "add_to_cart", total: 19 },
-      ],
+      eventMix: [],
     };
   }
 }
@@ -717,9 +799,16 @@ export async function getAnalyticsSummary(days: number) {
 export async function getAdminOverview(days: number) {
   try {
     const supabase = sb();
-    const [{ count: productCount }, { data: rawOrders }] = await Promise.all([
+    const [
+      { count: productCount },
+      { data: rawOrders },
+      { count: contentCount },
+      { count: publishedContentCount }
+    ] = await Promise.all([
       supabase.from("products").select("*", { count: "exact", head: true }),
       supabase.from("orders").select("*, order_items(*)").order("created_at", { ascending: false }),
+      supabase.from("content_sections").select("*", { count: "exact", head: true }),
+      supabase.from("content_sections").select("*", { count: "exact", head: true }).eq("status", "published"),
     ]);
 
     const orders = (rawOrders ?? []).map(mapOrder).filter(Boolean);
@@ -732,7 +821,7 @@ export async function getAdminOverview(days: number) {
       return sum + (isNaN(val) ? 0 : val);
     }, 0);
 
-    const averageOrderValue = activeOrders.length > 0 ? totalRevenue / activeOrders.length : 72.0;
+    const averageOrderValue = activeOrders.length > 0 ? totalRevenue / activeOrders.length : 0;
 
     // Status breakdown
     const statusCounts: Record<string, number> = {
@@ -749,7 +838,7 @@ export async function getAdminOverview(days: number) {
     });
 
     const ordersByStatus = [
-      { name: "Nouvelles", key: "new", value: statusCounts.new || (totalOrders === 0 ? 1 : 0), color: "#BC3B2C" },
+      { name: "Nouvelles", key: "new", value: statusCounts.new || 0, color: "#BC3B2C" },
       { name: "Confirmées", key: "confirmed", value: statusCounts.confirmed || 0, color: "#1E5FC2" },
       { name: "En cours", key: "processing", value: statusCounts.processing || 0, color: "#F59E0B" },
       { name: "Expédiées", key: "shipped", value: statusCounts.shipped || 0, color: "#8B5CF6" },
@@ -760,24 +849,16 @@ export async function getAdminOverview(days: number) {
     // Governorate distribution (Tunisia)
     const govCounts: Record<string, number> = {};
     orders.forEach((o) => {
-      const gov = o.governorate || o.city || "Tunis";
-      govCounts[gov] = (govCounts[gov] || 0) + 1;
+      const gov = o.governorate || o.city;
+      if (gov) {
+        govCounts[gov] = (govCounts[gov] || 0) + 1;
+      }
     });
 
-    let ordersByGovernorate = Object.entries(govCounts)
+    const ordersByGovernorate = Object.entries(govCounts)
       .map(([name, count]) => ({ name, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 7);
-
-    if (ordersByGovernorate.length === 0) {
-      ordersByGovernorate = [
-        { name: "Tunis", count: 4 },
-        { name: "Ariana", count: 3 },
-        { name: "Sousse", count: 2 },
-        { name: "Sfax", count: 2 },
-        { name: "Ben Arous", count: 1 },
-      ];
-    }
 
     // 14-day sales trend timeline
     const trendMap: Record<string, { date: string; label: string; revenue: number; orders: number }> = {};
@@ -801,14 +882,13 @@ export async function getAdminOverview(days: number) {
     });
 
     const salesTrend = Object.values(trendMap);
-
     const educatorOrdersCount = orders.filter((o) => o.isEducator === 1 || o.is_educator === 1).length;
 
     return {
-      contentSections: 0,
-      publishedSections: 0,
+      contentSections: contentCount ?? 0,
+      publishedSections: publishedContentCount ?? 0,
       seoPages: 0,
-      totalProducts: productCount ?? 1,
+      totalProducts: productCount ?? 0,
       totalOrders,
       totalRevenue: Math.round(totalRevenue * 100) / 100,
       averageOrderValue: Math.round(averageOrderValue * 100) / 100,
@@ -819,30 +899,23 @@ export async function getAdminOverview(days: number) {
       analytics: await getAnalyticsSummary(days),
     };
   } catch (err) {
-    console.warn("[DB] getAdminOverview fallback:", err);
+    console.warn("[DB] getAdminOverview error:", err);
     return {
       contentSections: 0,
       publishedSections: 0,
       seoPages: 0,
-      totalProducts: 1,
-      totalOrders: 3,
-      totalRevenue: 209.0,
-      averageOrderValue: 69.67,
-      educatorOrdersCount: 1,
+      totalProducts: 0,
+      totalOrders: 0,
+      totalRevenue: 0,
+      averageOrderValue: 0,
+      educatorOrdersCount: 0,
       ordersByStatus: [
-        { name: "Nouvelles", key: "new", value: 1, color: "#BC3B2C" },
-        { name: "Confirmées", key: "confirmed", value: 1, color: "#1E5FC2" },
-        { name: "Livrées", key: "delivered", value: 1, color: "#10B981" },
+        { name: "Nouvelles", key: "new", value: 0, color: "#BC3B2C" },
+        { name: "Confirmées", key: "confirmed", value: 0, color: "#1E5FC2" },
+        { name: "Livrées", key: "delivered", value: 0, color: "#10B981" },
       ],
-      ordersByGovernorate: [
-        { name: "Tunis", count: 2 },
-        { name: "Ariana", count: 1 },
-      ],
-      salesTrend: [
-        { date: "2026-09-20", label: "20 sept.", revenue: 65, orders: 1 },
-        { date: "2026-09-22", label: "22 sept.", revenue: 72, orders: 1 },
-        { date: "2026-09-25", label: "25 sept.", revenue: 72, orders: 1 },
-      ],
+      ordersByGovernorate: [],
+      salesTrend: [],
       analytics: await getAnalyticsSummary(days),
     };
   }

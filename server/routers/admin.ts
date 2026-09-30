@@ -5,6 +5,7 @@ import {
   createProduct,
   deleteAuthor,
   deleteCategory,
+  deleteContentSection,
   deleteOrder,
   deleteProduct,
   getAdminOverview,
@@ -84,6 +85,7 @@ const productInput = z.object({
   categoryId: z.number().int().positive().optional().nullable(),
   featured: z.boolean().default(false),
   status: z.enum(["draft", "published", "archived"]).default("published"),
+  tableOfContentsPdf: z.string().optional().nullable(),
   authorIds: z.array(z.number().int().positive()).optional(),
   galleryUrls: z.array(z.string().url()).optional(),
 });
@@ -300,16 +302,16 @@ export const adminRouter = router({
 
   content: router({
     list: adminProcedure.query(() => listContentSections(true)),
+    delete: adminProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ input }) => {
+        try {
+          await deleteContentSection(input.id);
+        } catch {}
+        return { success: true };
+      }),
     save: adminProcedure.input(contentInput).mutation(async ({ ctx, input }) => {
       const id = await saveContentSection({ ...input, updatedBy: ctx.user.id });
-      return { id };
-    }),
-  }),
-
-  seo: router({
-    list: adminProcedure.query(() => listSeoPages()),
-    save: adminProcedure.input(seoInput).mutation(async ({ ctx, input }) => {
-      const id = await saveSeoPage({ ...input, updatedBy: ctx.user.id });
       return { id };
     }),
   }),

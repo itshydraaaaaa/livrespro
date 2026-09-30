@@ -68,7 +68,6 @@ type AdminTab =
   | "orders"
   | "educator"
   | "content"
-  | "seo"
   | "audience";
 
 const adminMenu: DashboardMenuItem[] = [
@@ -78,8 +77,7 @@ const adminMenu: DashboardMenuItem[] = [
   { icon: Users, label: "Auteurs", path: "/admin/auteurs" },
   { icon: Globe2, label: "Rayons & Catégories", path: "/admin/categories" },
   { icon: GraduationCap, label: "Offre Educator", path: "/admin/offre-educator" },
-  { icon: BookOpenText, label: "Contenus", path: "/admin/contenu" },
-  { icon: FileSearch, label: "SEO", path: "/admin/seo" },
+  { icon: BookOpenText, label: "Contenus & Posts", path: "/admin/contenu" },
   { icon: LineChart, label: "Audience & Stats", path: "/admin/audience" },
 ];
 
@@ -197,7 +195,6 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
   const products = trpc.admin.products.list.useQuery(undefined, { enabled: tab === "products" });
   const categories = trpc.admin.categories.list.useQuery(undefined, { enabled: tab === "categories" || tab === "products" });
   const authors = trpc.admin.authors.list.useQuery(undefined, { enabled: tab === "authors" || tab === "products" });
-  const seo = trpc.admin.seo.list.useQuery(undefined, { enabled: tab === "seo" });
 
   // Mutations
   const updateOrderStatusMutation = trpc.admin.orders.updateStatus.useMutation({
@@ -286,14 +283,14 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
     },
   });
 
-  const saveSeo = trpc.admin.seo.save.useMutation({
+  const deleteContent = trpc.admin.content.delete.useMutation({
     onSuccess: async () => {
-      toast.success("Les paramètres SEO ont été enregistrés.");
-      await Promise.all([utils.admin.seo.list.invalidate(), utils.admin.overview.invalidate(), utils.site.seo.invalidate()]);
+      toast.success("Publication supprimée.");
+      await Promise.all([utils.admin.content.list.invalidate(), utils.admin.overview.invalidate(), utils.site.content.published.invalidate()]);
     },
   });
 
-  // Export orders to CSV function
+  // Export orders to CSV function with UTF-8 BOM for Microsoft Excel
   const exportOrdersCsv = () => {
     const data = orders.data ?? [];
     if (!data.length) {
@@ -318,28 +315,31 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
 
     const rows = data.map((o: any) => [
       o.id,
-      o.orderNumber || o.order_number || `#${o.id}`,
-      new Date(o.createdAt || o.created_at || Date.now()).toLocaleDateString("fr-TN"),
-      `"${((o.customerFirstName || o.customer_first_name || "") + " " + (o.customerLastName || o.customer_last_name || "")).trim()}"`,
-      `"${o.customerPhone || o.customer_phone || ""}"`,
-      `"${o.customerEmail || o.customer_email || ""}"`,
+      `"${o.orderNumber || o.order_number || `#${o.id}`}"`,
+      `"${new Date(o.createdAt || o.created_at || Date.now()).toLocaleDateString("fr-TN")}"`,
+      `"${((o.customerFirstName || o.customer_first_name || "") + " " + (o.customerLastName || o.customer_last_name || "")).trim().replace(/"/g, '""')}"`,
+      `"${(o.customerPhone || o.customer_phone || "").replace(/"/g, '""')}"`,
+      `"${(o.customerEmail || o.customer_email || "").replace(/"/g, '""')}"`,
       `"${(o.deliveryAddress || o.delivery_address || "").replace(/"/g, '""')}"`,
-      `"${o.governorate || o.city || ""}"`,
-      `"${(o.items || o.order_items || []).map((i: any) => `${i.productTitle || i.product_title || "Livre"} (x${i.quantity || 1})`).join("; ")}"`,
+      `"${(o.governorate || o.city || "").replace(/"/g, '""')}"`,
+      `"${(o.items || o.order_items || []).map((i: any) => `${i.productTitle || i.product_title || "Livre"} (x${i.quantity || 1})`).join("; ").replace(/"/g, '""')}"`,
       o.totalAmount || o.total_amount || "0.00",
-      o.status,
-      (o.isEducator || o.is_educator) ? "Oui" : "Non",
+      `"${o.status}"`,
+      (o.isEducator || o.is_educator) ? '"Oui"' : '"Non"',
     ]);
 
-    const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows.map((e) => e.join(","))].join("\n");
-    const encodedUri = encodeURI(csvContent);
+    const bom = "\uFEFF";
+    const csvContent = bom + [headers.join(";"), ...rows.map((e) => e.join(";"))].join("\r\n");
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.href = url;
     link.setAttribute("download", `commandes-livrespro-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("Fichier CSV exporté pour les livreurs.");
+    URL.revokeObjectURL(url);
+    toast.success("Fichier CSV exporté avec succès pour les livraisons.");
   };
 
   // Render Tabs
@@ -397,11 +397,14 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
   }
 
   if (tab === "content") {
-    return <ContentManager rows={content.data ?? []} onSave={(p) => saveContent.mutate(p)} saving={saveContent.isPending} />;
-  }
-
-  if (tab === "seo") {
-    return <SeoManager rows={seo.data ?? []} onSave={(p) => saveSeo.mutate(p)} saving={saveSeo.isPending} />;
+    return (
+      <ContentManager
+        rows={content.data ?? []}
+        onSave={(p) => saveContent.mutate(p)}
+        onDelete={(id) => deleteContent.mutate({ id })}
+        saving={saveContent.isPending}
+      />
+    );
   }
 
   if (tab === "audience") {
@@ -637,11 +640,11 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
           onClick={() => setLocation("/admin/produits")}
         />
         <QuickAction
-          icon={FileSearch}
-          title="Référencement"
-          value={`${ov?.seoPages ?? 0} page(s)`}
-          text="Contrôlez les balises Google et métadonnées par URL."
-          onClick={() => setLocation("/admin/seo")}
+          icon={Globe2}
+          title="Rayons & Catégories"
+          value="Gestion"
+          text="Organisez les collections éditoriales et les auteurs associés."
+          onClick={() => setLocation("/admin/categories")}
         />
       </div>
     </div>
@@ -1143,6 +1146,7 @@ function ProductManager({
   const [categoryId, setCategoryId] = useState<number | null>(null);
   const [status, setStatus] = useState<any>("published");
   const [featured, setFeatured] = useState(false);
+  const [tableOfContentsPdf, setTableOfContentsPdf] = useState("");
 
   useEffect(() => {
     if (selected) {
@@ -1156,6 +1160,7 @@ function ProductManager({
       setCategoryId(selected.categoryId ?? null);
       setStatus(selected.status || "published");
       setFeatured(Boolean(selected.featured));
+      setTableOfContentsPdf(selected.tableOfContentsPdf || selected.metadata?.tableOfContentsPdf || "");
     }
   }, [selected]);
 
@@ -1172,6 +1177,7 @@ function ProductManager({
       categoryId: categoryId || null,
       status,
       featured,
+      tableOfContentsPdf: tableOfContentsPdf || null,
     });
   };
 
@@ -1187,6 +1193,7 @@ function ProductManager({
     setCategoryId(categories[0]?.id ?? null);
     setStatus("published");
     setFeatured(false);
+    setTableOfContentsPdf("");
   };
 
   const filteredRows = useMemo(() => {
@@ -1397,6 +1404,70 @@ function ProductManager({
                 onChange={(e) => setDescription(e.target.value)}
                 className="mt-1"
               />
+            </div>
+
+            {/* Table of Contents PDF upload / attachment for DRM reader */}
+            <div className="rounded-xl border border-[#BC3B2C]/20 bg-[#FCFAF5] p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase tracking-wider text-[#141E33] flex items-center gap-1.5">
+                  <LockKeyhole className="h-3.5 w-3.5 text-[#BC3B2C]" />
+                  Sommaire PDF Protégé (DRM Anti-Copie)
+                </Label>
+                {tableOfContentsPdf ? (
+                  <Badge variant="outline" className="border-emerald-500/30 bg-emerald-50 text-emerald-700 text-[10px] font-bold">
+                    PDF Attaché
+                  </Badge>
+                ) : (
+                  <span className="text-[10px] text-[#5C574C]">Optionnel (par défaut : sommaire Kotler)</span>
+                )}
+              </div>
+              <p className="text-[11px] text-[#5C574C]">
+                Importez le fichier PDF du sommaire pour ce livre (jusqu'à 15 Mo). Il sera automatiquement rendu de manière sécurisée sur Canvas avec filigrane DRM sans possibilité de téléchargement ou capture.
+              </p>
+
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <Input
+                  type="file"
+                  accept="application/pdf"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      if (file.size > 15 * 1024 * 1024) {
+                        toast.error("Le fichier PDF ne doit pas dépasser 15 Mo.");
+                        return;
+                      }
+                      const reader = new FileReader();
+                      reader.onload = () => {
+                        const base64 = reader.result as string;
+                        setTableOfContentsPdf(base64);
+                        toast.success(`PDF "${file.name}" attaché et prêt à être sauvegardé.`);
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                  className="mt-1 text-xs file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#141E33] file:text-white hover:file:bg-[#BC3B2C]"
+                />
+                {tableOfContentsPdf && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setTableOfContentsPdf("");
+                      toast.info("PDF de sommaire détaché.");
+                    }}
+                    className="shrink-0 text-xs text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    Détacher
+                  </Button>
+                )}
+              </div>
+
+              {tableOfContentsPdf && (
+                <p className="text-[10px] text-emerald-700 font-semibold truncate">
+                  Fichier prêt : {tableOfContentsPdf.startsWith("data:") ? "Document PDF encodé prêt pour le DRM Canvas" : tableOfContentsPdf}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center gap-6 pt-2">
@@ -1676,6 +1747,20 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
   const [audience, setAudience] = useState("Enseignants et Formateurs");
   const [companion, setCompanion] = useState("Guide Pédagogique Numérique");
 
+  useEffect(() => {
+    if (row?.body) {
+      try {
+        const parsed = JSON.parse(row.body);
+        if (parsed.trigger) setTrigger(parsed.trigger);
+        if (parsed.discount) setDiscount(parsed.discount);
+        if (parsed.audience) setAudience(parsed.audience);
+        if (parsed.companion) setCompanion(parsed.companion);
+      } catch {
+        // Body was plain text
+      }
+    }
+  }, [row]);
+
   const save = () => {
     onSave({
       id: row?.id ?? undefined,
@@ -1688,125 +1773,238 @@ function EducatorAdmin({ row, onSave, saving }: { row: any; onSave: (p: any) => 
 
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <h1 className="font-display text-4xl">Règle Educator & Remises</h1>
+      <div>
+        <p className="eyebrow">Programme Académique</p>
+        <h1 className="mt-2 font-display text-4xl">Règle Educator & Remises</h1>
+        <p className="mt-2 text-xs text-[#52606B]">Configurez les règles de réduction automatique et le support pour les enseignants.</p>
+      </div>
+
       <div className="grid gap-6 xl:grid-cols-2">
-        <section className="border p-6 bg-white space-y-4 rounded-xl">
+        <section className="border border-[#172C41]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
           <div>
-            <Label className="text-xs font-bold uppercase">Livre déclencheur</Label>
+            <Label className="text-xs font-bold uppercase tracking-wider">Livre déclencheur</Label>
             <Input value={trigger} onChange={(e) => setTrigger(e.target.value)} className="mt-1" />
           </div>
           <div>
-            <Label className="text-xs font-bold uppercase">Remise (%)</Label>
+            <Label className="text-xs font-bold uppercase tracking-wider">Remise (%)</Label>
             <Input value={discount} onChange={(e) => setDiscount(e.target.value)} className="mt-1" />
           </div>
           <div>
-            <Label className="text-xs font-bold uppercase">Public éligible</Label>
+            <Label className="text-xs font-bold uppercase tracking-wider">Public éligible</Label>
             <Input value={audience} onChange={(e) => setAudience(e.target.value)} className="mt-1" />
           </div>
           <div>
-            <Label className="text-xs font-bold uppercase">Support offert</Label>
+            <Label className="text-xs font-bold uppercase tracking-wider">Support offert / associé</Label>
             <Input value={companion} onChange={(e) => setCompanion(e.target.value)} className="mt-1" />
           </div>
-          <Button onClick={save} disabled={saving} className="bg-[#172C41] text-white">
+          <Button onClick={save} disabled={saving} className="bg-[#172C41] text-white hover:bg-[#263f58]">
             <Save className="mr-2 h-4 w-4" />
-            Enregistrer
+            {saving ? "Enregistrement…" : "Enregistrer l'offre"}
           </Button>
         </section>
+
+        <aside className="border border-[#172C41]/10 bg-[#FCFAF5] p-6 rounded-xl space-y-4 shadow-xs">
+          <p className="eyebrow text-[#BC3B2C]">Aperçu en direct pour les clients</p>
+          <div className="rounded-xl border-l-4 border-[#BC3B2C] bg-white p-6 shadow-md space-y-3">
+            <span className="inline-block rounded-full bg-[#BC3B2C]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#BC3B2C]">
+              Avantage Spécial Educator
+            </span>
+            <h3 className="font-display text-2xl text-[#141E33]">
+              Remise exclusive de −{discount}%
+            </h3>
+            <p className="text-xs text-[#5C574C] leading-relaxed">
+              Pour tout achat de l'ouvrage <strong>"{trigger}"</strong>, les membres du public <strong>"{audience}"</strong> bénéficient d'une remise immédiate de <strong>{discount}%</strong> sur le <strong>"{companion}"</strong>.
+            </p>
+            <div className="flex items-center gap-2 pt-2 text-xs font-semibold text-[#141E33]">
+              <span className="h-2 w-2 rounded-full bg-emerald-600" />
+              <span>Application automatique et vérification simplifiée lors de la commande COD</span>
+            </div>
+          </div>
+        </aside>
       </div>
     </div>
   );
 }
 
-function ContentManager({ rows, onSave, saving }: { rows: Array<any>; onSave: (p: any) => void; saving: boolean }) {
+function ContentManager({
+  rows,
+  onSave,
+  onDelete,
+  saving,
+}: {
+  rows: Array<any>;
+  onSave: (p: any) => void;
+  onDelete: (id: number) => void;
+  saving: boolean;
+}) {
   const [selectedId, setSelectedId] = useState<number | null>(null);
   const selected = useMemo(() => rows.find((r) => r.id === selectedId), [rows, selectedId]);
   const [key, setKey] = useState("");
+  const [eyebrow, setEyebrow] = useState("Actualité");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [ctaLabel, setCtaLabel] = useState("En savoir plus");
+  const [ctaHref, setCtaHref] = useState("/librairie");
+  const [imageUrl, setImageUrl] = useState("");
+  const [status, setStatus] = useState<"published" | "draft">("published");
 
   useEffect(() => {
     if (selected) {
       setKey(selected.key);
+      setEyebrow(selected.eyebrow || "Actualité");
       setTitle(selected.title);
       setBody(selected.body || "");
+      setCtaLabel(selected.ctaLabel || selected.cta_label || "En savoir plus");
+      setCtaHref(selected.ctaHref || selected.cta_href || "/librairie");
+      setImageUrl(selected.imageUrl || selected.image_url || "");
+      setStatus(selected.status || "published");
     }
   }, [selected]);
 
+  const handleNew = () => {
+    setSelectedId(null);
+    const newKey = `post-${Date.now().toString().slice(-6)}`;
+    setKey(newKey);
+    setEyebrow("Publication");
+    setTitle("");
+    setBody("");
+    setCtaLabel("Découvrir");
+    setCtaHref("/librairie");
+    setImageUrl("/editorial/b2b-launch/recognition.jpg");
+    setStatus("published");
+  };
+
   return (
     <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <h1 className="font-display text-4xl">Blocs de contenu</h1>
-      <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-        <aside className="border p-4 bg-[#FCFAF5] space-y-2 rounded-xl">
-          {rows.map((r) => (
-            <button
-              key={r.id}
-              onClick={() => setSelectedId(r.id)}
-              className={`w-full p-3 text-left border rounded-lg ${selectedId === r.id ? "border-[#C94E36] bg-[#F9E5E0]" : "bg-white"}`}
-            >
-              <p className="font-semibold text-sm">{r.title}</p>
-              <p className="text-xs text-[#52606B]">/{r.key}</p>
-            </button>
-          ))}
-        </aside>
-        <section className="border p-6 bg-white space-y-4 rounded-xl">
-          <Input placeholder="Clé technique" value={key} onChange={(e) => setKey(e.target.value)} />
-          <Input placeholder="Titre" value={title} onChange={(e) => setTitle(e.target.value)} />
-          <Textarea placeholder="Texte" rows={5} value={body} onChange={(e) => setBody(e.target.value)} />
-          <Button
-            onClick={() => onSave({ id: selectedId ?? undefined, key, title, body, status: "published" })}
-            disabled={saving || !key || !title}
-            className="bg-[#172C41] text-white"
-          >
-            Enregistrer
-          </Button>
-        </section>
+      <div className="flex flex-col gap-4 border-b border-[#172C41]/10 pb-7 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+          <p className="eyebrow">Ligne Éditoriale & Landing Page</p>
+          <h1 className="mt-2 font-display text-4xl">Publications & Articles</h1>
+          <p className="mt-2 text-xs text-[#52606B]">
+            Publiez des actualités, communiqués de presse ou études de cas qui s’affichent en temps réel sur la page d'accueil.
+          </p>
+        </div>
+        <Button onClick={handleNew} className="bg-[#C94E36] text-white hover:bg-[#A93D2D]">
+          <Plus className="mr-2 h-4 w-4" />
+          Nouvelle publication
+        </Button>
       </div>
-    </div>
-  );
-}
 
-function SeoManager({ rows, onSave, saving }: { rows: Array<any>; onSave: (p: any) => void; saving: boolean }) {
-  const [selectedId, setSelectedId] = useState<number | null>(null);
-  const selected = useMemo(() => rows.find((r) => r.id === selectedId), [rows, selectedId]);
-  const [path, setPath] = useState("/");
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-
-  useEffect(() => {
-    if (selected) {
-      setPath(selected.path);
-      setTitle(selected.title);
-      setDescription(selected.description || "");
-    }
-  }, [selected]);
-
-  return (
-    <div className="mx-auto max-w-7xl space-y-7 px-1 py-3 md:px-4 md:py-8">
-      <h1 className="font-display text-4xl">SEO & Référencement</h1>
       <div className="grid gap-6 xl:grid-cols-[0.8fr_1.2fr]">
-        <aside className="border p-4 bg-[#FCFAF5] space-y-2 rounded-xl">
+        <aside className="border border-[#172C41]/10 p-4 bg-[#FCFAF5] space-y-2 rounded-xl shadow-xs">
+          <p className="text-[10px] font-extrabold uppercase tracking-wider text-[#52606B] pb-1">
+            Articles & Blocs enregistrés ({rows.length})
+          </p>
           {rows.map((r) => (
             <button
               key={r.id}
               onClick={() => setSelectedId(r.id)}
-              className={`w-full p-3 text-left border rounded-lg ${selectedId === r.id ? "border-[#C94E36] bg-[#F9E5E0]" : "bg-white"}`}
+              className={`w-full p-3 text-left border rounded-lg transition ${
+                selectedId === r.id ? "border-[#C94E36] bg-[#F9E5E0]" : "border-[#172C41]/10 bg-white hover:border-[#172C41]/30"
+              }`}
             >
-              <p className="font-semibold text-sm">{r.path}</p>
-              <p className="text-xs text-[#52606B]">{r.title}</p>
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase text-[#BC3B2C]">{r.eyebrow || "Article"}</span>
+                <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold ${r.status === "published" ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"}`}>
+                  {r.status === "published" ? "Publié" : "Brouillon"}
+                </span>
+              </div>
+              <p className="font-semibold text-sm text-[#141E33] mt-1">{r.title}</p>
+              <p className="text-xs text-[#52606B] truncate">/{r.key}</p>
             </button>
           ))}
         </aside>
-        <section className="border p-6 bg-white space-y-4 rounded-xl">
-          <Input placeholder="Chemin (/librairie)" value={path} onChange={(e) => setPath(e.target.value)} />
-          <Input placeholder="Titre SEO" value={title} onChange={(e) => setTitle(e.target.value)} />
-          <Textarea placeholder="Meta description" rows={3} value={description} onChange={(e) => setDescription(e.target.value)} />
-          <Button
-            onClick={() => onSave({ id: selectedId ?? undefined, path, title, description, robots: "index" })}
-            disabled={saving || !path || !title}
-            className="bg-[#172C41] text-white"
-          >
-            Enregistrer
-          </Button>
+
+        <section className="border border-[#172C41]/10 p-6 bg-white space-y-4 rounded-xl shadow-xs">
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider">Clé technique (slug)</Label>
+              <Input placeholder="post-lancement" value={key} onChange={(e) => setKey(e.target.value)} className="mt-1" />
+            </div>
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider">Surtitre (Eyebrow)</Label>
+              <Input placeholder="Actualité · Édition" value={eyebrow} onChange={(e) => setEyebrow(e.target.value)} className="mt-1" />
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-xs font-bold uppercase tracking-wider">Titre de la publication *</Label>
+            <Input placeholder="Titre de l'article" value={title} onChange={(e) => setTitle(e.target.value)} className="mt-1" />
+          </div>
+
+          <div>
+            <Label className="text-xs font-bold uppercase tracking-wider">Texte de l'article / Contenu</Label>
+            <Textarea placeholder="Rédigez le contenu ou l'annonce..." rows={5} value={body} onChange={(e) => setBody(e.target.value)} className="mt-1" />
+          </div>
+
+          <div className="grid gap-3 sm:grid-cols-2">
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider">Libellé du bouton (CTA)</Label>
+              <Input placeholder="En savoir plus" value={ctaLabel} onChange={(e) => setCtaLabel(e.target.value)} className="mt-1" />
+            </div>
+            <div>
+              <Label className="text-xs font-bold uppercase tracking-wider">Lien de redirection (Href)</Label>
+              <Input placeholder="/librairie" value={ctaHref} onChange={(e) => setCtaHref(e.target.value)} className="mt-1" />
+            </div>
+          </div>
+
+          <div>
+            <Label className="text-xs font-bold uppercase tracking-wider">URL de l'image d'illustration</Label>
+            <Input placeholder="/editorial/b2b-launch/community.jpg" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="mt-1" />
+          </div>
+
+          <div className="flex items-center justify-between border-t pt-4">
+            <div className="flex items-center gap-3">
+              <Label className="text-xs font-bold uppercase">Statut :</Label>
+              <select
+                aria-label="Statut"
+                value={status}
+                onChange={(e) => setStatus(e.target.value as any)}
+                className="border border-[#172C41]/20 bg-white px-3 py-1.5 text-xs rounded-md"
+              >
+                <option value="published">Publié (Visible sur le site)</option>
+                <option value="draft">Brouillon</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              {selectedId && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    if (confirm("Supprimer cette publication ?")) {
+                      onDelete(selectedId);
+                      setSelectedId(null);
+                    }
+                  }}
+                  className="text-xs text-red-600 border-red-200 hover:bg-red-50"
+                >
+                  <Trash2 className="mr-1.5 h-3.5 w-3.5" />
+                  Supprimer
+                </Button>
+              )}
+              <Button
+                onClick={() => onSave({
+                  id: selectedId ?? undefined,
+                  key,
+                  eyebrow,
+                  title,
+                  body,
+                  ctaLabel,
+                  ctaHref,
+                  imageUrl: imageUrl || null,
+                  status,
+                })}
+                disabled={saving || !key || !title}
+                className="bg-[#172C41] text-white hover:bg-[#263f58]"
+              >
+                <Save className="mr-2 h-4 w-4" />
+                {saving ? "Enregistrement…" : "Enregistrer la publication"}
+              </Button>
+            </div>
+          </div>
         </section>
       </div>
     </div>

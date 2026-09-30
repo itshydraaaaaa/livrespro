@@ -1,4 +1,5 @@
 import { useRef } from "react";
+import { trpc } from "@/lib/trpc";
 import { AnimatedCounter } from "@/components/storefront/AnimatedCounter";
 import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { SiteFooter } from "@/components/storefront/SiteFooter";
@@ -124,6 +125,8 @@ const staggerContainer: Variants = {
 
 export default function Home() {
   const prefersReduced = useReducedMotion();
+  const { data: publishedSections } = trpc.site.content.published.useQuery();
+  const posts = (publishedSections ?? []).filter((p: any) => p.key !== "educator-offer");
 
   const heroSectionRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress: heroProgress } = useScroll({
@@ -252,11 +255,11 @@ export default function Home() {
                 className="relative overflow-hidden rounded-2xl shadow-2xl ring-1 ring-[#141E33]/10"
               >
                 <img
-                  src={`${A}book-angle.jpg`}
-                  alt="B2B Brand Management Tunisia Edition"
+                  src="/editorial/b2b-launch/main-book.png"
+                  alt="B2B Brand Management Tunisia Edition - The Main Book"
                   fetchPriority="high"
                   decoding="async"
-                  className="h-[360px] sm:h-[480px] lg:h-[610px] w-full object-cover object-center transition-transform duration-700 hover:scale-105"
+                  className="h-[380px] sm:h-[500px] lg:h-[620px] w-full object-contain object-center transition-transform duration-700 hover:scale-105 drop-shadow-2xl"
                 />
                 {/* Floating Glassmorphic Pill on Book Cover */}
                 <div className="glass-panel absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-20 flex items-center gap-2.5 rounded-full px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs font-bold text-[#141E33] shadow-lg">
@@ -583,6 +586,66 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* DYNAMIC POSTS & EDITORIAL PUBLICATIONS (Managed via Admin Dashboard) */}
+        {posts && posts.length > 0 && (
+          <section id="actualites" className="container py-16 md:py-20">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10">
+              <div>
+                <p className="text-[11px] font-extrabold uppercase tracking-[.22em] text-[#BC3B2C]">
+                  Actualités & Publications
+                </p>
+                <h2 className="mt-2 font-display text-3xl sm:text-4xl text-[#141E33]">
+                  La Tribune Éditoriale
+                </h2>
+              </div>
+              <p className="text-xs text-[#5C574C] max-w-md">
+                Articles récents, réflexions stratégiques et annonces officielles gérés dynamiquement depuis l'Atelier des Pages.
+              </p>
+            </div>
+
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {posts.map((post: any) => (
+                <article
+                  key={post.id}
+                  className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-[#141E33]/10 bg-white p-6 shadow-sm transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+                >
+                  <div>
+                    {post.imageUrl && (
+                      <div className="mb-5 overflow-hidden rounded-xl aspect-[16/9] bg-[#E9DFCF]">
+                        <img
+                          src={post.imageUrl}
+                          alt={post.title}
+                          loading="lazy"
+                          className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                    )}
+                    <span className="inline-block rounded-full bg-[#BC3B2C]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-[#BC3B2C]">
+                      {post.eyebrow || "Publication"}
+                    </span>
+                    <h3 className="mt-3 font-display text-xl font-bold text-[#141E33] group-hover:text-[#BC3B2C] transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="mt-3 text-xs leading-6 text-[#5C574C] line-clamp-3">
+                      {post.body}
+                    </p>
+                  </div>
+
+                  <div className="mt-6 border-t border-[#141E33]/05 pt-4">
+                    <a
+                      href={post.ctaHref || "/librairie"}
+                      className="inline-flex items-center gap-2 text-xs font-bold text-[#BC3B2C] hover:text-[#141E33] transition-colors"
+                    >
+                      <span>{post.ctaLabel || "Lire la suite"}</span>
+                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-1" />
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* SECTION 9: PHOTO GALLERY */}
         <section id="lancement" className="container pb-24">
