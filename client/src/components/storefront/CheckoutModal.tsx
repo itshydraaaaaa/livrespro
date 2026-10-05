@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { trackBehavior } from "@/components/AnalyticsManager";
 import { useCart } from "@/contexts/CartContext";
 import { formatMoney } from "@/lib/format";
 import { trpc } from "@/lib/trpc";
@@ -37,9 +38,47 @@ export function CheckoutModal() {
 
   const { data: tunisia } = trpc.site.tunisia.useQuery();
 
+  const shippingCost = "7.00";
+  const subtotalNum = cart?.items.reduce((sum, item) => {
+    return sum + (parseFloat(item.unitPrice.amount) || 0) * item.quantity;
+  }, 0) ?? 0;
+  const totalNum = subtotalNum + parseFloat(shippingCost);
+
+  useEffect(() => {
+    if (isCheckoutOpen && cart?.items?.length) {
+      trackBehavior({
+        eventType: "initiate_checkout",
+        value: totalNum,
+        currency: "TND",
+        numItems: cart.itemCount ?? 1,
+        contentIds: cart.items.map((i) => i.productHandle),
+        contents: cart.items.map((i) => ({
+          id: i.productHandle,
+          quantity: i.quantity,
+          item_price: parseFloat(i.unitPrice.amount) || 0,
+        })),
+      });
+    }
+  }, [isCheckoutOpen]);
+
   const createOrderMutation = trpc.site.orders.create.useMutation({
     onSuccess: (data) => {
       setCreatedOrder(data);
+      if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
+        (window as any).fbq("track", "Purchase", {
+          currency: "TND",
+          value: totalNum,
+          content_type: "product",
+          content_ids: cart?.items.map((item) => item.productHandle) || [],
+          contents: cart?.items.map((item) => ({
+            id: item.productHandle,
+            quantity: item.quantity,
+            item_price: parseFloat(item.unitPrice.amount) || 0,
+          })) || [],
+          num_items: cart?.itemCount ?? 1,
+          order_id: data.orderNumber || data.orderId,
+        });
+      }
       clearCart();
       toast.success("Votre commande a été enregistrée avec succès !");
     },
@@ -49,12 +88,6 @@ export function CheckoutModal() {
   });
 
   if (!isCheckoutOpen) return null;
-
-  const shippingCost = "7.00";
-  const subtotalNum = cart?.items.reduce((sum, item) => {
-    return sum + (parseFloat(item.unitPrice.amount) || 0) * item.quantity;
-  }, 0) ?? 0;
-  const totalNum = subtotalNum + parseFloat(shippingCost);
 
   const digitsOnly = phone.replace(/\D/g, "");
   const nationalDigits = digitsOnly.startsWith("216") && digitsOnly.length === 11 ? digitsOnly.slice(3) : digitsOnly;

@@ -49,14 +49,29 @@ export default function ProductDetail() {
   }, [educatorSection]);
 
   useEffect(() => {
-    if (product?.handle) trackBehavior({ eventType: "view_book", productHandle: product.handle });
-  }, [product?.handle]);
+    if (product?.handle) {
+      trackBehavior({
+        eventType: "view_book",
+        productHandle: product.handle,
+        productTitle: product.title,
+        price: parseFloat(product.priceRange?.min?.amount || "0") || 0,
+        currency: product.priceRange?.min?.currencyCode || "TND",
+      });
+    }
+  }, [product?.handle, product?.title, product?.priceRange?.min?.amount]);
 
   const onAddToCart = async () => {
     if (!product) return;
     try {
       await addItem({ product }, 1);
-      trackBehavior({ eventType: "add_to_cart", productHandle: product.handle });
+      trackBehavior({
+        eventType: "add_to_cart",
+        productHandle: product.handle,
+        productTitle: product.title,
+        price: parseFloat(product.priceRange?.min?.amount || "0") || 0,
+        currency: product.priceRange?.min?.currencyCode || "TND",
+        quantity: 1,
+      });
       toast.success("Ajouté à votre sélection professionnelle.");
     } catch {
       toast.error("Impossible d’ajouter ce titre pour le moment.");

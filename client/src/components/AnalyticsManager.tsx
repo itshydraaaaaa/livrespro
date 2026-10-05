@@ -1,14 +1,22 @@
 import { Button } from "@/components/ui/button";
 import { trpc } from "@/lib/trpc";
 import { ShieldCheck, X } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation } from "wouter";
 
 export type BehavioralEvent = "page_view" | "view_book" | "add_to_cart" | "initiate_checkout";
 
-type AnalyticsDetail = {
+export type AnalyticsDetail = {
   eventType: Exclude<BehavioralEvent, "page_view">;
   productHandle?: string;
+  productTitle?: string;
+  price?: number;
+  value?: number;
+  currency?: string;
+  quantity?: number;
+  numItems?: number;
+  contentIds?: string[];
+  contents?: Array<{ id: string; quantity: number; item_price: number }>;
 };
 
 const CONSENT_KEY = "atelier-analytics-consent";
@@ -79,6 +87,8 @@ export function AnalyticsManager() {
     });
   };
 
+  const isInitialLocation = useRef(true);
+
   useEffect(() => {
     if (consent === "accepted") track("page_view");
     // location intentionally drives a new page-view for client-side navigation.
@@ -86,9 +96,50 @@ export function AnalyticsManager() {
   }, [location, consent]);
 
   useEffect(() => {
+    if (isInitialLocation.current) {
+      isInitialLocation.current = false;
+      return;
+    }
+    if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
+      (window as any).fbq("track", "PageView");
+    }
+  }, [location]);
+
+  useEffect(() => {
     const onBehavior = (event: Event) => {
       const detail = (event as CustomEvent<AnalyticsDetail>).detail;
-      if (detail) track(detail.eventType, detail.productHandle);
+      if (detail) {
+        track(detail.eventType, detail.productHandle);
+        if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
+          if (detail.eventType === "view_book") {
+            (window as any).fbq("track", "ViewContent", {
+              content_name: detail.productTitle || detail.productHandle,
+              content_ids: detail.productHandle ? [detail.productHandle] : detail.contentIds,
+              content_type: "product",
+              value: detail.price ?? detail.value,
+              currency: detail.currency || "TND",
+            });
+          } else if (detail.eventType === "add_to_cart") {
+            const calculatedValue = detail.price ? detail.price * (detail.quantity || 1) : detail.value;
+            (window as any).fbq("track", "AddToCart", {
+              content_name: detail.productTitle || detail.productHandle,
+              content_ids: detail.productHandle ? [detail.productHandle] : detail.contentIds,
+              content_type: "product",
+              value: calculatedValue,
+              currency: detail.currency || "TND",
+            });
+          } else if (detail.eventType === "initiate_checkout") {
+            (window as any).fbq("track", "InitiateCheckout", {
+              content_type: "product",
+              content_ids: detail.contentIds,
+              contents: detail.contents,
+              num_items: detail.numItems,
+              value: detail.value,
+              currency: detail.currency || "TND",
+            });
+          }
+        }
+      }
     };
     window.addEventListener("atelier:analytics", onBehavior);
     return () => window.removeEventListener("atelier:analytics", onBehavior);

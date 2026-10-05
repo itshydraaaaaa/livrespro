@@ -3,7 +3,8 @@ import { SiteFooter } from "@/components/storefront/SiteFooter";
 import { ProtectedBookTableOfContents } from "@/components/storefront/ProtectedBookTableOfContents";
 import { trpc } from "@/lib/trpc";
 import { CheckCircle2, Minus, Plus, Truck, GraduationCap, ArrowRight, BookOpen, ShieldCheck, Sparkles } from "lucide-react";
-import { useState, useMemo, useRef } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
+import { trackBehavior } from "@/components/AnalyticsManager";
 import { AnimatePresence, motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { toast } from "sonner";
 
@@ -55,9 +56,34 @@ export default function B2BBook() {
     return offer;
   }, [educatorSection]);
 
+  useEffect(() => {
+    if (mainBook?.handle) {
+      trackBehavior({
+        eventType: "view_book",
+        productHandle: mainBook.handle,
+        productTitle: mainBook.title,
+        price: parseFloat(mainBook.priceRange?.min?.amount || "65.00") || 65,
+        currency: "TND",
+      });
+    }
+  }, [mainBook?.handle, mainBook?.title, mainBook?.priceRange?.min?.amount]);
+
   const order = trpc.site.orders.create.useMutation({
     onSuccess: (r: any) => {
       setDone(r.orderNumber || r.orderId);
+      const unitPriceNum = parseFloat(mainBook?.priceRange?.min?.amount || "65.00") || 65;
+      const totalAmount = unitPriceNum * qty + 7.0; // 7 TND standard shipping in Tunisia
+      if (typeof window !== "undefined" && typeof (window as any).fbq === "function") {
+        (window as any).fbq("track", "Purchase", {
+          content_type: "product",
+          content_ids: [mainBook?.handle || "b2b-brand-management"],
+          content_name: mainBook?.title || "B2B Brand Management — Tunisia Edition",
+          currency: "TND",
+          value: totalAmount,
+          num_items: qty,
+          order_id: r.orderNumber || r.orderId,
+        });
+      }
       toast.success("Commande enregistrée");
     },
     onError: () => toast.error("Impossible d’enregistrer la commande."),
@@ -201,13 +227,13 @@ export default function B2BBook() {
             </h2>
             <div className="mt-9 grid grid-cols-2 gap-3 md:grid-cols-4 lg:grid-cols-7">
               {[
+                { name: "CHO Group", logo: "cho-group.png" },
                 { name: "BIAT", logo: "biat.png" },
-                { name: "Wallyscar", logo: "wallyscar.png" },
                 { name: "MSB", logo: "msb.png" },
                 { name: "ARVEA", logo: "arvea.png" },
                 { name: "Gourmandise", logo: "gourmandise.png" },
                 { name: "MPBS", logo: "mpbs.png" },
-                { name: "CHO Group", logo: "cho-group.png" },
+                { name: "Wallyscar", logo: "wallyscar.png" },
               ].map((x) => (
                 <div
                   className="flex min-h-32 flex-col items-center justify-center gap-3 rounded-xl border border-[#141E33]/10 bg-[#F6F1E7]/50 px-4 py-5 text-center transition-all hover:bg-white hover:shadow-sm"
