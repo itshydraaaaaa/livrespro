@@ -14,7 +14,6 @@ import {
   AlertTriangle,
   RotateCcw,
   Sparkles,
-  Layers,
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
@@ -652,9 +651,7 @@ export function ProtectedBookTableOfContents({
   const [totalPdfPages, setTotalPdfPages] = useState<number>(21);
   const [zoom, setZoom] = useState<number>(1);
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<"reader" | "outline">("reader");
   const [isWindowBlurred, setIsWindowBlurred] = useState<boolean>(false);
-  const [expandedChapter, setExpandedChapter] = useState<number | null>(1);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -976,7 +973,6 @@ export function ProtectedBookTableOfContents({
     if (pdfDoc) {
       const target = Math.min(Math.max(1, pg), maxPages);
       setCurrentPage(target);
-      setActiveTab("reader");
       return;
     }
     // Map chapter page to corresponding PDF TOC page (17, 18, 19, 20, 21)
@@ -987,7 +983,6 @@ export function ProtectedBookTableOfContents({
     else if (pg >= 142 && pg <= 208) target = 20;
     else if (pg >= 209) target = 21;
     setCurrentPage(target);
-    setActiveTab("reader");
     toast.success(`Affichage de la page de sommaire correspondante (Page ${target})`);
   };
 
@@ -1034,49 +1029,25 @@ export function ProtectedBookTableOfContents({
           </p>
         </div>
 
-        {/* View Switcher Tabs */}
+        {/* Security badge & Fullscreen toggle */}
         <div className="flex items-center gap-2 self-start md:self-auto">
-          <div className="inline-flex rounded-full bg-[#F6F1E7] p-1 border border-[#141E33]/10">
-            <button
-              type="button"
-              onClick={() => setActiveTab("reader")}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all ${
-                activeTab === "reader"
-                  ? "bg-[#141E33] text-white shadow-sm"
-                  : "text-[#5C574C] hover:text-[#141E33]"
-              }`}
-            >
-              <Eye className="h-3.5 w-3.5" /> Lecteur Sécurisé
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab("outline")}
-              className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all ${
-                activeTab === "outline"
-                  ? "bg-[#141E33] text-white shadow-sm"
-                  : "text-[#5C574C] hover:text-[#141E33]"
-              }`}
-            >
-              <Layers className="h-3.5 w-3.5" /> Sommaire Interactif
-            </button>
-          </div>
+          <span className="inline-flex items-center gap-2 rounded-full bg-[#141E33] px-4 py-2 text-xs font-bold text-white shadow-sm">
+            <Eye className="h-3.5 w-3.5" /> Lecture Sécurisée
+          </span>
 
-          {activeTab === "reader" && (
-            <button
-              type="button"
-              onClick={() => setIsFullscreen(!isFullscreen)}
-              title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
-              className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#141E33]/10 bg-white text-[#141E33] transition hover:bg-[#F6F1E7]"
-            >
-              {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => setIsFullscreen(!isFullscreen)}
+            title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
+            className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#141E33]/10 bg-white text-[#141E33] transition hover:bg-[#F6F1E7]"
+          >
+            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </button>
         </div>
       </div>
 
-      {/* VIEW 1: PROTECTED DIGITAL CANVAS READER */}
-      {activeTab === "reader" && (
-        <div className="relative mt-6 flex flex-col items-center">
+      {/* PROTECTED DIGITAL CANVAS READER */}
+      <div className="relative mt-6 flex flex-col items-center">
           {/* Quick jump bar */}
           <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#F6F1E7] p-3 text-xs border border-[#141E33]/05">
             <div className="flex flex-wrap items-center gap-1.5">
@@ -1274,134 +1245,6 @@ export function ProtectedBookTableOfContents({
             </div>
           </div>
         </div>
-      )}
-
-      {/* VIEW 2: INTERACTIVE CHAPTER OUTLINE & CASE STUDIES EXPLORER */}
-      {activeTab === "outline" && (
-        <div className="mt-6 space-y-4">
-          <div className="rounded-2xl bg-[#E9DFCF]/40 p-4 border border-[#141E33]/10 text-xs text-[#5C574C] flex items-center justify-between flex-wrap gap-2">
-            <span>
-              💡 Cliquez sur un chapitre ou une étude de cas pour consulter la page de sommaire correspondante dans le lecteur sécurisé.
-            </span>
-            <button
-              type="button"
-              onClick={() => setActiveTab("reader")}
-              className="inline-flex items-center gap-1 text-[11px] font-extrabold uppercase tracking-wider text-[#BC3B2C] hover:underline"
-            >
-              Basculer vers le lecteur sécurisé →
-            </button>
-          </div>
-
-          {/* Chapters Accordion */}
-          <div className="grid gap-3">
-            {BOOK_CHAPTERS.map((ch) => {
-              const isOpen = expandedChapter === ch.number;
-              return (
-                <div
-                  key={ch.number}
-                  className={`overflow-hidden rounded-2xl border transition-all ${
-                    isOpen ? "border-[#BC3B2C]/40 bg-white shadow-md" : "border-[#141E33]/10 bg-[#F6F1E7]/50"
-                  }`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setExpandedChapter(isOpen ? null : ch.number)}
-                    className="flex w-full items-center justify-between p-4 sm:p-5 text-left"
-                  >
-                    <div className="flex items-start sm:items-center gap-3">
-                      <span className="flex h-7 w-7 sm:h-8 sm:w-8 shrink-0 items-center justify-center rounded-full bg-[#141E33] text-xs font-extrabold text-[#E9DFCF]">
-                        {ch.number}
-                      </span>
-                      <div>
-                        <h3 className="font-display text-base sm:text-lg text-[#141E33]">
-                          {ch.title}
-                        </h3>
-                        <p className="text-xs text-[#5C574C]">Page {ch.page}</p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="hidden sm:inline-block rounded-full bg-[#E9DFCF] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#141E33]">
-                        {ch.sections.length} sections
-                      </span>
-                      <span className="text-sm font-bold text-[#BC3B2C]">{isOpen ? "−" : "+"}</span>
-                    </div>
-                  </button>
-
-                  {isOpen && (
-                    <div className="border-t border-[#141E33]/08 bg-white p-4 sm:p-6">
-                      {/* Case Study Highlight Box */}
-                      {ch.caseStudy && (
-                        <div className="mb-5 rounded-xl border border-[#BC3B2C]/20 bg-[#F6F1E7] p-4">
-                          <div className="flex items-center justify-between flex-wrap gap-2">
-                            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#BC3B2C] px-3 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.15em] text-white">
-                              <Sparkles className="h-3 w-3" /> Case Study Officiel
-                            </span>
-                            <span className="text-xs font-bold text-[#BC3B2C]">Page {ch.caseStudy.page}</span>
-                          </div>
-                          <h4 className="mt-2 font-display text-lg text-[#141E33]">
-                            {ch.caseStudy.name}
-                          </h4>
-                          <p className="text-xs italic text-[#5C574C] mt-0.5">
-                            {ch.caseStudy.title}
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Sections List */}
-                      <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#5C574C] mb-3">
-                        Sous-sections & Thématiques abordées :
-                      </p>
-                      <div className="grid gap-2 sm:grid-cols-2">
-                        {ch.sections.map((sec, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-center justify-between rounded-lg bg-[#F6F1E7]/60 px-3 py-2 text-xs text-[#141E33]"
-                          >
-                            <span className="truncate pr-2 font-medium">{sec.title}</span>
-                            <span className="shrink-0 font-bold text-[#5C574C]">p. {sec.page}</span>
-                          </div>
-                        ))}
-                      </div>
-
-                      <div className="mt-5 flex justify-end">
-                        <button
-                          type="button"
-                          onClick={() => handleSelectChapterPage(ch.page)}
-                          className="inline-flex items-center gap-2 rounded-full bg-[#141E33] px-5 py-2 text-xs font-bold uppercase tracking-wider text-white transition hover:bg-[#BC3B2C]"
-                        >
-                          <BookOpen className="h-3.5 w-3.5" /> Ouvrir dans le lecteur protégé
-                        </button>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Reference Indices */}
-          <div className="mt-6 rounded-2xl border border-[#141E33]/10 bg-[#F6F1E7] p-5">
-            <h4 className="font-display text-base text-[#141E33]">Index & Références de l’Édition :</h4>
-            <div className="mt-3 grid gap-3 sm:grid-cols-3 text-xs">
-              <div className="rounded-xl bg-white p-3 shadow-xs">
-                <p className="font-bold text-[#141E33]">List of Abbreviations</p>
-                <p className="text-[#5C574C] mt-1">Acronymes et concepts B2B clés</p>
-                <p className="mt-2 font-extrabold text-[#BC3B2C]">Page 249</p>
-              </div>
-              <div className="rounded-xl bg-white p-3 shadow-xs">
-                <p className="font-bold text-[#141E33]">List of Companies Mentioned</p>
-                <p className="text-[#5C574C] mt-1">Répertoire des entreprises analysées</p>
-                <p className="mt-2 font-extrabold text-[#BC3B2C]">Page 253</p>
-              </div>
-              <div className="rounded-xl bg-white p-3 shadow-xs">
-                <p className="font-bold text-[#141E33]">List of Figures</p>
-                <p className="text-[#5C574C] mt-1">Diagrammes, schémas et graphiques</p>
-                <p className="mt-2 font-extrabold text-[#BC3B2C]">Page 277</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
     </section>
   );
 }
