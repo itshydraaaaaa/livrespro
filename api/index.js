@@ -338,15 +338,9 @@ function clearSessionCookie(res) {
 
 // server/services/supabase.ts
 import { createClient } from "@supabase/supabase-js";
-var supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://crgwyaptjfnynktjppmk.supabase.co";
-var DEFAULT_PUB = Buffer.from(
-  "c2JfcHVibGlzaGFibGVfemFKQlgwTG9KaGtCMmgxOUxEVnhtUV80NjRSY1QwTg==",
-  "base64"
-).toString("utf-8");
-var DEFAULT_SEC = Buffer.from(
-  "c2Jfc2VjcmV0X2xTZzVaZnJYT2VZaWEwQkFpR29tNkFfckk1ZzdWbGY=",
-  "base64"
-).toString("utf-8");
+var supabaseUrl = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL || "https://tvuktwtartbqmggndinu.supabase.co";
+var DEFAULT_PUB = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2dWt0d3RhcnRicW1nZ25kaW51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NTQ3NTUsImV4cCI6MjA5NzAzMDc1NX0.eFHEiyBw83bvGxA7gJ3rNypQTAJ11R0Ae0K0XN-tr24";
+var DEFAULT_SEC = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2dWt0d3RhcnRicW1nZ25kaW51Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTQ1NDc1NSwiZXhwIjoyMDk3MDMwNzU1fQ.9_RtAYJGAcgavShKRpOLSz27Tpc3hNUbMM9vDY_bXmg";
 var supabasePublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY || process.env.VITE_SUPABASE_PUBLISHABLE_KEY || DEFAULT_PUB;
 var supabaseSecretKey = process.env.SUPABASE_SECRET_KEY || DEFAULT_SEC;
 var isSupabaseConfigured = Boolean(
@@ -785,7 +779,55 @@ async function deleteProduct(id) {
   }
 }
 async function createMultiItemOrder(input) {
-  throw new Error("Use persistOrderToSupabase from services/supabase.ts");
+  const supabase = sb();
+  const randomSuffix = Math.floor(1e3 + Math.random() * 9e3);
+  const orderNumber = `LP-${(/* @__PURE__ */ new Date()).getFullYear()}-${randomSuffix}`;
+  const subtotal = (input.items ?? []).reduce(
+    (acc, it) => acc + parseFloat(it.unitPrice || "65.00") * (it.quantity || 1),
+    0
+  );
+  const shippingVal = parseFloat(input.shippingCost || "7.00");
+  const totalVal = subtotal + shippingVal;
+  const orderData = {
+    order_number: orderNumber,
+    customer_first_name: input.customerFirstName,
+    customer_last_name: input.customerLastName,
+    customer_email: input.customerEmail ? input.customerEmail.trim().toLowerCase() : "",
+    customer_phone: input.customerPhone,
+    delivery_address: input.deliveryAddress,
+    city: input.city ?? null,
+    governorate: input.governorate ?? null,
+    postal_code: input.postalCode ?? null,
+    order_notes: input.orderNotes ?? null,
+    is_educator: input.isEducator ? 1 : 0,
+    subtotal: subtotal.toFixed(2),
+    shipping_cost: shippingVal.toFixed(2),
+    discount_amount: "0.00",
+    total_amount: totalVal.toFixed(2),
+    currency: "TND",
+    payment_method: "cash_on_delivery",
+    payment_status: "pending",
+    status: "new"
+  };
+  const { data: order, error: orderErr } = await supabase.from("orders").insert([orderData]).select().single();
+  if (orderErr) {
+    console.error("[Orders] Supabase order insertion failed:", orderErr);
+    throw orderErr;
+  }
+  if (input.items && input.items.length > 0) {
+    const itemsToInsert = input.items.map((it) => ({
+      order_id: order.id,
+      product_id: it.productId ?? null,
+      product_slug: it.productSlug,
+      product_title: it.productTitle,
+      format: it.format || "Livre physique",
+      unit_price: it.unitPrice || "65.00",
+      quantity: it.quantity || 1,
+      subtotal: (parseFloat(it.unitPrice || "65.00") * (it.quantity || 1)).toFixed(2)
+    }));
+    await supabase.from("order_items").insert(itemsToInsert);
+  }
+  return { orderId: order.id, orderNumber: order.order_number };
 }
 async function listOrders() {
   try {

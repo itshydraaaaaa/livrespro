@@ -573,7 +573,65 @@ export async function deleteProduct(id: number): Promise<void> {
 // ─── Orders ───────────────────────────────────────────────────────────────────
 
 export async function createMultiItemOrder(input: any): Promise<{ orderId: number; orderNumber: string }> {
-  throw new Error("Use persistOrderToSupabase from services/supabase.ts");
+  const supabase = sb();
+  const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+  const orderNumber = `LP-${new Date().getFullYear()}-${randomSuffix}`;
+
+  const subtotal = (input.items ?? []).reduce(
+    (acc: number, it: any) => acc + parseFloat(it.unitPrice || '65.00') * (it.quantity || 1),
+    0
+  );
+  const shippingVal = parseFloat(input.shippingCost || '7.00');
+  const totalVal = subtotal + shippingVal;
+
+  const orderData = {
+    order_number: orderNumber,
+    customer_first_name: input.customerFirstName,
+    customer_last_name: input.customerLastName,
+    customer_email: input.customerEmail ? input.customerEmail.trim().toLowerCase() : '',
+    customer_phone: input.customerPhone,
+    delivery_address: input.deliveryAddress,
+    city: input.city ?? null,
+    governorate: input.governorate ?? null,
+    postal_code: input.postalCode ?? null,
+    order_notes: input.orderNotes ?? null,
+    is_educator: input.isEducator ? 1 : 0,
+    subtotal: subtotal.toFixed(2),
+    shipping_cost: shippingVal.toFixed(2),
+    discount_amount: '0.00',
+    total_amount: totalVal.toFixed(2),
+    currency: 'TND',
+    payment_method: 'cash_on_delivery',
+    payment_status: 'pending',
+    status: 'new',
+  };
+
+  const { data: order, error: orderErr } = await supabase
+    .from('orders')
+    .insert([orderData])
+    .select()
+    .single();
+
+  if (orderErr) {
+    console.error('[Orders] Supabase order insertion failed:', orderErr);
+    throw orderErr;
+  }
+
+  if (input.items && input.items.length > 0) {
+    const itemsToInsert = input.items.map((it: any) => ({
+      order_id: order.id,
+      product_id: it.productId ?? null,
+      product_slug: it.productSlug,
+      product_title: it.productTitle,
+      format: it.format || 'Livre physique',
+      unit_price: it.unitPrice || '65.00',
+      quantity: it.quantity || 1,
+      subtotal: (parseFloat(it.unitPrice || '65.00') * (it.quantity || 1)).toFixed(2),
+    }));
+    await supabase.from('order_items').insert(itemsToInsert);
+  }
+
+  return { orderId: order.id, orderNumber: order.order_number };
 }
 
 export async function listOrders(): Promise<any[]> {

@@ -3,15 +3,13 @@ import { createClient, SupabaseClient } from "@supabase/supabase-js";
 const supabaseUrl =
   process.env.SUPABASE_URL ||
   process.env.VITE_SUPABASE_URL ||
-  "https://crgwyaptjfnynktjppmk.supabase.co";
-const DEFAULT_PUB = Buffer.from(
-  "c2JfcHVibGlzaGFibGVfemFKQlgwTG9KaGtCMmgxOUxEVnhtUV80NjRSY1QwTg==",
-  "base64"
-).toString("utf-8");
-const DEFAULT_SEC = Buffer.from(
-  "c2Jfc2VjcmV0X2xTZzVaZnJYT2VZaWEwQkFpR29tNkFfckk1ZzdWbGY=",
-  "base64"
-).toString("utf-8");
+  "https://tvuktwtartbqmggndinu.supabase.co";
+
+const DEFAULT_PUB =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2dWt0d3RhcnRicW1nZ25kaW51Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE0NTQ3NTUsImV4cCI6MjA5NzAzMDc1NX0.eFHEiyBw83bvGxA7gJ3rNypQTAJ11R0Ae0K0XN-tr24";
+
+const DEFAULT_SEC =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InR2dWt0d3RhcnRicW1nZ25kaW51Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MTQ1NDc1NSwiZXhwIjoyMDk3MDMwNzU1fQ.9_RtAYJGAcgavShKRpOLSz27Tpc3hNUbMM9vDY_bXmg";
 
 const supabasePublishableKey =
   process.env.SUPABASE_PUBLISHABLE_KEY ||
