@@ -1,23 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  ShieldCheck,
-  Lock,
-  ChevronLeft,
-  ChevronRight,
-  ZoomIn,
-  ZoomOut,
-  Maximize2,
-  Minimize2,
-  BookOpen,
-  FileText,
-  Eye,
-  AlertTriangle,
-  RotateCcw,
-  RotateCw,
-  Sparkles,
-  CheckCircle2,
-} from "lucide-react";
-import { toast } from "sonner";
+import { ChevronLeft, ChevronRight, ShieldCheck, Lock } from "lucide-react";
 
 export interface BookChapterMeta {
   number: number;
@@ -78,7 +60,7 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
       { title: "Holistic Branding and H2H Marketing", page: 54 },
       { title: "The Branding Triangle & Branding Commodities", page: 55 },
       { title: "The Role of Emotions in B2B Branding", page: 56 },
-      { title: "AI and Transformative Marketing in B2B (Hyper-Personalization)", page: 57 },
+      { title: "AI and Transformative Marketing in B2B", page: 57 },
       { title: "Summary, Questions for Discussion & Literature", page: 59 },
     ],
   },
@@ -98,8 +80,7 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
       { title: "Make a Consistent Impression", page: 77 },
       { title: "AI and Brand Management Dimensions", page: 78 },
       { title: "Brand Distinction & Return on Brand Investment (ROBI)", page: 79 },
-      { title: "Brand Architecture", page: 80 },
-      { title: "Brands in Marketing-Mix 5Es", page: 81 },
+      { title: "Brand Architecture & Marketing-Mix 5Es", page: 80 },
       { title: "AI and Brand Distinction", page: 83 },
       { title: "Summary, Questions for Discussion & Literature", page: 84 },
     ],
@@ -115,8 +96,8 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
     },
     sections: [
       { title: "Introduction: Transformative Brand Strategy", page: 107 },
-      { title: "Corporate Brands & Family Brands", page: 109 },
-      { title: "Individual, National and International Brands", page: 111 },
+      { title: "Corporate, Family, and Individual Brands", page: 109 },
+      { title: "National and International Brands", page: 112 },
       { title: "Brand Elements (Name, Logo, Tagline, Story)", page: 115 },
       { title: "AI and Transformative Brand Strategy", page: 119 },
       { title: "Summary, Questions for Discussion & Literature", page: 120 },
@@ -159,8 +140,7 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
       { title: "Brand Strategy and Analysis", page: 189 },
       { title: "Brand Architecture & Brand Portfolio Management", page: 191 },
       { title: "Brand Audit, Metrics & Business Intelligence", page: 192 },
-      { title: "CEO and Personal Branding", page: 194 },
-      { title: "Generative AI and Branding", page: 196 },
+      { title: "CEO and Personal Branding / Generative AI", page: 194 },
       { title: "Summary, Questions for Discussion & Literature", page: 197 },
     ],
   },
@@ -175,8 +155,7 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
     },
     sections: [
       { title: "Introduction: Learning from Branding Failures", page: 209 },
-      { title: "Maintaining Brand Identity", page: 210 },
-      { title: "Understanding Branding Obstacles", page: 211 },
+      { title: "Maintaining Brand Identity & Obstacles", page: 210 },
       { title: "AI and Branding Obstacles", page: 214 },
       { title: "Summary, Questions for Discussion & Literature", page: 215 },
     ],
@@ -193,8 +172,7 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
     sections: [
       { title: "Tunisia, a Mediterranean B2B Hub – Potential vs. Brand Reality", page: 227 },
       { title: "The Pioneers: Establishing Proof of Concept", page: 227 },
-      { title: "Digital B2B: Visibility Tool or Strategic Lever?", page: 228 },
-      { title: "The Shift toward Thought Leadership", page: 229 },
+      { title: "Digital B2B & Thought Leadership", page: 228 },
       { title: "The Missing Link: The B2B2C Value Chain", page: 229 },
       { title: "The Systemic Impact: The Expanded Stakeholder Ecosystem", page: 231 },
     ],
@@ -219,1108 +197,320 @@ export const BOOK_CHAPTERS: BookChapterMeta[] = [
   },
 ];
 
-// Definition of all 21 pages rendered strictly in canvas
-interface PageRenderData {
-  pageNumber: number;
-  headerLeft?: string;
-  headerRight?: string;
-  title?: string;
-  subtitle?: string;
-  type: "cover" | "text" | "agenda" | "toc" | "legal";
-  lines: Array<{
-    text: string;
-    style?: "title" | "subtitle" | "h1" | "h2" | "body" | "bold" | "bullet" | "quote" | "meta" | "code" | "center";
-    indent?: number;
-    color?: string;
-  }>;
-}
-
-const PAGES_DATA: PageRenderData[] = [
-  // Page 1: Cover
-  {
-    pageNumber: 1,
-    headerRight: "1",
-    type: "cover",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Philip Kotler   Waldemar Pfoertsch   Walid Kallel", style: "bold", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "Tunisia Edition", style: "subtitle", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "B2B Branding", style: "title", color: "#141E33" },
-      { text: "Management", style: "title", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "Case Studies Collection", style: "subtitle", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "2026", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "Global Marketing Nexus", style: "meta", color: "#141E33" },
-    ],
-  },
-  // Page 2: Blank / Half-title
-  {
-    pageNumber: 2,
-    headerLeft: "2",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "text",
-    lines: [
-      { text: "", style: "body" },
-      { text: "", style: "body" },
-      { text: "B2B Branding Management", style: "subtitle", color: "#141E33" },
-      { text: "Case Studies Collection — Tunisia Edition 2026", style: "meta", color: "#5C574C" },
-    ],
-  },
-  // Page 3: Imprint & Authors
-  {
-    pageNumber: 3,
-    headerRight: "3",
-    type: "legal",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Philip Kotler", style: "bold", color: "#141E33" },
-      { text: "Kellogg School of Management", style: "body", color: "#5C574C" },
-      { text: "Northwestern University, Evanston, IL, USA", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Waldemar Pfoertsch", style: "bold", color: "#141E33" },
-      { text: "CIIM Business School, University of Limassol", style: "body", color: "#5C574C" },
-      { text: "Limassol, Cyprus", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Walid Kallel", style: "bold", color: "#141E33" },
-      { text: "Strategic Marketing Consultant & Brand Educator", style: "body", color: "#5C574C" },
-      { text: "Business Success Tunisia, Tunis, Tunisia", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "ISBN-13: 979-8-90243-605-8", style: "bold", color: "#BC3B2C" },
-      { text: "© The Authors, under exclusive license to Global Marketing Nexus, 2026", style: "meta", color: "#141E33" },
-    ],
-  },
-  // Page 4: Copyright
-  {
-    pageNumber: 4,
-    headerLeft: "4",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "legal",
-    lines: [
-      { text: "Copyright Notice & Intellectual Property", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "Copyright protection applies to this work. In particular, the rights of translation, reprinting, reuse of illustrations, recitation, broadcasting, reproduction on microfilms or in any other physical way, and transmission or information storage and retrieval, electronic adaptation, computer software, or by similar or dissimilar methodology that is currently known or will be developed in the future are owned and licensed solely and exclusively by the publisher. This is the case regardless of whether the material is in its entirety or in part.", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Even if there is no explicit declaration to the contrary, the use of general descriptive names, registered names, trademarks, service marks, and other similar names in this book does not imply that these names are exempt from the applicable protective laws and regulations and are therefore free for general use.", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "It is reasonable for the publisher, the writers, and the editors to assume that the guidance and information contained in this book are regarded as true and correct as of the date of publication.", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 5: Preface
-  {
-    pageNumber: 5,
-    headerRight: "5",
-    type: "text",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "Preface", style: "title", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "The Future of B2B Is Human.", style: "bold", color: "#BC3B2C" },
-      { text: "The world of business is not simply evolving. It is being reinvented — fundamentally, irreversibly, and at a pace that no playbook can fully capture.", style: "body", color: "#141E33" },
-      { text: "We are emerging from a decade of profound disruption: a cascade of technological leaps, geopolitical realignments, climate pressures, and a global pandemic that rewired how we work, communicate, and trust. In this new reality, the old rules of B2B engagement — built on cold logic, rigid hierarchies, and transactional efficiency — no longer hold. They've been exposed as incomplete. Outdated. Fragile.", style: "body", color: "#5C574C" },
-      { text: "We now stand at the dawn of a new era. Not of business-to-business, but of human-to-human (H2H) partnership. For decades, B2B Branding management was treated as a secondary function — a matter of polished brochures, corporate logos, and clever taglines. Strategy resided in spreadsheets; branding was left to designers. But today, that separation is not just outdated — it's dangerous.", style: "body", color: "#5C574C" },
-      { text: "In a world of noise, skepticism, and endless choice, a strong brand is no longer a nice-to-have. It is the most critical strategic asset a company possesses:", style: "body", color: "#141E33" },
-      { text: "•  It is what cuts through complexity.", style: "bullet", color: "#BC3B2C" },
-      { text: "•  It is what builds resilience in crisis.", style: "bullet", color: "#BC3B2C" },
-      { text: "•  It is what turns data into trust, and trust into loyalty.", style: "bullet", color: "#BC3B2C" },
-    ],
-  },
-  // Page 6: Preface cont.
-  {
-    pageNumber: 6,
-    headerLeft: "6",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "text",
-    lines: [
-      { text: "Each case reveals a company that has embraced the H2H philosophy: one that balances analytical rigor with emotional intelligence, leverages artificial intelligence for hyper-personalization, and yet never loses sight of ethics, empathy, and storytelling. You'll meet leaders who use data not to replace human judgment, but to amplify it.", style: "body", color: "#5C574C" },
-      { text: "This is not about soft skills. It's about strategic advantage — because in the world of automation, the human touch is the ultimate differentiator.", style: "bold", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "This volume is for those shaping the future:", style: "subtitle", color: "#141E33" },
-      { text: "• C-Suite Leaders who know that brand is not a cost center, but a growth engine.", style: "bullet", color: "#5C574C" },
-      { text: "• Marketing & Sales Pioneers tasked with turning brand promise into measurable impact.", style: "bullet", color: "#5C574C" },
-      { text: "• Academics & Educators who are reimagining business curricula for a world where brand and human behavior are inseparable.", style: "bullet", color: "#5C574C" },
-      { text: "• Ambitious Students preparing to lead with technical excellence and emotional intelligence.", style: "bullet", color: "#5C574C" },
-      { text: "• Every professional who believes business can — and must — be a force for good.", style: "bullet", color: "#5C574C" },
-    ],
-  },
-  // Page 7: Preface acknowledgements
-  {
-    pageNumber: 7,
-    headerRight: "7",
-    type: "text",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "Acknowledgements & Partners", style: "subtitle", color: "#141E33" },
-      { text: "A special thank you to Ahmed Kibria and the Global Marketing Nexus team — whose global vision, collaborative spirit, and relentless curiosity made this deep dive possible. Special thanks to Dr. Varsha Agarwal from Atlas University, Mumbai for proofreading the text.", style: "body", color: "#5C574C" },
-      { text: "We extend our sincere gratitude to the Mediterranean School of Business (MSB) for their invaluable contribution to the success of this first Tunisian edition of B2B Brand Management Case Studies Collection. As a strategic partner, MSB has demonstrated a remarkable commitment by mobilizing significant resources and expertise.", style: "body", color: "#5C574C" },
-      { text: "The future of B2B is not about replacing humans with machines. It is about augmenting human potential with technology. It is a symphony — of data and intuition, of logic and empathy, of strategy and soul.", style: "bold", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "April 2026", style: "bold", color: "#BC3B2C" },
-      { text: "Longboat Key, Florida, USA | Maroni, Cyprus | Tunis, Tunisia", style: "meta", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Philip Kotler          pkotler@aol.com", style: "body", color: "#141E33" },
-      { text: "Waldemar Pfoertsch   waldemar@pfoertsch.com", style: "body", color: "#141E33" },
-      { text: "Walid Kallel         walidkallel@bsuccess.tn", style: "body", color: "#141E33" },
-    ],
-  },
-  // Page 8: Disclaimers
-  {
-    pageNumber: 8,
-    headerLeft: "8",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "legal",
-    lines: [
-      { text: "Disclaimer for Content", style: "subtitle", color: "#141E33" },
-      { text: "In the preparation of this work, the authors made selective use of artificial intelligence (AI) tools to support and enhance the creative and editorial process. Specifically, AI-assisted technologies were employed for: Idea Generation, Language Improvement, Draft Refinement, and Graph Generation.", style: "body", color: "#5C574C" },
-      { text: "All AI-generated suggestions were critically reviewed, fact-checked against original sources, and substantively revised by the human authors. The final content remains the sole intellectual product and responsibility of the authors.", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Disclaimer for Case Studies", style: "subtitle", color: "#141E33" },
-      { text: "The cases are developed for class discussion and educational purposes only. It is not intended to illustrate either effective or ineffective handling of an administrative, strategic, or branding situation. The events, data, and company information presented are based on real occurrences and publicly available sources.", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 9: Foreword
-  {
-    pageNumber: 9,
-    headerRight: "9",
-    type: "text",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "Foreword", style: "title", color: "#141E33" },
-      { text: "By Abdelaziz Makhloufi — Founder and CEO, CHO Group", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "There is a moment every exporter knows well. It is the moment your product — something grown in your own soil, bottled with your own labor — crosses a border and becomes something else entirely. On a supermarket shelf in Europe or a dinner table in America, that bottle of olive oil is no longer just agricultural produce. It is a promise. It is a story. It is, for all practical purposes, a diplomat without a passport.", style: "body", color: "#5C574C" },
-      { text: "I have spent my career building brands in a global marketplace that does not owe Tunisia any favors. When we created Terra d'Elyssa, we were not simply competing on price or quality — though both must be beyond question. We were asking international agents, distributors, value added reseller, retailers and consumers to trust a Tunisian name, to place it alongside the historic producers of Italy and Spain, and to recognize that excellence has no single address.", style: "body", color: "#5C574C" },
-      { text: "This is the reality of B2B Branding management in emerging economies. We do not inherit trust; we earn it, bottle by bottle, contract by contract.", style: "bold", color: "#141E33" },
-    ],
-  },
-  // Page 10: Foreword cont.
-  {
-    pageNumber: 10,
-    headerLeft: "10",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "text",
-    lines: [
-      { text: "...port, whether an American distributor renews a contract, and whether a European retailer places our oil at eye level rather than on the bottom shelf.", style: "body", color: "#5C574C" },
-      { text: "I commend the authors for tackling these subjects with the seriousness they deserve. In an era where information travels instantly and perception can shift overnight; brand management is not a luxury — it is survival. For Tunisian businesses seeking to expand beyond our borders, for African enterprises claiming their place in global supply chains, and for any B2B leader who understands that reputation is the most valuable asset not listed on a balance sheet, the insights gathered here will prove indispensable.", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "May this work inspire you to build brands that endure, that travel well, and that carry the dignity of their origins with them wherever they go.", style: "bold", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "By Abdelaziz Makhloufi", style: "bold", color: "#BC3B2C" },
-      { text: "Founder and CEO, CHO Group", style: "meta", color: "#141E33" },
-    ],
-  },
-  // Page 11: About Kotler
-  {
-    pageNumber: 11,
-    headerRight: "11",
-    type: "text",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "About the Authors", style: "title", color: "#141E33" },
-      { text: "Dr. Philip Kotler", style: "bold", color: "#BC3B2C" },
-      { text: "Dr. Philip Kotler is widely recognized as one of the most influential figures in the field of marketing. He was the S.C. Johnson & Son Distinguished Professor of International Marketing at the Kellogg School of Management, Northwestern University, Evanston, Illinois. He received his master's degree at the University of Chicago and his PhD at Massachusetts Institute of Technology, both in economics.", style: "body", color: "#5C574C" },
-      { text: "Professor Kotler is the author of more than 100 books, including Marketing Management: Analysis, Planning, Implementation and Control, the most widely used marketing book in graduate business schools worldwide; Principles of Marketing; Strategic Marketing for Non-profit Organizations; Lateral Marketing, and Marketing Insights from A to Z.", style: "body", color: "#5C574C" },
-      { text: "He was the first recipient of the AMA's Distinguished Marketing Educator Award (1985), received the Paul Converse Award (1978), and Charles Coolidge Parlin Marketing Research Award (1989).", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 12: Kotler cont.
-  {
-    pageNumber: 12,
-    headerLeft: "12",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "text",
-    lines: [
-      { text: "Professor Kotler has consulted for such companies as IBM, General Electric, AT&T, Honeywell, Bank of America, Merck and others in the areas of marketing strategy, marketing organization and international marketing.", style: "body", color: "#5C574C" },
-      { text: "He has been Chairman of the College of Marketing of the Institute of Management Sciences, a Director of the American Marketing Association, a Trustee of the Marketing Science Institute, and a Member of the Advisory Board of the Drucker Foundation. He has received honorary doctoral degrees from Stockholm University, University of Zurich, Athens University of Economics, DePaul University, Cracow School of Business, Groupe H.E.C. in Paris, and Vienna University.", style: "body", color: "#5C574C" },
-      { text: "Philip Kotler is a founding member of The Sarasota Institute, Florida.", style: "bold", color: "#141E33" },
-    ],
-  },
-  // Page 13: About Pfoertsch
-  {
-    pageNumber: 13,
-    headerRight: "13",
-    type: "text",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "About the Authors", style: "title", color: "#141E33" },
-      { text: "Dr. Waldemar Pfoertsch", style: "bold", color: "#BC3B2C" },
-      { text: "Waldemar Pfoertsch has redefined how organizations approach B2B Branding Management and Human-to-Human (H2H) marketing in a digital, sustainability-focused world. With an academic legacy spanning Europe, the United States, and Asia, his expertise bridges global strategy with authentic customer connection.", style: "body", color: "#5C574C" },
-      { text: "Dr. Pfoertsch is Professor of Marketing Management at CIIM Business School of the University of Limassol, Cyprus, and Professor Emeritus of International Business at Pforzheim University, Germany. He has lectured at Mannheim Business School, Tongji University (Shanghai), Technical University of Munich (TUM), and IIM Calcutta.", style: "body", color: "#5C574C" },
-      { text: "From 2007 to 2010, he was Professor of Marketing at CEIBS in Shanghai. He has co-authored seminal books, including B2B Brand Management (with Philip Kotler), H2H Marketing, and Transformational Sales.", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 14: Pfoertsch cont.
-  {
-    pageNumber: 14,
-    headerLeft: "14",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "text",
-    lines: [
-      { text: "Dr. Pfoertsch brings extensive management consulting experience in the USA, Europe, and China. At UBM/Mercer Consulting Group, Arthur Andersen Operational Consulting, and LEK Consulting, he helped companies develop international strategies. Earlier, he held sales and strategy positions at Siemens AG in Germany and the USA and served as an Economic Advisor to UNIDO in Sierra Leone.", style: "body", color: "#5C574C" },
-      { text: "His current research focuses on Human-to-Human marketing in industrial companies, particularly the role of artificial intelligence in enabling empathetic customer relationships at scale, and the integration of sustainability metrics into brand valuation frameworks.", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 15: About Kallel
-  {
-    pageNumber: 15,
-    headerRight: "15",
-    type: "text",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "About the Authors", style: "title", color: "#141E33" },
-      { text: "Walid Kallel", style: "bold", color: "#BC3B2C" },
-      { text: "Strategic Marketing Consultant & Brand Educator", style: "subtitle", color: "#141E33" },
-      { text: "Walid Kallel is a visionary in the world of brand strategy and marketing transformation, whose work has quietly reshaped the landscape of Tunisian industry. A graduate of the Faculty of Economic and Management Sciences of Tunis, where he earned his master's in economics, and holder of the Advanced Specialized Certificate in Marketing Techniques from ESC Tunis, Walid brings a rare blend of analytical rigor and creative vision.", style: "body", color: "#5C574C" },
-      { text: "Over the past two decades, he has advised more than 200 Tunisian enterprises, helping them move beyond transactional marketing to build enduring brand identities rooted in strategic clarity. He has spearheaded brand leadership platforms for pioneering industrial firms such as SIFCOL, MPBS, AMECAP, and WINOX.", style: "body", color: "#5C574C" },
-      { text: "His advisory portfolio spans international development institutions such as GIZ, EBRD, and FOPRODEX.", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 16: Kallel cont.
-  {
-    pageNumber: 16,
-    headerLeft: "16",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "text",
-    lines: [
-      { text: "Walid has partnered with ESSILOR ACADEMY, the academy of the world leader in optical lenses, to train and coach optical clients in Tunisia, Senegal, Ivory Coast, Cameroon, and other countries.", style: "body", color: "#5C574C" },
-      { text: "At the core of his philosophy lies a powerful conviction: a company's primary capital is not its machinery, balance sheet, or even its products — it is its brand. This intangible asset — the promise that lives in the customer's mind — is the true engine of value creation.", style: "bold", color: "#141E33" },
-      { text: "He calls himself not just a consultant, but a brand educator. Because sustainable change doesn't come from top-down mandates — it comes from shared understanding. From people who believe in the brand because they helped shape it.", style: "body", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "Walid KALLEL — walidkallel@bsuccess.tn", style: "bold", color: "#BC3B2C" },
-    ],
-  },
-  // Page 17: Agenda (Summary Table of Contents)
-  {
-    pageNumber: 17,
-    headerRight: "17",
-    type: "agenda",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "Agenda", style: "title", color: "#141E33" },
-      { text: "1  Performance Branding: Quantifying Impact of B2B Strategy ...... 22", style: "bold", color: "#141E33" },
-      { text: "   Case Study: Mediterranean School of Business (MSB) .......... 34", style: "bullet", color: "#BC3B2C" },
-      { text: "2  Digital Transformative reshaping strategies of B2B Marketing ... 48", style: "bold", color: "#141E33" },
-      { text: "   Case Study: MyBIAT: An innovative digital solution ......... 62", style: "bullet", color: "#BC3B2C" },
-      { text: "3  Dimensions of Brand Management and Brand Distinction ........... 73", style: "bold", color: "#141E33" },
-      { text: "   Case Study: Arvea the Community-Based Brand ................ 88", style: "bullet", color: "#BC3B2C" },
-      { text: "4  Dynamic Capability of Transformative Brand Strategy ............ 107", style: "bold", color: "#141E33" },
-      { text: "   Case Study: Gourmandise & Co. — A Legacy Brand ............. 125", style: "bullet", color: "#BC3B2C" },
-      { text: "5  Brand Specialties and Brand Communication ...................... 142", style: "bold", color: "#141E33" },
-      { text: "   Case Study: Smart Olive Oil (Group CHO TUNISIA) ............. 157", style: "bullet", color: "#BC3B2C" },
-      { text: "6  The Process of Building B2B Brandings .......................... 184", style: "bold", color: "#141E33" },
-      { text: "   Case Study: Wallyscar 619 Turning Crisis Into Opportunity ... 200", style: "bullet", color: "#BC3B2C" },
-      { text: "7  Exercise Caution Regarding Branding Missteps ................... 209", style: "bold", color: "#141E33" },
-      { text: "   Case Study: MPBS - Building Brand Power ..................... 218", style: "bullet", color: "#BC3B2C" },
-      { text: "8  The Strategic Awakening of B2B in Tunisia ...................... 226", style: "bold", color: "#141E33" },
-      { text: "   Case Study: Organic B2B Branding in the Optical Sector ...... 230", style: "bullet", color: "#BC3B2C" },
-      { text: "9  Future Perspective of B2B Brandings ............................ 237", style: "bold", color: "#141E33" },
-      { text: "", style: "body" },
-      { text: "Content", style: "subtitle", color: "#BC3B2C" },
-      { text: "Preface ............................................................. 5", style: "body", color: "#5C574C" },
-      { text: "Foreword ............................................................ 9", style: "body", color: "#5C574C" },
-      { text: "About the Authors ................................................... 11", style: "body", color: "#5C574C" },
-    ],
-  },
-  // Page 18: Detailed TOC - Part 1
-  {
-    pageNumber: 18,
-    headerLeft: "18",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "toc",
-    lines: [
-      { text: "Performance Branding Defined ......................................... 23", style: "body", color: "#5C574C" },
-      { text: "  How it delivers strategic benefits ................................. 24", style: "meta", color: "#5C574C" },
-      { text: "  Additional critical benefits ....................................... 24", style: "meta", color: "#5C574C" },
-      { text: "Challenges in Brand Management B2B Branding .......................... 25", style: "body", color: "#5C574C" },
-      { text: "The Rise of Big Tech and H2H Marketing ................................ 25", style: "body", color: "#5C574C" },
-      { text: "  What Branding Really Means ......................................... 26", style: "meta", color: "#5C574C" },
-      { text: "Brand Leadership ..................................................... 27", style: "body", color: "#5C574C" },
-      { text: "B2B Performance Branding Benefits .................................... 27", style: "body", color: "#5C574C" },
-      { text: "The 95-5 Rule and Performance Branding ............................... 28", style: "body", color: "#5C574C" },
-      { text: "AI and Performance Branding in B2B ................................... 30", style: "body", color: "#5C574C" },
-      { text: "Case Study: MSB (Mediterranean School of Business) ................... 34", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "2  Digital Transformative reshaping strategies ......................... 48", style: "bold", color: "#141E33" },
-      { text: "  Introduction: The Evolution of B2B Branding ........................ 48", style: "meta", color: "#5C574C" },
-      { text: "  Transformative Marketing and Brand Management ....................... 49", style: "meta", color: "#5C574C" },
-      { text: "  B2B Market Dynamics & Industrial Products .......................... 50", style: "meta", color: "#5C574C" },
-      { text: "  Derived Demand & Organizational Buying ............................. 51", style: "meta", color: "#5C574C" },
-      { text: "  Human Factors in Business Decisions ................................ 52", style: "meta", color: "#5C574C" },
-      { text: "  Brand Relevance & Functions in B2B ................................. 53", style: "meta", color: "#5C574C" },
-      { text: "  Holistic Branding and H2H Marketing ................................ 54", style: "meta", color: "#5C574C" },
-      { text: "  The Branding Triangle & Branding Commodities ....................... 55", style: "meta", color: "#5C574C" },
-      { text: "  AI and Transformative Marketing in B2B ............................. 57", style: "meta", color: "#5C574C" },
-    ],
-  },
-  // Page 19: Detailed TOC - Part 2
-  {
-    pageNumber: 19,
-    headerRight: "19",
-    type: "toc",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "Case Study: MyBIAT: An innovative and responsible solution ........... 62", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "3  Dimensions of Brand Management and Brand Distinction ............... 73", style: "bold", color: "#141E33" },
-      { text: "  The Four Dimensions of Brand Management ............................ 74", style: "meta", color: "#5C574C" },
-      { text: "  How Brands Create Value in B2B ..................................... 75", style: "meta", color: "#5C574C" },
-      { text: "  Return on Brand Investment (ROBI) .................................. 80", style: "meta", color: "#5C574C" },
-      { text: "  Brand Architecture & Marketing-Mix 5Es ............................. 80", style: "meta", color: "#5C574C" },
-      { text: "  Case Study: Arvea the Community-Based Brand ........................ 88", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "4  Dynamic Capability of Transformative Brand Strategy ................. 107", style: "bold", color: "#141E33" },
-      { text: "  Corporate, Family, and Individual Brands ........................... 109", style: "meta", color: "#5C574C" },
-      { text: "  National and International Brands .................................. 112", style: "meta", color: "#5C574C" },
-      { text: "  Brand Elements (Name, Logo, Tagline, Story) ........................ 115", style: "meta", color: "#5C574C" },
-      { text: "  Case Study: Gourmandise & Co. — Legacy Brand ....................... 125", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "5  Brand Specialties and Brand Communication ........................... 142", style: "bold", color: "#141E33" },
-      { text: "  Introduction: Holistic Brand Communication ......................... 142", style: "meta", color: "#5C574C" },
-    ],
-  },
-  // Page 20: Detailed TOC - Part 3
-  {
-    pageNumber: 20,
-    headerLeft: "20",
-    headerRight: "B2B Branding Management Case Studies Collection",
-    type: "toc",
-    lines: [
-      { text: "Key Brand Communication Tools (Sales, Social Media, LinkedIn) ....... 144", style: "meta", color: "#5C574C" },
-      { text: "Direct Marketing, Trade Shows & Sponsoring ........................... 145", style: "meta", color: "#5C574C" },
-      { text: "Brand Evaluation, AI, Living the Brand & Word-of-Mouth ................ 148", style: "meta", color: "#5C574C" },
-      { text: "Social Branding and Corporate Social Responsibility .................. 151", style: "meta", color: "#5C574C" },
-      { text: "Case Study: Group CHO TUNISIA - Smart Olive Oil ...................... 157", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "6  The Process of Building B2B Brandings .............................. 184", style: "bold", color: "#141E33" },
-      { text: "  Service-Dominant Logic and Brand Co-Creation ....................... 185", style: "meta", color: "#5C574C" },
-      { text: "  Brand Planning and Shareholder Value ............................... 186", style: "meta", color: "#5C574C" },
-      { text: "  Brand Building Process & Strategy Analysis ......................... 187", style: "meta", color: "#5C574C" },
-      { text: "  Brand Portfolio Management & Brand Audit ........................... 192", style: "meta", color: "#5C574C" },
-      { text: "  CEO and Personal Branding / Generative AI .......................... 194", style: "meta", color: "#5C574C" },
-      { text: "  Case Study: Wallyscar 619 Turning Crisis Into Opportunity .......... 200", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "7  Exercise Caution Regarding Branding Missteps ........................ 209", style: "bold", color: "#141E33" },
-    ],
-  },
-  // Page 21: Detailed TOC - Part 4
-  {
-    pageNumber: 21,
-    headerRight: "21",
-    type: "toc",
-    lines: [
-      { text: "B2B Branding Management Case Studies Collection", style: "meta", color: "#5C574C" },
-      { text: "Introduction: Learning from Branding Failures ........................ 209", style: "meta", color: "#5C574C" },
-      { text: "Maintaining Brand Identity & Obstacles ............................... 210", style: "meta", color: "#5C574C" },
-      { text: "Case Study: MPBS - Building Brand Power Across B2B Ecosystem ......... 218", style: "bold", color: "#BC3B2C" },
-      { text: "", style: "body" },
-      { text: "8  The Strategic Awakening of B2B in Tunisia ........................... 226", style: "bold", color: "#141E33" },
-      { text: "  Tunisia, a Mediterranean B2B Hub – Potential vs. Reality ........... 227", style: "meta", color: "#5C574C" },
-      { text: "  Digital B2B & Thought Leadership ................................... 228", style: "meta", color: "#5C574C" },
-      { text: "  Case Study: Organic B2B Branding in the Optical Sector ............. 230", style: "bold", color: "#BC3B2C" },
-      { text: "  The Systemic Impact: Expanded Stakeholder Ecosystem ................ 231", style: "meta", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "9  Future Perspective of B2B Brandings ................................. 237", style: "bold", color: "#141E33" },
-      { text: "  Rising Importance of B2B Branding & AI ............................. 238", style: "meta", color: "#5C574C" },
-      { text: "  Future Trends, Relevance, Simplicity, Humanity ..................... 241", style: "meta", color: "#5C574C" },
-      { text: "", style: "body" },
-      { text: "List of Abbreviations ................................................ 249", style: "bold", color: "#141E33" },
-      { text: "List of Companies Mentioned .......................................... 253", style: "bold", color: "#141E33" },
-      { text: "List of Figures ...................................................... 277", style: "bold", color: "#141E33" },
-    ],
-  },
+// Clean page labels for direct selection
+const PAGE_DESCRIPTIONS: { page: number; label: string }[] = [
+  { page: 1, label: "Page 1 · Titre & Couverture officielle" },
+  { page: 2, label: "Page 2 · Faux-titre" },
+  { page: 3, label: "Page 3 · Auteurs, Institutions & ISBN" },
+  { page: 4, label: "Page 4 · Protection du Copyright" },
+  { page: 5, label: "Page 5 · Préface : The Future of B2B Is Human" },
+  { page: 6, label: "Page 6 · Préface (suite)" },
+  { page: 7, label: "Page 7 · Remerciements & Contacts" },
+  { page: 8, label: "Page 8 · Disclaimer & Avertissements" },
+  { page: 9, label: "Page 9 · Préface Abdelaziz Makhloufi (CEO CHO Group)" },
+  { page: 10, label: "Page 10 · Préface Abdelaziz Makhloufi (suite)" },
+  { page: 11, label: "Page 11 · Dr. Philip Kotler — Biographie" },
+  { page: 12, label: "Page 12 · Dr. Philip Kotler (suite)" },
+  { page: 13, label: "Page 13 · Dr. Waldemar Pfoertsch — Biographie" },
+  { page: 14, label: "Page 14 · Dr. Waldemar Pfoertsch (suite)" },
+  { page: 15, label: "Page 15 · Walid Kallel — Biographie" },
+  { page: 16, label: "Page 16 · Walid Kallel (suite)" },
+  { page: 17, label: "Page 17 · Agenda & Sommaire Général" },
+  { page: 18, label: "Page 18 · Sommaire détaillé — Ch. 1 & Ch. 2" },
+  { page: 19, label: "Page 19 · Sommaire détaillé — Ch. 3 & Ch. 4" },
+  { page: 20, label: "Page 20 · Sommaire détaillé — Ch. 5 & Ch. 6" },
+  { page: 21, label: "Page 21 · Sommaire détaillé — Ch. 7, 8, 9 & Index" },
 ];
 
 export interface ProtectedBookTableOfContentsProps {
   pdfUrl?: string | null;
   bookTitle?: string;
   initialChapters?: BookChapterMeta[];
+  defaultPage?: number;
 }
 
 export function ProtectedBookTableOfContents({
   pdfUrl,
   bookTitle = "B2B Brand Management — Tunisia Edition",
-  initialChapters,
+  defaultPage = 17,
 }: ProtectedBookTableOfContentsProps = {}) {
-  const [currentPage, setCurrentPage] = useState<number>(pdfUrl ? 1 : 17);
+  // We default to Page 17 (Agenda & Sommaire), or page 1 if custom PDF
+  const [currentPage, setCurrentPage] = useState<number>(defaultPage);
+  const [totalPages, setTotalPages] = useState<number>(21);
+  const [loading, setLoading] = useState<boolean>(true);
   const [pdfDoc, setPdfDoc] = useState<any>(null);
-  const [pdfLoading, setPdfLoading] = useState<boolean>(false);
-  const [totalPdfPages, setTotalPdfPages] = useState<number>(21);
-  const [zoom, setZoom] = useState<number>(1);
-  const [rotation, setRotation] = useState<number>(0); // 0, 90, 180, 270
-  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
-  const [isWindowBlurred, setIsWindowBlurred] = useState<boolean>(false);
 
-  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const touchStartXRef = useRef<number | null>(null);
 
-  // Load PDF dynamically when pdfUrl is provided
+  // Load custom PDF if provided via pdfUrl
   useEffect(() => {
     if (!pdfUrl) {
       setPdfDoc(null);
-      setTotalPdfPages(21);
-      setCurrentPage(17);
+      setTotalPages(21);
       return;
     }
 
-    let isCancelled = false;
-    setPdfLoading(true);
-
+    let cancelled = false;
     const loadPdf = async () => {
       try {
         const pdfjs = (window as any).pdfjsLib;
-        if (!pdfjs) {
-          console.warn("pdfjsLib not yet available");
-          setPdfLoading(false);
-          return;
-        }
-        const loadingTask = pdfjs.getDocument(pdfUrl);
-        const doc = await loadingTask.promise;
-        if (!isCancelled) {
+        if (!pdfjs) return;
+        const task = pdfjs.getDocument(pdfUrl);
+        const doc = await task.promise;
+        if (!cancelled) {
           setPdfDoc(doc);
-          setTotalPdfPages(doc.numPages);
+          setTotalPages(doc.numPages);
           setCurrentPage(1);
-          setPdfLoading(false);
         }
       } catch (err) {
-        console.error("Erreur de chargement du PDF de sommaire:", err);
-        if (!isCancelled) {
-          setPdfLoading(false);
-          toast.error("Impossible de charger le document PDF du sommaire.");
-        }
+        console.error("PDF load error:", err);
       }
     };
 
     loadPdf();
-
     return () => {
-      isCancelled = true;
+      cancelled = true;
     };
   }, [pdfUrl]);
 
-  // Security layer: Anti-Screenshot on window blur / tab focus switch
+  // Preload neighboring pages for instant flipping
   useEffect(() => {
-    const handleBlur = () => setIsWindowBlurred(true);
-    const handleFocus = () => setIsWindowBlurred(false);
-    const handleVisibility = () => {
-      if (document.hidden) {
-        setIsWindowBlurred(true);
-      } else {
-        setIsWindowBlurred(false);
+    if (pdfDoc) return;
+    const preload = (p: number) => {
+      if (p >= 1 && p <= totalPages) {
+        const img = new Image();
+        img.src = `/sommaire-pages/page-${p}.webp`;
       }
     };
+    preload(currentPage - 1);
+    preload(currentPage + 1);
+  }, [currentPage, totalPages, pdfDoc]);
 
-    window.addEventListener("blur", handleBlur);
-    window.addEventListener("focus", handleFocus);
-    document.addEventListener("visibilitychange", handleVisibility);
+  // Render current page onto high-resolution Canvas (Zero DOM text => impossible to copy/paste)
+  const renderCurrentPage = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    // Keyboard protection: intercept PrintScreen, Ctrl+P, Ctrl+S, Inspect
+    if (pdfDoc) {
+      // Dynamic PDF.js render
+      setLoading(true);
+      pdfDoc
+        .getPage(currentPage)
+        .then((page: any) => {
+          const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+          const viewport = page.getViewport({ scale: dpr * 1.5 });
+          canvas.width = viewport.width;
+          canvas.height = viewport.height;
+
+          page.render({ canvasContext: ctx, viewport }).promise.then(() => {
+            // Subtle watermark
+            ctx.save();
+            ctx.translate(viewport.width / 2, viewport.height / 2);
+            ctx.rotate(-Math.PI / 6);
+            ctx.font = `600 ${Math.round(20 * dpr)}px system-ui, -apple-system, sans-serif`;
+            ctx.fillStyle = "rgba(188, 59, 44, 0.05)";
+            ctx.textAlign = "center";
+            ctx.fillText("LIVRESPRO.TN · LECTURE SÉCURISÉE · REPRODUCTION INTERDITE", 0, -60);
+            ctx.fillText(`TUNISIA EDITION · ${bookTitle.toUpperCase()}`, 0, 40);
+            ctx.restore();
+            setLoading(false);
+          });
+        })
+        .catch(() => setLoading(false));
+      return;
+    }
+
+    // Default book: High-DPI authentic PDF page render
+    setLoading(true);
+    const img = new Image();
+    img.src = `/sommaire-pages/page-${currentPage}.webp`;
+    img.onload = () => {
+      const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // Draw original crisp PDF page
+      ctx.drawImage(img, 0, 0);
+
+      // Baked-in Anti-Theft Watermark across canvas pixels (non-intrusive)
+      ctx.save();
+      ctx.translate(img.width / 2, img.height / 2);
+      ctx.rotate(-Math.PI / 6);
+      ctx.font = "600 22px system-ui, -apple-system, sans-serif";
+      ctx.fillStyle = "rgba(188, 59, 44, 0.055)";
+      ctx.textAlign = "center";
+      ctx.fillText("LIVRESPRO.TN · LECTURE PROTÉGÉE · REPRODUCTION INTERDITE", 0, -80);
+      ctx.fillText("© 2026 GLOBAL MARKETING NEXUS · KOTLER · PFOERTSCH · KALLEL", 0, 20);
+      ctx.restore();
+
+      setLoading(false);
+    };
+    img.onerror = () => setLoading(false);
+  }, [currentPage, pdfDoc, bookTitle]);
+
+  useEffect(() => {
+    renderCurrentPage();
+  }, [renderCurrentPage]);
+
+  // Keyboard navigation & anti-copy interceptors
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // PrintScreen interception
-      if (e.key === "PrintScreen") {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText("").catch(() => {});
-        }
-        setIsWindowBlurred(true);
-        setTimeout(() => setIsWindowBlurred(false), 1200);
-        toast.error("Capture d'écran désactivée pour protéger les droits d'auteur de l'ouvrage.");
+      // Left / Right arrow navigation
+      if (e.key === "ArrowLeft") {
+        setCurrentPage((p) => Math.max(1, p - 1));
+      } else if (e.key === "ArrowRight") {
+        setCurrentPage((p) => Math.min(totalPages, p + 1));
       }
 
-      // Print interception (Ctrl+P / Cmd+P)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "p") {
+      // Block copy shortcuts
+      if ((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === "c" || e.key.toLowerCase() === "p" || e.key.toLowerCase() === "s" || e.key.toLowerCase() === "u")) {
         e.preventDefault();
-        toast.error("L'impression est désactivée pour ce document protégé.");
-      }
-
-      // Save interception (Ctrl+S / Cmd+S)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "s") {
-        e.preventDefault();
-        toast.error("Le téléchargement direct de ce document n'est pas autorisé.");
-      }
-
-      // Copy interception (Ctrl+C / Cmd+C when inside container)
-      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === "c") {
-        const selection = window.getSelection();
-        if (selection && selection.toString().length > 0) {
-          e.preventDefault();
-          selection.removeAllRanges();
-          toast.error("La copie de texte est protégée contre la reproduction.");
-        }
       }
     };
 
     window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [totalPages]);
 
-    return () => {
-      window.removeEventListener("blur", handleBlur);
-      window.removeEventListener("focus", handleFocus);
-      document.removeEventListener("visibilitychange", handleVisibility);
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, []);
+  const handlePrev = () => setCurrentPage((p) => Math.max(1, p - 1));
+  const handleNext = () => setCurrentPage((p) => Math.min(totalPages, p + 1));
 
-  // Canvas drawing routine
-  const renderCanvasPage = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    // Dimensions for high-DPI crispness (aspect ratio standard book 800 x 1130)
-    const baseWidth = 800;
-    const baseHeight = 1130;
-    const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
-
-    // Apply rotation â€” swap canvas dimensions for 90/270 deg
-    const isRotated90or270 = rotation === 90 || rotation === 270;
-    canvas.width = isRotated90or270 ? baseHeight * dpr : baseWidth * dpr;
-    canvas.height = isRotated90or270 ? baseWidth * dpr : baseHeight * dpr;
-    ctx.scale(dpr, dpr);
-
-    // Apply rotation transform around the canvas center
-    if (rotation !== 0) {
-      const cx = isRotated90or270 ? baseHeight / 2 : baseWidth / 2;
-      const cy = isRotated90or270 ? baseWidth / 2 : baseHeight / 2;
-      ctx.translate(cx, cy);
-      ctx.rotate((rotation * Math.PI) / 180);
-      ctx.translate(-baseWidth / 2, -baseHeight / 2);
-    }
-
-    // 1. Page Background (Cream book paper)
-    ctx.fillStyle = "#FCFAF6";
-    ctx.fillRect(0, 0, baseWidth, baseHeight);
-
-    // Subtle paper edge shadow
-    ctx.strokeStyle = "rgba(20, 30, 51, 0.08)";
-    ctx.lineWidth = 1;
-    ctx.strokeRect(1, 1, baseWidth - 2, baseHeight - 2);
-
-    // Subtle margin guide line
-    ctx.strokeStyle = "rgba(20, 30, 51, 0.04)";
-    ctx.strokeRect(40, 40, baseWidth - 80, baseHeight - 80);
-
-    const pageData = PAGES_DATA.find((p) => p.pageNumber === currentPage) || PAGES_DATA[16];
-
-    // 2. Running Header
-    ctx.font = "italic 13px 'Plus Jakarta Sans', system-ui, sans-serif";
-    ctx.fillStyle = "#8C827A";
-    if (pageData.headerLeft) {
-      ctx.textAlign = "left";
-      ctx.fillText(pageData.headerLeft, 60, 55);
-    }
-    if (pageData.headerRight) {
-      ctx.textAlign = "right";
-      ctx.fillText(pageData.headerRight, baseWidth - 60, 55);
-    }
-
-    // Header divider line
-    ctx.beginPath();
-    ctx.moveTo(60, 68);
-    ctx.lineTo(baseWidth - 60, 68);
-    ctx.strokeStyle = "rgba(20, 30, 51, 0.15)";
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // 3. Render Lines
-    let currentY = 120;
-    const lineHeight = 28;
-    const leftMargin = 60;
-    const contentWidth = baseWidth - 120;
-
-    // Helper: wraps text and returns updated Y position
-    const wrapText = (
-      text: string,
-      x: number,
-      startY: number,
-      font: string,
-      lineH: number,
-      maxWidth: number
-    ): number => {
-      ctx.font = font;
-      const words = text.split(" ");
-      let line = "";
-      let y = startY;
-      for (let n = 0; n < words.length; n++) {
-        const testLine = line + words[n] + " ";
-        if (ctx.measureText(testLine).width > maxWidth && n > 0) {
-          ctx.fillText(line.trimEnd(), x, y);
-          line = words[n] + " ";
-          y += lineH;
-        } else {
-          line = testLine;
-        }
-      }
-      if (line.trim()) ctx.fillText(line.trimEnd(), x, y);
-      return y + lineH;
-    };
-
-    pageData.lines.forEach((line) => {
-      if (!line.text) {
-        currentY += lineHeight * 0.7;
-        return;
-      }
-
-      ctx.fillStyle = line.color || "#141E33";
-      ctx.textAlign = line.style === "center" ? "center" : "left";
-      const x = line.style === "center" ? baseWidth / 2 : leftMargin + (line.indent || 0);
-      const availableWidth = contentWidth - (line.indent || 0);
-
-      switch (line.style) {
-        case "title":
-          currentY += 12;
-          currentY = wrapText(line.text, x, currentY, "bold 32px 'DM Serif Display', Georgia, serif", 36, availableWidth);
-          currentY += 12;
-          break;
-        case "subtitle":
-          currentY += 8;
-          currentY = wrapText(line.text, x, currentY, "bold 20px 'DM Serif Display', Georgia, serif", 28, availableWidth);
-          currentY += 8;
-          break;
-        case "bold":
-          currentY = wrapText(line.text, x, currentY, "bold 15px 'Plus Jakarta Sans', system-ui, sans-serif", lineHeight, availableWidth);
-          break;
-        case "bullet":
-          currentY = wrapText(line.text, x, currentY, "14px 'Plus Jakarta Sans', system-ui, sans-serif", lineHeight, availableWidth);
-          break;
-        case "meta":
-          currentY = wrapText(line.text, x, currentY, "12px 'Plus Jakarta Sans', system-ui, sans-serif", Math.round(lineHeight * 0.85), availableWidth);
-          break;
-        default: {
-          // Body text with word wrap
-          ctx.font = "14px 'Plus Jakarta Sans', system-ui, sans-serif";
-          const words = line.text.split(" ");
-          let currentLine = "";
-          for (let n = 0; n < words.length; n++) {
-            const testLine = currentLine + words[n] + " ";
-            const metrics = ctx.measureText(testLine);
-            if (metrics.width > availableWidth && n > 0) {
-              ctx.fillText(currentLine, x, currentY);
-              currentLine = words[n] + " ";
-              currentY += lineHeight;
-            } else {
-              currentLine = testLine;
-            }
-          }
-          ctx.fillText(currentLine, x, currentY);
-          currentY += lineHeight;
-          break;
-        }
-      }
-    });
-
-    // 4. Protected DRM Watermark (Diagonal translucent stamp)
-    ctx.save();
-    ctx.translate(baseWidth / 2, baseHeight / 2);
-    ctx.rotate(-Math.PI / 6);
-    ctx.font = "bold 22px 'Plus Jakarta Sans', sans-serif";
-    ctx.fillStyle = "rgba(188, 59, 44, 0.05)";
-    ctx.textAlign = "center";
-    ctx.fillText("LIVRESPRO.TN Â· LECTURE SÃ‰CURISÃ‰E Â· REPRODUCTION INTERDITE", 0, -120);
-    ctx.fillText("Â© 2026 GLOBAL MARKETING NEXUS Â· KOTLER Â· PFOERTSCH Â· KALLEL", 0, 0);
-    ctx.fillText("DOCUMENT PROTÃ‰GÃ‰ CONTRE LA COPIE ET LE TÃ‰LÃ‰CHARGEMENT", 0, 120);
-    ctx.restore();
-
-    // 5. Running Footer
-    ctx.font = "11px 'Plus Jakarta Sans', system-ui, sans-serif";
-    ctx.fillStyle = "#A89F91";
-    ctx.textAlign = "center";
-    ctx.fillText(
-      `LivresPro.tn Â· AperÃ§u sous licence exclusive de l'Ã©dition tunisienne â€” Page ${currentPage} / 21`,
-      baseWidth / 2,
-      baseHeight - 35
-    );
-  }, [currentPage, rotation]);
-
-  // Canvas PDF drawing routine for uploaded PDF tables of contents (>250 books)
-  const renderPdfPage = useCallback(async () => {
-    if (!pdfDoc) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    try {
-      const page = await pdfDoc.getPage(currentPage);
-      const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
-      const viewport = page.getViewport({ scale: dpr * zoom * 1.35, rotation: rotation });
-
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-
-      // Render PDF onto canvas
-      await page.render({ canvasContext: ctx, viewport }).promise;
-
-      // Apply DRM watermark overlay
-      ctx.save();
-      ctx.translate(viewport.width / 2, viewport.height / 2);
-      ctx.rotate(-Math.PI / 6);
-      ctx.font = `bold ${Math.round(22 * zoom * dpr)}px 'Plus Jakarta Sans', system-ui, sans-serif`;
-      ctx.fillStyle = "rgba(188, 59, 44, 0.07)";
-      ctx.textAlign = "center";
-      ctx.fillText("LIVRESPRO.TN · LECTURE SÉCURISÉE · REPRODUCTION INTERDITE", 0, -80);
-      ctx.fillText(`TUNISIA EDITION · ${bookTitle.toUpperCase()}`, 0, 0);
-      ctx.fillText("DOCUMENT PROTÉGÉ CONTRE LA COPIE ET LE TÉLÉCHARGEMENT", 0, 80);
-      ctx.restore();
-
-      // Outer protective border
-      ctx.strokeStyle = "rgba(20, 30, 51, 0.12)";
-      ctx.lineWidth = 2 * dpr;
-      ctx.strokeRect(2, 2, viewport.width - 4, viewport.height - 4);
-
-      // Running Footer
-      ctx.font = `${Math.round(11 * dpr)}px 'Plus Jakarta Sans', system-ui, sans-serif`;
-      ctx.fillStyle = "#A89F91";
-      ctx.textAlign = "center";
-      ctx.fillText(
-        `LivresPro.tn · Sommaire sous licence exclusive — Page ${currentPage} / ${totalPdfPages}`,
-        viewport.width / 2,
-        viewport.height - 15 * dpr
-      );
-    } catch (err) {
-      console.error("Erreur de rendu canvas PDF:", err);
-    }
-  }, [pdfDoc, currentPage, zoom, rotation, bookTitle, totalPdfPages]);
-
-  useEffect(() => {
-    if (pdfDoc) {
-      renderPdfPage();
-    } else {
-      renderCanvasPage();
-    }
-  }, [pdfDoc, renderPdfPage, renderCanvasPage, zoom, rotation]);
-
-  const maxPages = pdfDoc ? totalPdfPages : 21;
-
-  const handleNextPage = () => {
-    if (currentPage < maxPages) setCurrentPage((p) => p + 1);
+  // Touch swipe support for mobile
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartXRef.current = e.touches[0].clientX;
   };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) setCurrentPage((p) => p - 1);
-  };
-
-  const handleSelectChapterPage = (pg: number) => {
-    if (pdfDoc) {
-      const target = Math.min(Math.max(1, pg), maxPages);
-      setCurrentPage(target);
-      return;
-    }
-    // Map chapter page to corresponding PDF TOC page (17, 18, 19, 20, 21)
-    let target = 17;
-    if (pg === 1) target = 1;
-    else if (pg >= 22 && pg <= 48) target = 18;
-    else if (pg >= 49 && pg <= 141) target = 19;
-    else if (pg >= 142 && pg <= 208) target = 20;
-    else if (pg >= 209) target = 21;
-    setCurrentPage(target);
-    toast.success(`Affichage de la page de sommaire correspondante (Page ${target})`);
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartXRef.current === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartXRef.current;
+    if (deltaX > 45) handlePrev();
+    else if (deltaX < -45) handleNext();
+    touchStartXRef.current = null;
   };
 
   return (
-    <section
-      id="sommaire"
+    <div
       ref={containerRef}
-      className={`relative my-12 overflow-hidden rounded-3xl border border-[#BC3B2C]/25 bg-white shadow-xl transition-all ${
-        isFullscreen ? "fixed inset-0 z-50 m-0 rounded-none bg-[#141E33] p-4" : "p-4 sm:p-8"
-      }`}
+      className="relative select-none overflow-hidden rounded-2xl border border-[#141E33]/15 bg-[#FCFAF6] shadow-lg transition-all"
+      style={{
+        WebkitUserSelect: "none",
+        MozUserSelect: "none",
+        msUserSelect: "none",
+        userSelect: "none",
+      }}
       onContextMenu={(e) => {
         e.preventDefault();
-        toast.error("Le clic droit est désactivé sur ce document sous copyright.");
         return false;
       }}
       onCopy={(e) => {
         e.preventDefault();
-        toast.error("La copie de texte est strictement interdite sur ce document.");
+        if (e.clipboardData) e.clipboardData.clearData();
       }}
       onCut={(e) => e.preventDefault()}
       onDragStart={(e) => e.preventDefault()}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
-      {/* Background ambient accents */}
-      <div className="pointer-events-none absolute -right-20 top-0 h-72 w-72 rounded-full bg-[#BC3B2C]/05 blur-3xl" />
-      <div className="pointer-events-none absolute -left-20 bottom-0 h-72 w-72 rounded-full bg-[#1E5FC2]/05 blur-3xl" />
+      {/* Essential Navigation Header — Minimal, clean, no additional clutter */}
+      <div className="flex items-center justify-between border-b border-[#141E33]/10 bg-white px-4 py-3 sm:px-6">
+        {/* Anti-copy Status Pill */}
+        <div className="flex items-center gap-2 text-xs font-semibold text-[#141E33]">
+          <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
+          <span className="hidden sm:inline font-bold uppercase tracking-wider text-[11px] text-[#5C574C]">
+            Sommaire Officiel ·
+          </span>
+          <span className="inline-flex items-center gap-1 text-[11px] text-[#BC3B2C] font-bold">
+            <Lock className="h-3 w-3" /> Anti-Copie
+          </span>
+        </div>
 
-      {/* Header bar with security credentials */}
-      <div className="relative z-10 flex flex-col gap-4 border-b border-[#141E33]/10 pb-6 md:flex-row md:items-center md:justify-between">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#141E33] px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.16em] text-[#E9DFCF]">
-              <Lock className="h-3 w-3 text-[#BC3B2C]" /> Sommaire Officiel Protégé
-            </span>
-            <span className="inline-flex items-center gap-1 rounded-full bg-[#BC3B2C]/10 px-3 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#BC3B2C]">
-              <ShieldCheck className="h-3.5 w-3.5" /> DRM Anti-Copie Actif
+        {/* Essential Page Controls */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={currentPage <= 1}
+            aria-label="Page précédente"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#141E33]/15 bg-white text-[#141E33] transition hover:bg-[#F6F1E7] disabled:cursor-not-allowed disabled:opacity-35"
+          >
+            <ChevronLeft className="h-4 w-4" />
+          </button>
+
+          {/* Clean Page Selector */}
+          <div className="relative">
+            <select
+              aria-label="Sélectionner la page"
+              value={currentPage}
+              onChange={(e) => setCurrentPage(Number(e.target.value))}
+              className="h-9 cursor-pointer appearance-none rounded-lg border border-[#141E33]/15 bg-[#F6F1E7] py-1 pl-3 pr-8 text-xs font-bold text-[#141E33] focus:border-[#BC3B2C] focus:outline-hidden"
+            >
+              {PAGE_DESCRIPTIONS.slice(0, totalPages).map((p) => (
+                <option key={p.page} value={p.page}>
+                  {p.label}
+                </option>
+              ))}
+            </select>
+            <span className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-[#5C574C]">
+              ▼
             </span>
           </div>
 
-          <h2 className="mt-3 font-display text-2xl text-[#141E33] sm:text-3xl md:text-4xl">
-            Table des Matières & Structure de l’Ouvrage
-          </h2>
-          <p className="mt-1 text-xs text-[#5C574C]">
-            Édition originale · 9 Chapitres fondamentaux, 7 Études de cas tunisiennes exclusives · 277 pages
-          </p>
-        </div>
-
-        {/* Security badge & Fullscreen toggle */}
-        <div className="flex items-center gap-2 self-start md:self-auto">
-          <span className="inline-flex items-center gap-2 rounded-full bg-[#141E33] px-4 py-2 text-xs font-bold text-white shadow-sm">
-            <Eye className="h-3.5 w-3.5" /> Lecture Sécurisée
-          </span>
-
           <button
             type="button"
-            onClick={() => setIsFullscreen(!isFullscreen)}
-            title={isFullscreen ? "Quitter le plein écran" : "Plein écran"}
-            className="hidden sm:inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#141E33]/10 bg-white text-[#141E33] transition hover:bg-[#F6F1E7]"
+            onClick={handleNext}
+            disabled={currentPage >= totalPages}
+            aria-label="Page suivante"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-[#141E33]/15 bg-white text-[#141E33] transition hover:bg-[#F6F1E7] disabled:cursor-not-allowed disabled:opacity-35"
           >
-            {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+            <ChevronRight className="h-4 w-4" />
           </button>
         </div>
       </div>
 
-      {/* PROTECTED DIGITAL CANVAS READER */}
-      <div className="relative mt-6 flex flex-col items-center">
-          {/* Quick jump bar */}
-          <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-3 rounded-2xl bg-[#F6F1E7] p-3 text-xs border border-[#141E33]/05">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="font-extrabold uppercase tracking-wider text-[#5C574C] mr-2">Accès direct :</span>
-              {!pdfDoc ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(1)}
-                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                      currentPage === 1 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                    }`}
-                  >
-                    Titre (p. 1)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(3)}
-                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                      currentPage === 3 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                    }`}
-                  >
-                    ISBN & Auteurs (p. 3)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(5)}
-                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                      currentPage === 5 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                    }`}
-                  >
-                    Préface (p. 5)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(17)}
-                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                      currentPage === 17 ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                    }`}
-                  >
-                    Agenda (p. 17)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setCurrentPage(18)}
-                    className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                      currentPage >= 18 && currentPage <= 21
-                        ? "bg-[#BC3B2C] text-white"
-                        : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                    }`}
-                  >
-                    Sommaire Détaillé (p. 18-21)
-                  </button>
-                </>
-              ) : (
-                Array.from({ length: Math.min(maxPages, 8) }).map((_, idx) => {
-                  const pNum = idx + 1;
-                  return (
-                    <button
-                      key={pNum}
-                      type="button"
-                      onClick={() => setCurrentPage(pNum)}
-                      className={`rounded-lg px-2.5 py-1 font-semibold transition ${
-                        currentPage === pNum ? "bg-[#BC3B2C] text-white" : "bg-white text-[#141E33] hover:bg-[#E9DFCF]"
-                      }`}
-                    >
-                      Page {pNum}
-                    </button>
-                  );
-                })
-              )}
-            </div>
+      {/* Reader Canvas Area with Multi-layer Anti-Copy Protection */}
+      <div className="relative flex justify-center bg-[#EFECE6]/50 p-3 sm:p-6 md:p-8">
+        {/* Invisible protection shield preventing drag and inspection */}
+        <div
+          className="absolute inset-0 z-10 cursor-default select-none"
+          style={{ WebkitUserSelect: "none", MozUserSelect: "none", userSelect: "none" }}
+          onContextMenu={(e) => e.preventDefault()}
+          onMouseDown={(e) => {
+            if (e.detail > 1) e.preventDefault();
+          }}
+        />
 
-            {/* Page navigation controls */}
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                disabled={currentPage <= 1}
-                onClick={handlePrevPage}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#141E33] shadow-xs disabled:opacity-40 hover:bg-[#E9DFCF]"
-                title="Page précédente"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
-              <span className="font-bold text-[#141E33] min-w-16 text-center">
-                {currentPage} / {maxPages}
-              </span>
-              <button
-                type="button"
-                disabled={currentPage >= maxPages}
-                onClick={handleNextPage}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[#141E33] shadow-xs disabled:opacity-40 hover:bg-[#E9DFCF]"
-                title="Page suivante"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+        {/* Loading Spinner */}
+        {loading && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#FCFAF6]/75 backdrop-blur-xs">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#BC3B2C] border-t-transparent" />
           </div>
+        )}
 
-          {/* Secure Reader Frame */}
-          <div className="relative flex justify-center w-full overflow-hidden rounded-2xl bg-[#E9DFCF]/40 p-2 sm:p-6 shadow-inner">
-            {/* Anti-screenshot privacy blur mask */}
-            {isWindowBlurred && (
-              <div
-                onClick={() => setIsWindowBlurred(false)}
-                className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-[#141E33]/90 backdrop-blur-md p-6 text-center text-white cursor-pointer"
-              >
-                <AlertTriangle className="h-12 w-12 text-[#BC3B2C] mb-3 animate-pulse" />
-                <h3 className="font-display text-2xl">Affichage Protégé Masqué</h3>
-                <p className="mt-2 max-w-md text-xs text-white/70">
-                  Le contenu est automatiquement protégé en cas de changement de fenêtre ou d'outil de capture.
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setIsWindowBlurred(false)}
-                  className="mt-5 rounded-full bg-[#BC3B2C] px-6 py-2.5 text-xs font-bold text-white shadow-md hover:bg-[#a83426]"
-                >
-                  Cliquer pour réactiver l’affichage
-                </button>
-              </div>
-            )}
-
-            {/* Invisible event shield to block drag and browser selection */}
-            <div
-              className="absolute inset-0 z-20 cursor-default select-none"
-              style={{ WebkitUserSelect: "none", MozUserSelect: "none", msUserSelect: "none" }}
-              onContextMenu={(e) => {
-                e.preventDefault();
-                toast.error("Document protégé : clic droit désactivé.");
-              }}
-              onMouseDown={(e) => {
-                if (e.detail > 1) e.preventDefault(); // prevent double-click select
-              }}
-            />
-
-            {/* Loading state for dynamic PDF rendering */}
-            {pdfLoading && (
-              <div className="absolute inset-0 z-25 flex flex-col items-center justify-center bg-white/85 backdrop-blur-xs">
-                <div className="h-9 w-9 animate-spin rounded-full border-3 border-[#BC3B2C] border-t-transparent" />
-                <p className="mt-3 text-xs font-bold text-[#141E33]">Sécurisation et rendu du sommaire...</p>
-              </div>
-            )}
-
-            {/* The High-DPI Canvas Rendering Engine */}
-            <div
-              className="relative max-w-full overflow-auto rounded-xl shadow-2xl transition-transform"
-              style={{
-                transform: `scale(${zoom})`,
-                transformOrigin: "top center",
-              }}
-            >
-              <canvas
-                ref={canvasRef}
-                className="block max-w-full h-auto rounded-lg bg-white select-none pointer-events-none"
-                style={{
-                  width: "100%",
-                  maxWidth: rotation === 90 || rotation === 270 ? "820px" : "680px",
-                  aspectRatio: rotation === 90 || rotation === 270 ? "1130 / 800" : "800 / 1130",
-                }}
-              />
-            </div>
-
-            {/* In-Viewer Navigation & Controls Bar (Zoom, Rotation, Reset) */}
-            <div className="relative z-30 mt-4 flex w-full max-w-2xl flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-[#141E33]/15 bg-white/95 px-4 py-2.5 text-xs shadow-lg backdrop-blur-md">
-              {/* Zoom Controls */}
-              <div className="flex items-center gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setZoom((z) => Math.max(0.8, Math.round((z - 0.1) * 10) / 10))}
-                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
-                  title="Réduire le zoom"
-                >
-                  <ZoomOut className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Réduire</span>
-                </button>
-                <span className="min-w-[44px] text-center font-bold text-[#141E33]">
-                  {Math.round(zoom * 100)}%
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setZoom((z) => Math.min(1.4, Math.round((z + 0.1) * 10) / 10))}
-                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
-                  title="Agrandir le zoom"
-                >
-                  <ZoomIn className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">Agrandir</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setZoom(1);
-                    setRotation(0);
-                  }}
-                  className="rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
-                  title="Réinitialiser (Zoom 100% · 0°)"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                </button>
-              </div>
-
-              {/* Rotation Controls */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C] hidden sm:inline">
-                  Rotation :
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setRotation((r) => (r + 270) % 360)}
-                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
-                  title="Pivoter de 90° vers la gauche"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">−90°</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRotation((r) => (r + 90) % 360)}
-                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
-                  title="Pivoter de 90° vers la droite"
-                >
-                  <RotateCw className="h-3.5 w-3.5" />
-                  <span className="hidden sm:inline">+90°</span>
-                </button>
-                {rotation !== 0 && (
-                  <span className="rounded-full bg-[#BC3B2C]/10 px-2 py-0.5 text-[10px] font-extrabold text-[#BC3B2C]">
-                    {rotation}°
-                  </span>
-                )}
-              </div>
-
-              {/* Protection watermark pill */}
-              <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#5C574C]">
-                <ShieldCheck className="h-3.5 w-3.5 text-[#BC3B2C]" />
-                <span className="hidden md:inline">Lecture sécurisée protégée</span>
-                <span className="inline md:hidden">Protégé</span>
-              </div>
-            </div>
-          </div>
+        {/* Canvas Frame — Native raster rendering (no selectable DOM text) */}
+        <div className="relative w-full max-w-[760px] overflow-hidden rounded-xl bg-white shadow-xl border border-[#141E33]/10">
+          <canvas
+            ref={canvasRef}
+            className="block h-auto w-full select-none pointer-events-none"
+            style={{
+              aspectRatio: "998 / 1418",
+            }}
+          />
         </div>
-    </section>
+      </div>
+
+      {/* Minimal Footer Info */}
+      <div className="flex items-center justify-between border-t border-[#141E33]/10 bg-white px-4 py-2.5 text-[11px] text-[#5C574C]">
+        <div className="flex items-center gap-1.5">
+          <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+          <span>Document officiel sous licence exclusive</span>
+        </div>
+        <div className="font-semibold text-[#141E33]">
+          Page {currentPage} sur {totalPages}
+        </div>
+      </div>
+    </div>
   );
 }
