@@ -27,7 +27,7 @@ export default function Terms() {
             Conditions Générales de Vente & d’Utilisation
           </h1>
           <p className="text-sm md:text-base text-[#5C574C] max-w-2xl leading-relaxed">
-            Dernière mise à jour : 27 septembre 2026. Les présentes conditions régissent l'achat d'ouvrages et l'utilisation de la plateforme LivresPro.tn éditée par BUSINESS SUCCESS (Tunis, Tunisie).
+            Dernière mise à jour : 27 septembre 2026. Les présentes conditions régissent l'achat d'ouvrages et l'utilisation de la plateforme Liverspro.shop éditée par BUSINESS SUCCESS (Tunis, Tunisie).
           </p>
         </div>
 
@@ -42,7 +42,7 @@ export default function Terms() {
               Mentions Légales & Éditeur
             </h2>
             <p>
-              Le site <strong>LivresPro.tn</strong> et la marque <strong>L’Atelier des Pages</strong> sont édités et exploités par la société <strong>BUSINESS SUCCESS</strong>, société de conseil et d'édition de droit tunisien, sise à Tunis, Tunisie.
+              Le site <strong>Liverspro.shop</strong> et la marque <strong>L’Atelier des Pages</strong> sont édités et exploités par la société <strong>BUSINESS SUCCESS</strong>, société de conseil et d'édition de droit tunisien, sise à Tunis, Tunisie.
             </p>
             <p>
               Contact service client et commandes : <strong>contact@business-success.tn</strong> · Téléphone commercial Tunisie : <strong>(+216) 24 555 777</strong>.

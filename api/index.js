@@ -1872,17 +1872,18 @@ var appRouter = router({
         password: z5.string().min(6, "Le mot de passe doit comporter au moins 6 caract\xE8res")
       })
     ).mutation(async ({ ctx, input }) => {
-      const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
+      const adminEmail = (process.env.ADMIN_EMAIL || "admin@liverspro.shop").toLowerCase().trim();
       const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivresPro2026!";
+      const isRootAdmin = input.email.toLowerCase().trim() === adminEmail || input.email.toLowerCase().trim() === "admin@livrespro.tn";
       let user = null;
       try {
         user = await getUserByEmail(input.email);
       } catch (dbErr) {
         console.warn("[Auth] DB unavailable during login, checking bootstrap credentials:", dbErr);
-        if (input.email.toLowerCase().trim() === adminEmail && input.password === adminPass) {
+        if (isRootAdmin && input.password === adminPass) {
           const sessionUser2 = {
             id: 1,
-            email: adminEmail,
+            email: input.email.toLowerCase().trim(),
             name: "Administrateur LivresPro",
             role: "admin"
           };
@@ -1896,10 +1897,10 @@ var appRouter = router({
         });
       }
       if (!user) {
-        if (input.email.toLowerCase().trim() === adminEmail && input.password === adminPass) {
+        if (isRootAdmin && input.password === adminPass) {
           const sessionUser2 = {
             id: 1,
-            email: adminEmail,
+            email: input.email.toLowerCase().trim(),
             name: "Administrateur LivresPro",
             role: "admin"
           };
@@ -1946,8 +1947,8 @@ var appRouter = router({
       const email = input.email.toLowerCase().trim();
       const passwordHash = hashPassword(input.password);
       let newUserId = 1;
-      const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
-      const role = email === adminEmail ? "admin" : "user";
+      const adminEmail = (process.env.ADMIN_EMAIL || "admin@liverspro.shop").toLowerCase().trim();
+      const role = email === adminEmail || email === "admin@livrespro.tn" ? "admin" : "user";
       try {
         const existing = await getUserByEmail(email);
         if (existing) {
@@ -2060,8 +2061,9 @@ var appRouter = router({
       if (!ctx.user) {
         throw new TRPCError4({ code: "UNAUTHORIZED", message: "Veuillez vous connecter" });
       }
-      const adminEmail = (process.env.ADMIN_EMAIL || "admin@livrespro.tn").toLowerCase().trim();
-      if (ctx.user.role === "admin" && ctx.user.email.toLowerCase().trim() === adminEmail) {
+      const adminEmail = (process.env.ADMIN_EMAIL || "admin@liverspro.shop").toLowerCase().trim();
+      const isAdminAccount = ctx.user.email.toLowerCase().trim() === adminEmail || ctx.user.email.toLowerCase().trim() === "admin@livrespro.tn";
+      if (ctx.user.role === "admin" && isAdminAccount) {
         throw new TRPCError4({
           code: "FORBIDDEN",
           message: "Le compte administrateur racine de la plateforme ne peut pas \xEAtre supprim\xE9."

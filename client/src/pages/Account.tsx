@@ -777,8 +777,8 @@ export default function Account() {
                 <div className="mt-4 space-y-2.5 text-xs">
                   <div className="flex items-center gap-2 text-[#141E33]">
                     <Mail className="h-4 w-4 text-[#BC3B2C]" />
-                    <a href="mailto:contact@livrespro.tn" className="font-semibold hover:underline">
-                      contact@livrespro.tn
+                    <a href="mailto:contact@liverspro.shop" className="font-semibold hover:underline">
+                      contact@liverspro.shop
                     </a>
                   </div>
                   <div className="flex items-center gap-2 text-[#141E33]">
@@ -891,7 +891,7 @@ export default function Account() {
                   <li>Les factures et bons de livraison existants déjà traités pour les livreurs resteront archivés selon la réglementation fiscale.</li>
                 </ul>
 
-                {user.role === "admin" && user.email.toLowerCase().includes("admin@livrespro.tn") ? (
+                {user.role === "admin" && (user.email.toLowerCase().includes("admin@livrespro.tn") || user.email.toLowerCase().includes("admin@liverspro.shop")) ? (
                   <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900">
                     <p className="font-bold flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />

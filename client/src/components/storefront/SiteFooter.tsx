@@ -49,7 +49,7 @@ export function SiteFooter() {
             className="mt-4 h-20 w-auto max-w-full object-contain object-left"
           />
           <p className="mt-3 text-xs leading-5 text-white/60">
-            LivresPro.tn — L’Atelier des Pages est une marque de la société BUSINESS SUCCESS.
+            Liverspro.shop — L’Atelier des Pages est une marque de la société BUSINESS SUCCESS.
           </p>
         </div>
       </div>

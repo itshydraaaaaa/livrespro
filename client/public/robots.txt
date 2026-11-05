@@ -1,4 +1,4 @@
-# LivresPro.tn Robots configuration
+# Liverspro.shop Robots configuration
 User-agent: *
 Allow: /
 Allow: /librairie
@@ -15,4 +15,4 @@ Disallow: /mon-compte
 Disallow: /login
 
 # Sitemap location
-Sitemap: https://livrespro.vercel.app/sitemap.xml
+Sitemap: https://liverspro.shop/sitemap.xml

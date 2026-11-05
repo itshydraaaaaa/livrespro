@@ -42,7 +42,7 @@ export default function Privacy() {
               Cadre Légal & Responsable du Traitement
             </h2>
             <p>
-              Le présent traitement de données est opéré par <strong>BUSINESS SUCCESS</strong>, société éditrice de <strong>L'Atelier des Pages</strong> et de la plateforme <strong>LivresPro.tn</strong>, domiciliée à Tunis, République Tunisienne.
+              Le présent traitement de données est opéré par <strong>BUSINESS SUCCESS</strong>, société éditrice de <strong>L'Atelier des Pages</strong> et de la plateforme <strong>Liverspro.shop</strong>, domiciliée à Tunis, République Tunisienne.
             </p>
             <p>
               Nos traitements respectent les dispositions de la <strong>Loi organique n° 2004-63 du 27 juillet 2004</strong> portant sur la protection des données à caractère personnel en Tunisie, sous le contrôle de l’Instance Nationale de Protection des Données Personnelles (INPDP).

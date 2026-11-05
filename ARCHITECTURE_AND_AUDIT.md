@@ -3,7 +3,7 @@
 **Date du document :** 27 Septembre 2026  
 **Auteurs :** Équipe d'Ingénierie & Architecture Full-Stack  
 **Version du Document :** 2.0 (Prêt pour la Production)  
-**URL de Production :** `https://livrespro.vercel.app/`  
+**URL de Production :** `https://liverspro.shop/`  
 **Dépôt Source :** `https://github.com/itshydraaaaaa/livrespro.git`
 
 ---
