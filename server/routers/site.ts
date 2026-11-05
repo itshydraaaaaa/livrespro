@@ -98,7 +98,7 @@ export const siteRouter = router({
         orderPayload = {
           customer_first_name: input.customerFirstName,
           customer_last_name: input.customerLastName,
-          customer_email: input.customerEmail,
+          customer_email: input.customerEmail.trim().toLowerCase(),
           customer_phone: input.customerPhone,
           delivery_address: input.deliveryAddress,
           city: input.city ?? null,
@@ -130,7 +130,7 @@ export const siteRouter = router({
         orderPayload = {
           customer_first_name: input.firstName,
           customer_last_name: input.lastName,
-          customer_email: input.email,
+          customer_email: input.email.trim().toLowerCase(),
           customer_phone: input.phone,
           delivery_address: input.deliveryAddress,
           is_educator: input.educator ? 1 : 0,
@@ -180,15 +180,46 @@ export const siteRouter = router({
       const fallbackOrderNumber = `LP-${new Date().getFullYear()}-${randomSuffix}`;
       const finalOrderNumber = createdOrder?.orderNumber ?? fallbackOrderNumber;
 
-      // Persist to Supabase if configured
+      // Persist to Supabase (primary store)
+      let supabaseOrder: any = null;
       if (orderPayload) {
         orderPayload.order_number = finalOrderNumber;
-        await persistOrderToSupabase(orderPayload, orderItems).catch(() => null);
+        supabaseOrder = await persistOrderToSupabase(orderPayload, orderItems).catch(() => null);
+      }
+
+      const realOrderId = supabaseOrder?.id ?? createdOrder?.orderId ?? 9999;
+      const realOrderNumber = supabaseOrder?.order_number ?? finalOrderNumber;
+
+      // Send order confirmation email (non-blocking)
+      try {
+        const { sendOrderConfirmationEmail } = await import("../services/email");
+        await sendOrderConfirmationEmail(
+          {
+            orderNumber: realOrderNumber,
+            orderId: realOrderId,
+            customerFirstName: orderPayload?.customer_first_name ?? "",
+            customerLastName: orderPayload?.customer_last_name ?? "",
+            customerEmail: orderPayload?.customer_email ?? "",
+            customerPhone: orderPayload?.customer_phone ?? "",
+            deliveryAddress: orderPayload?.delivery_address ?? "",
+            city: orderPayload?.city ?? null,
+            governorate: orderPayload?.governorate ?? null,
+            subtotal: orderPayload?.subtotal ?? "0.00",
+            shippingCost: orderPayload?.shipping_cost ?? "7.00",
+            totalAmount: orderPayload?.total_amount ?? "0.00",
+            currency: orderPayload?.currency ?? "TND",
+            paymentMethod: orderPayload?.payment_method ?? "cash_on_delivery",
+            orderDate: new Date().toISOString(),
+          },
+          orderItems
+        ).catch(() => null);
+      } catch {
+        // Email service unavailable — order still confirmed
       }
 
       return {
-        orderId: createdOrder?.orderId ?? 9999,
-        orderNumber: finalOrderNumber,
+        orderId: realOrderId,
+        orderNumber: realOrderNumber,
       };
     }),
     myOrders: publicProcedure.query(async ({ ctx }) => {

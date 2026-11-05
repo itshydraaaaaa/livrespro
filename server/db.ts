@@ -1,4 +1,4 @@
-/**
+﻿/**
  * LivresPro.tn — Database Adapter Layer (Supabase Cloud)
  *
  * All data operations go directly to Supabase PostgreSQL.
@@ -293,7 +293,7 @@ export async function listOrdersByCustomerEmail(email: string): Promise<any[]> {
     const { data } = await sb()
       .from("orders")
       .select("*, order_items(*)")
-      .eq("customer_email", email.toLowerCase().trim())
+      .ilike("customer_email", email.trim())
       .order("created_at", { ascending: false });
     return (data ?? []).map(mapOrder).filter(Boolean);
   } catch {

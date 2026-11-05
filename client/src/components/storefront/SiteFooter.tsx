@@ -18,7 +18,7 @@ export function SiteFooter() {
 
         <div>
           <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#BC3B2C]">
-            Navigation & Rayons
+            Navigation &amp; Rayons
           </p>
           <div className="mt-4 space-y-3 text-sm text-white/70">
             <Link href="/librairie" className="block transition-colors hover:text-white">
@@ -31,15 +31,16 @@ export function SiteFooter() {
               Études de cas réels
             </a>
             <a href="/#educator" className="block transition-colors hover:text-white">
-              Offre Enseignants & Formateurs
+              Offre Enseignants &amp; Formateurs
             </a>
             <Link href="/mon-compte" className="block transition-colors hover:text-white">
-              Espace Lecteur & Commandes
+              Espace Lecteur &amp; Commandes
             </Link>
           </div>
         </div>
 
-        <div>
+        {/* Logo band — light background for visibility */}
+        <div className="rounded-2xl bg-[#F6F1E7] p-5">
           <p className="text-[10px] font-extrabold uppercase tracking-[.18em] text-[#BC3B2C]">
             Une marque de
           </p>
@@ -48,15 +49,15 @@ export function SiteFooter() {
             alt="BUSINESS SUCCESS"
             className="mt-4 h-20 w-auto max-w-full object-contain object-left"
           />
-          <p className="mt-3 text-xs leading-5 text-white/60">
-            Liverspro.shop — L’Atelier des Pages est une marque de la société BUSINESS SUCCESS.
+          <p className="mt-3 text-xs leading-5 text-[#5C574C]">
+            Liverspro.shop — L'Atelier des Pages est une marque de la société BUSINESS SUCCESS.
           </p>
         </div>
       </div>
 
       <div className="container flex flex-col items-center justify-between gap-4 border-t border-white/10 py-5 text-[10px] font-bold uppercase tracking-[.14em] text-white/40 sm:flex-row">
         <div className="flex flex-wrap items-center gap-3">
-          <span>© 2026 L’Atelier des Pages · Tous droits réservés.</span>
+          <span>© 2026 L'Atelier des Pages · Tous droits réservés.</span>
           <span>·</span>
           <span className="flex items-center gap-1.5 text-white/60">
             <span>🇹🇳</span>
@@ -65,7 +66,7 @@ export function SiteFooter() {
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <Link href="/terms" className="transition-colors hover:text-white">
-            CGV & Mentions Légales
+            CGV &amp; Mentions Légales
           </Link>
           <span>·</span>
           <Link href="/privacy" className="transition-colors hover:text-white">

@@ -13,6 +13,7 @@ import {
   Eye,
   AlertTriangle,
   RotateCcw,
+  RotateCw,
   Sparkles,
   CheckCircle2,
 } from "lucide-react";
@@ -650,6 +651,7 @@ export function ProtectedBookTableOfContents({
   const [pdfLoading, setPdfLoading] = useState<boolean>(false);
   const [totalPdfPages, setTotalPdfPages] = useState<number>(21);
   const [zoom, setZoom] = useState<number>(1);
+  const [rotation, setRotation] = useState<number>(0); // 0, 90, 180, 270
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const [isWindowBlurred, setIsWindowBlurred] = useState<boolean>(false);
 
@@ -773,9 +775,20 @@ export function ProtectedBookTableOfContents({
     const baseHeight = 1130;
     const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
 
-    canvas.width = baseWidth * dpr;
-    canvas.height = baseHeight * dpr;
+    // Apply rotation â€” swap canvas dimensions for 90/270 deg
+    const isRotated90or270 = rotation === 90 || rotation === 270;
+    canvas.width = isRotated90or270 ? baseHeight * dpr : baseWidth * dpr;
+    canvas.height = isRotated90or270 ? baseWidth * dpr : baseHeight * dpr;
     ctx.scale(dpr, dpr);
+
+    // Apply rotation transform around the canvas center
+    if (rotation !== 0) {
+      const cx = isRotated90or270 ? baseHeight / 2 : baseWidth / 2;
+      const cy = isRotated90or270 ? baseWidth / 2 : baseHeight / 2;
+      ctx.translate(cx, cy);
+      ctx.rotate((rotation * Math.PI) / 180);
+      ctx.translate(-baseWidth / 2, -baseHeight / 2);
+    }
 
     // 1. Page Background (Cream book paper)
     ctx.fillStyle = "#FCFAF6";
@@ -818,6 +831,33 @@ export function ProtectedBookTableOfContents({
     const leftMargin = 60;
     const contentWidth = baseWidth - 120;
 
+    // Helper: wraps text and returns updated Y position
+    const wrapText = (
+      text: string,
+      x: number,
+      startY: number,
+      font: string,
+      lineH: number,
+      maxWidth: number
+    ): number => {
+      ctx.font = font;
+      const words = text.split(" ");
+      let line = "";
+      let y = startY;
+      for (let n = 0; n < words.length; n++) {
+        const testLine = line + words[n] + " ";
+        if (ctx.measureText(testLine).width > maxWidth && n > 0) {
+          ctx.fillText(line.trimEnd(), x, y);
+          line = words[n] + " ";
+          y += lineH;
+        } else {
+          line = testLine;
+        }
+      }
+      if (line.trim()) ctx.fillText(line.trimEnd(), x, y);
+      return y + lineH;
+    };
+
     pageData.lines.forEach((line) => {
       if (!line.text) {
         currentY += lineHeight * 0.7;
@@ -827,36 +867,29 @@ export function ProtectedBookTableOfContents({
       ctx.fillStyle = line.color || "#141E33";
       ctx.textAlign = line.style === "center" ? "center" : "left";
       const x = line.style === "center" ? baseWidth / 2 : leftMargin + (line.indent || 0);
+      const availableWidth = contentWidth - (line.indent || 0);
 
       switch (line.style) {
         case "title":
-          ctx.font = "bold 32px 'DM Serif Display', Georgia, serif";
           currentY += 12;
-          ctx.fillText(line.text, x, currentY);
-          currentY += 24;
+          currentY = wrapText(line.text, x, currentY, "bold 32px 'DM Serif Display', Georgia, serif", 36, availableWidth);
+          currentY += 12;
           break;
         case "subtitle":
-          ctx.font = "bold 20px 'DM Serif Display', Georgia, serif";
           currentY += 8;
-          ctx.fillText(line.text, x, currentY);
-          currentY += 16;
+          currentY = wrapText(line.text, x, currentY, "bold 20px 'DM Serif Display', Georgia, serif", 28, availableWidth);
+          currentY += 8;
           break;
         case "bold":
-          ctx.font = "bold 15px 'Plus Jakarta Sans', system-ui, sans-serif";
-          ctx.fillText(line.text, x, currentY);
-          currentY += lineHeight;
+          currentY = wrapText(line.text, x, currentY, "bold 15px 'Plus Jakarta Sans', system-ui, sans-serif", lineHeight, availableWidth);
           break;
         case "bullet":
-          ctx.font = "14px 'Plus Jakarta Sans', system-ui, sans-serif";
-          ctx.fillText(line.text, x, currentY);
-          currentY += lineHeight;
+          currentY = wrapText(line.text, x, currentY, "14px 'Plus Jakarta Sans', system-ui, sans-serif", lineHeight, availableWidth);
           break;
         case "meta":
-          ctx.font = "12px 'Plus Jakarta Sans', system-ui, sans-serif";
-          ctx.fillText(line.text, x, currentY);
-          currentY += lineHeight * 0.85;
+          currentY = wrapText(line.text, x, currentY, "12px 'Plus Jakarta Sans', system-ui, sans-serif", Math.round(lineHeight * 0.85), availableWidth);
           break;
-        default:
+        default: {
           // Body text with word wrap
           ctx.font = "14px 'Plus Jakarta Sans', system-ui, sans-serif";
           const words = line.text.split(" ");
@@ -864,7 +897,7 @@ export function ProtectedBookTableOfContents({
           for (let n = 0; n < words.length; n++) {
             const testLine = currentLine + words[n] + " ";
             const metrics = ctx.measureText(testLine);
-            if (metrics.width > contentWidth && n > 0) {
+            if (metrics.width > availableWidth && n > 0) {
               ctx.fillText(currentLine, x, currentY);
               currentLine = words[n] + " ";
               currentY += lineHeight;
@@ -875,6 +908,7 @@ export function ProtectedBookTableOfContents({
           ctx.fillText(currentLine, x, currentY);
           currentY += lineHeight;
           break;
+        }
       }
     });
 
@@ -885,9 +919,9 @@ export function ProtectedBookTableOfContents({
     ctx.font = "bold 22px 'Plus Jakarta Sans', sans-serif";
     ctx.fillStyle = "rgba(188, 59, 44, 0.05)";
     ctx.textAlign = "center";
-    ctx.fillText("LIVRESPRO.TN · LECTURE SÉCURISÉE · REPRODUCTION INTERDITE", 0, -120);
-    ctx.fillText("© 2026 GLOBAL MARKETING NEXUS · KOTLER · PFOERTSCH · KALLEL", 0, 0);
-    ctx.fillText("DOCUMENT PROTÉGÉ CONTRE LA COPIE ET LE TÉLÉCHARGEMENT", 0, 120);
+    ctx.fillText("LIVRESPRO.TN Â· LECTURE SÃ‰CURISÃ‰E Â· REPRODUCTION INTERDITE", 0, -120);
+    ctx.fillText("Â© 2026 GLOBAL MARKETING NEXUS Â· KOTLER Â· PFOERTSCH Â· KALLEL", 0, 0);
+    ctx.fillText("DOCUMENT PROTÃ‰GÃ‰ CONTRE LA COPIE ET LE TÃ‰LÃ‰CHARGEMENT", 0, 120);
     ctx.restore();
 
     // 5. Running Footer
@@ -895,11 +929,11 @@ export function ProtectedBookTableOfContents({
     ctx.fillStyle = "#A89F91";
     ctx.textAlign = "center";
     ctx.fillText(
-      `LivresPro.tn · Aperçu sous licence exclusive de l’édition tunisienne — Page ${currentPage} / 21`,
+      `LivresPro.tn Â· AperÃ§u sous licence exclusive de l'Ã©dition tunisienne â€” Page ${currentPage} / 21`,
       baseWidth / 2,
       baseHeight - 35
     );
-  }, [currentPage]);
+  }, [currentPage, rotation]);
 
   // Canvas PDF drawing routine for uploaded PDF tables of contents (>250 books)
   const renderPdfPage = useCallback(async () => {
@@ -912,7 +946,7 @@ export function ProtectedBookTableOfContents({
     try {
       const page = await pdfDoc.getPage(currentPage);
       const dpr = typeof window !== "undefined" ? Math.min(window.devicePixelRatio || 1, 2) : 1;
-      const viewport = page.getViewport({ scale: dpr * zoom * 1.35 });
+      const viewport = page.getViewport({ scale: dpr * zoom * 1.35, rotation: rotation });
 
       canvas.width = viewport.width;
       canvas.height = viewport.height;
@@ -949,7 +983,7 @@ export function ProtectedBookTableOfContents({
     } catch (err) {
       console.error("Erreur de rendu canvas PDF:", err);
     }
-  }, [pdfDoc, currentPage, zoom, bookTitle, totalPdfPages]);
+  }, [pdfDoc, currentPage, zoom, rotation, bookTitle, totalPdfPages]);
 
   useEffect(() => {
     if (pdfDoc) {
@@ -957,7 +991,7 @@ export function ProtectedBookTableOfContents({
     } else {
       renderCanvasPage();
     }
-  }, [pdfDoc, renderPdfPage, renderCanvasPage, zoom]);
+  }, [pdfDoc, renderPdfPage, renderCanvasPage, zoom, rotation]);
 
   const maxPages = pdfDoc ? totalPdfPages : 21;
 
@@ -1204,44 +1238,86 @@ export function ProtectedBookTableOfContents({
                 className="block max-w-full h-auto rounded-lg bg-white select-none pointer-events-none"
                 style={{
                   width: "100%",
-                  maxWidth: "680px",
-                  aspectRatio: "800 / 1130",
+                  maxWidth: rotation === 90 || rotation === 270 ? "820px" : "680px",
+                  aspectRatio: rotation === 90 || rotation === 270 ? "1130 / 800" : "800 / 1130",
                 }}
               />
             </div>
-          </div>
 
-          {/* Bottom Zoom & Protection Notice */}
-          <div className="mt-4 flex w-full flex-wrap items-center justify-between gap-3 text-xs text-[#5C574C]">
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setZoom((z) => Math.max(0.8, z - 0.1))}
-                className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-white px-3 py-1.5 font-semibold text-[#141E33] hover:bg-[#F6F1E7]"
-              >
-                <ZoomOut className="h-3.5 w-3.5" /> Réduire
-              </button>
-              <span className="font-bold text-[#141E33]">{Math.round(zoom * 100)}%</span>
-              <button
-                type="button"
-                onClick={() => setZoom((z) => Math.min(1.4, z + 0.1))}
-                className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-white px-3 py-1.5 font-semibold text-[#141E33] hover:bg-[#F6F1E7]"
-              >
-                <ZoomIn className="h-3.5 w-3.5" /> Agrandir
-              </button>
-              <button
-                type="button"
-                onClick={() => setZoom(1)}
-                className="rounded-lg border border-[#141E33]/10 bg-white px-3 py-1.5 font-semibold text-[#141E33] hover:bg-[#F6F1E7]"
-                title="Taille normale"
-              >
-                <RotateCcw className="h-3 w-3" />
-              </button>
-            </div>
+            {/* In-Viewer Navigation & Controls Bar (Zoom, Rotation, Reset) */}
+            <div className="relative z-30 mt-4 flex w-full max-w-2xl flex-wrap items-center justify-between gap-2.5 rounded-2xl border border-[#141E33]/15 bg-white/95 px-4 py-2.5 text-xs shadow-lg backdrop-blur-md">
+              {/* Zoom Controls */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setZoom((z) => Math.max(0.8, Math.round((z - 0.1) * 10) / 10))}
+                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
+                  title="Réduire le zoom"
+                >
+                  <ZoomOut className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Réduire</span>
+                </button>
+                <span className="min-w-[44px] text-center font-bold text-[#141E33]">
+                  {Math.round(zoom * 100)}%
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setZoom((z) => Math.min(1.4, Math.round((z + 0.1) * 10) / 10))}
+                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
+                  title="Agrandir le zoom"
+                >
+                  <ZoomIn className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">Agrandir</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setZoom(1);
+                    setRotation(0);
+                  }}
+                  className="rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
+                  title="Réinitialiser (Zoom 100% · 0°)"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </button>
+              </div>
 
-            <div className="flex items-center gap-2 font-medium">
-              <ShieldCheck className="h-4 w-4 text-[#BC3B2C]" />
-              <span>Lecture in-situ protégée · Reproduction et capture interdites</span>
+              {/* Rotation Controls */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C] hidden sm:inline">
+                  Rotation :
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setRotation((r) => (r + 270) % 360)}
+                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
+                  title="Pivoter de 90° vers la gauche"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">−90°</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRotation((r) => (r + 90) % 360)}
+                  className="flex items-center gap-1 rounded-lg border border-[#141E33]/10 bg-[#F6F1E7] px-2.5 py-1.5 font-semibold text-[#141E33] hover:bg-[#E9DFCF] transition-colors"
+                  title="Pivoter de 90° vers la droite"
+                >
+                  <RotateCw className="h-3.5 w-3.5" />
+                  <span className="hidden sm:inline">+90°</span>
+                </button>
+                {rotation !== 0 && (
+                  <span className="rounded-full bg-[#BC3B2C]/10 px-2 py-0.5 text-[10px] font-extrabold text-[#BC3B2C]">
+                    {rotation}°
+                  </span>
+                )}
+              </div>
+
+              {/* Protection watermark pill */}
+              <div className="flex items-center gap-1.5 text-[11px] font-medium text-[#5C574C]">
+                <ShieldCheck className="h-3.5 w-3.5 text-[#BC3B2C]" />
+                <span className="hidden md:inline">Lecture sécurisée protégée</span>
+                <span className="inline md:hidden">Protégé</span>
+              </div>
             </div>
           </div>
         </div>

@@ -122,7 +122,7 @@ export default function Admin({ tab }: { tab: AdminTab }) {
           <div className="mt-6 flex flex-col gap-3">
             <Button
               type="button"
-              onClick={() => setLocation("/login?redirect=/admin")}
+              onClick={() => setLocation("/admin/login")}
               className="btn-terracotta h-12 w-full rounded-xl text-xs font-bold uppercase tracking-wider text-white shadow-md"
             >
               Se connecter à mon compte

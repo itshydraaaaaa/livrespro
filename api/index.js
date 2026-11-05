@@ -1,3 +1,255 @@
+var __defProp = Object.defineProperty;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __esm = (fn, res) => function __init() {
+  return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+};
+var __export = (target, all) => {
+  for (var name in all)
+    __defProp(target, name, { get: all[name], enumerable: true });
+};
+
+// server/services/email.ts
+var email_exports = {};
+__export(email_exports, {
+  sendOrderConfirmationEmail: () => sendOrderConfirmationEmail
+});
+function formatDate(isoDate) {
+  try {
+    return new Intl.DateTimeFormat("fr-TN", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
+      timeZone: "Africa/Tunis"
+    }).format(new Date(isoDate));
+  } catch {
+    return isoDate;
+  }
+}
+function formatPaymentMethod(method) {
+  if (method === "cash_on_delivery") return "Paiement \xE0 la r\xE9ception (Cash on Delivery)";
+  return method;
+}
+function buildEmailHtml(data, items) {
+  const itemRows = items.map(
+    (it) => `
+      <tr>
+        <td style="padding:10px 12px;border-bottom:1px solid #e8e3d9;font-size:13px;color:#141E33;">${it.product_title}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e8e3d9;font-size:13px;color:#5C574C;text-align:center;">${it.format}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e8e3d9;font-size:13px;text-align:center;color:#141E33;">${it.quantity}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e8e3d9;font-size:13px;text-align:right;color:#141E33;">${it.unit_price} ${data.currency}</td>
+        <td style="padding:10px 12px;border-bottom:1px solid #e8e3d9;font-size:13px;text-align:right;font-weight:600;color:#141E33;">${it.subtotal} ${data.currency}</td>
+      </tr>`
+  ).join("");
+  const locationLine = [data.city, data.governorate].filter(Boolean).join(", ");
+  return `<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Confirmation de commande ${data.orderNumber}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#F6F1E7;font-family:'Helvetica Neue',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F6F1E7;padding:32px 0;">
+    <tr>
+      <td align="center">
+        <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(20,30,51,0.10);">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:#141E33;padding:28px 36px;text-align:center;">
+              <p style="margin:0 0 4px 0;color:#BC3B2C;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;">L'Atelier des Pages \xB7 Liverspro.shop</p>
+              <h1 style="margin:0;color:#F6F1E7;font-size:22px;font-weight:700;">Commande Confirm\xE9e \u2713</h1>
+            </td>
+          </tr>
+
+          <!-- Order Reference Banner -->
+          <tr>
+            <td style="background:#BC3B2C;padding:14px 36px;text-align:center;">
+              <p style="margin:0;color:#ffffff;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;">R\xE9f\xE9rence de commande</p>
+              <p style="margin:4px 0 0;color:#ffffff;font-size:22px;font-weight:800;letter-spacing:0.08em;">${data.orderNumber}</p>
+            </td>
+          </tr>
+
+          <!-- Greeting -->
+          <tr>
+            <td style="padding:28px 36px 0;">
+              <p style="margin:0;font-size:15px;color:#141E33;line-height:1.6;">
+                Bonjour <strong>${data.customerFirstName} ${data.customerLastName}</strong>,
+              </p>
+              <p style="margin:12px 0 0;font-size:14px;color:#5C574C;line-height:1.6;">
+                Nous avons bien re\xE7u votre commande et elle est en cours de traitement. Vous recevrez une confirmation d\xE8s l'exp\xE9dition de votre colis.
+              </p>
+            </td>
+          </tr>
+
+          <!-- Order Info -->
+          <tr>
+            <td style="padding:20px 36px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#F6F1E7;border-radius:10px;padding:16px;">
+                <tr>
+                  <td style="font-size:12px;color:#5C574C;padding:4px 0;">
+                    <strong style="color:#141E33;">Date de commande :</strong>&nbsp;${formatDate(data.orderDate)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;color:#5C574C;padding:4px 0;">
+                    <strong style="color:#141E33;">Mode de paiement :</strong>&nbsp;${formatPaymentMethod(data.paymentMethod)}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;color:#5C574C;padding:4px 0;">
+                    <strong style="color:#141E33;">T\xE9l\xE9phone :</strong>&nbsp;${data.customerPhone}
+                  </td>
+                </tr>
+                <tr>
+                  <td style="font-size:12px;color:#5C574C;padding:4px 0;">
+                    <strong style="color:#141E33;">Adresse de livraison :</strong>&nbsp;${data.deliveryAddress}${locationLine ? ` \u2014 ${locationLine}` : ""}
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Items Table -->
+          <tr>
+            <td style="padding:0 36px 20px;">
+              <p style="margin:0 0 10px;font-size:13px;font-weight:800;color:#141E33;text-transform:uppercase;letter-spacing:0.12em;">D\xE9tail de la commande</p>
+              <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #e8e3d9;border-radius:8px;overflow:hidden;">
+                <thead>
+                  <tr style="background:#F6F1E7;">
+                    <th style="padding:10px 12px;text-align:left;font-size:11px;color:#5C574C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Ouvrage</th>
+                    <th style="padding:10px 12px;text-align:center;font-size:11px;color:#5C574C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Format</th>
+                    <th style="padding:10px 12px;text-align:center;font-size:11px;color:#5C574C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Qt\xE9</th>
+                    <th style="padding:10px 12px;text-align:right;font-size:11px;color:#5C574C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">P.U.</th>
+                    <th style="padding:10px 12px;text-align:right;font-size:11px;color:#5C574C;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;">Sous-total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${itemRows}
+                </tbody>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Totals -->
+          <tr>
+            <td style="padding:0 36px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="font-size:13px;color:#5C574C;padding:4px 0;">Sous-total produits</td>
+                  <td style="font-size:13px;color:#141E33;text-align:right;padding:4px 0;">${data.subtotal} ${data.currency}</td>
+                </tr>
+                <tr>
+                  <td style="font-size:13px;color:#5C574C;padding:4px 0;">Frais de livraison</td>
+                  <td style="font-size:13px;color:#141E33;text-align:right;padding:4px 0;">${data.shippingCost} ${data.currency}</td>
+                </tr>
+                <tr>
+                  <td style="border-top:2px solid #141E33;font-size:15px;font-weight:800;color:#141E33;padding:10px 0 4px;">TOTAL \xC0 PAYER</td>
+                  <td style="border-top:2px solid #141E33;font-size:15px;font-weight:800;color:#BC3B2C;text-align:right;padding:10px 0 4px;">${data.totalAmount} ${data.currency}</td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Next Steps -->
+          <tr>
+            <td style="padding:0 36px 24px;">
+              <table width="100%" cellpadding="0" cellspacing="0" style="background:#E8F5E9;border-left:4px solid #2E7D32;border-radius:0 8px 8px 0;padding:14px 16px;">
+                <tr>
+                  <td>
+                    <p style="margin:0 0 6px;font-size:13px;font-weight:700;color:#1B5E20;">Prochaines \xE9tapes</p>
+                    <ul style="margin:0;padding-left:18px;font-size:12px;color:#2E7D32;line-height:1.8;">
+                      <li>Notre \xE9quipe pr\xE9pare votre commande sous 24 \xE0 48 h.</li>
+                      <li>Livraison Cash on Delivery (COD) partout en Tunisie.</li>
+                      <li>Le paiement est effectu\xE9 \xE0 la r\xE9ception du colis.</li>
+                      <li>Pour toute question : <a href="mailto:contact@liverspro.shop" style="color:#2E7D32;">contact@liverspro.shop</a></li>
+                    </ul>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#F6F1E7;padding:20px 36px;text-align:center;border-top:1px solid #e8e3d9;">
+              <p style="margin:0;font-size:11px;color:#8C827A;">
+                \xA9 2026 L'Atelier des Pages \xB7 Liverspro.shop \xB7 Une marque de BUSINESS SUCCESS<br/>
+                R\xE9f\xE9rence commande : <strong>${data.orderNumber}</strong>
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
+}
+function buildEmailText(data, items) {
+  const itemLines = items.map((it) => `  - ${it.product_title} (${it.format}) \xD7 ${it.quantity} \u2192 ${it.subtotal} ${data.currency}`).join("\n");
+  return `CONFIRMATION DE COMMANDE \u2014 ${data.orderNumber}
+L'Atelier des Pages \xB7 Liverspro.shop
+
+Bonjour ${data.customerFirstName} ${data.customerLastName},
+
+Votre commande a bien \xE9t\xE9 enregistr\xE9e.
+
+R\xC9CAPITULATIF
+R\xE9f\xE9rence : ${data.orderNumber}
+Date : ${formatDate(data.orderDate)}
+Paiement : ${formatPaymentMethod(data.paymentMethod)}
+T\xE9l\xE9phone : ${data.customerPhone}
+Adresse : ${data.deliveryAddress}${data.city ? `, ${data.city}` : ""}${data.governorate ? `, ${data.governorate}` : ""}
+
+ARTICLES COMMAND\xC9S
+${itemLines}
+
+Sous-total : ${data.subtotal} ${data.currency}
+Livraison  : ${data.shippingCost} ${data.currency}
+TOTAL      : ${data.totalAmount} ${data.currency}
+
+PROCHAINES \xC9TAPES
+- Pr\xE9paration sous 24-48 h
+- Livraison COD sur toute la Tunisie
+- Paiement \xE0 la r\xE9ception du colis
+- Contact : contact@liverspro.shop
+
+\xA9 2026 L'Atelier des Pages \xB7 Liverspro.shop`;
+}
+async function sendOrderConfirmationEmail(data, items) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey || !data.customerEmail) return;
+  const fromAddress = process.env.RESEND_FROM_EMAIL || "L'Atelier des Pages <noreply@liverspro.shop>";
+  const payload = {
+    from: fromAddress,
+    to: [data.customerEmail],
+    subject: `\u2705 Commande ${data.orderNumber} confirm\xE9e \u2014 L'Atelier des Pages`,
+    html: buildEmailHtml(data, items),
+    text: buildEmailText(data, items)
+  };
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    console.warn(`[Email] Resend API error ${res.status}: ${body}`);
+  } else {
+    console.log(`[Email] Confirmation sent to ${data.customerEmail} for order ${data.orderNumber}`);
+  }
+}
+var init_email = __esm({
+  "server/services/email.ts"() {
+    "use strict";
+  }
+});
+
 // server/app.ts
 import express from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
@@ -311,7 +563,7 @@ async function deleteUserAccount(userId, email) {
 }
 async function listOrdersByCustomerEmail(email) {
   try {
-    const { data } = await sb().from("orders").select("*, order_items(*)").eq("customer_email", email.toLowerCase().trim()).order("created_at", { ascending: false });
+    const { data } = await sb().from("orders").select("*, order_items(*)").ilike("customer_email", email.trim()).order("created_at", { ascending: false });
     return (data ?? []).map(mapOrder).filter(Boolean);
   } catch {
     return [];
@@ -1611,7 +1863,7 @@ var siteRouter = router({
         orderPayload = {
           customer_first_name: input.customerFirstName,
           customer_last_name: input.customerLastName,
-          customer_email: input.customerEmail,
+          customer_email: input.customerEmail.trim().toLowerCase(),
           customer_phone: input.customerPhone,
           delivery_address: input.deliveryAddress,
           city: input.city ?? null,
@@ -1641,7 +1893,7 @@ var siteRouter = router({
         orderPayload = {
           customer_first_name: input.firstName,
           customer_last_name: input.lastName,
-          customer_email: input.email,
+          customer_email: input.email.trim().toLowerCase(),
           customer_phone: input.phone,
           delivery_address: input.deliveryAddress,
           is_educator: input.educator ? 1 : 0,
@@ -1688,13 +1940,40 @@ var siteRouter = router({
       const randomSuffix = Math.floor(1e3 + Math.random() * 9e3);
       const fallbackOrderNumber = `LP-${(/* @__PURE__ */ new Date()).getFullYear()}-${randomSuffix}`;
       const finalOrderNumber = createdOrder?.orderNumber ?? fallbackOrderNumber;
+      let supabaseOrder = null;
       if (orderPayload) {
         orderPayload.order_number = finalOrderNumber;
-        await persistOrderToSupabase(orderPayload, orderItems).catch(() => null);
+        supabaseOrder = await persistOrderToSupabase(orderPayload, orderItems).catch(() => null);
+      }
+      const realOrderId = supabaseOrder?.id ?? createdOrder?.orderId ?? 9999;
+      const realOrderNumber = supabaseOrder?.order_number ?? finalOrderNumber;
+      try {
+        const { sendOrderConfirmationEmail: sendOrderConfirmationEmail2 } = await Promise.resolve().then(() => (init_email(), email_exports));
+        await sendOrderConfirmationEmail2(
+          {
+            orderNumber: realOrderNumber,
+            orderId: realOrderId,
+            customerFirstName: orderPayload?.customer_first_name ?? "",
+            customerLastName: orderPayload?.customer_last_name ?? "",
+            customerEmail: orderPayload?.customer_email ?? "",
+            customerPhone: orderPayload?.customer_phone ?? "",
+            deliveryAddress: orderPayload?.delivery_address ?? "",
+            city: orderPayload?.city ?? null,
+            governorate: orderPayload?.governorate ?? null,
+            subtotal: orderPayload?.subtotal ?? "0.00",
+            shippingCost: orderPayload?.shipping_cost ?? "7.00",
+            totalAmount: orderPayload?.total_amount ?? "0.00",
+            currency: orderPayload?.currency ?? "TND",
+            paymentMethod: orderPayload?.payment_method ?? "cash_on_delivery",
+            orderDate: (/* @__PURE__ */ new Date()).toISOString()
+          },
+          orderItems
+        ).catch(() => null);
+      } catch {
       }
       return {
-        orderId: createdOrder?.orderId ?? 9999,
-        orderNumber: finalOrderNumber
+        orderId: realOrderId,
+        orderNumber: realOrderNumber
       };
     }),
     myOrders: publicProcedure.query(async ({ ctx }) => {

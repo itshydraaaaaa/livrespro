@@ -4,6 +4,7 @@ import { AnalyticsManager } from "@/components/AnalyticsManager";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Admin from "@/pages/Admin";
+import AdminLogin from "@/pages/AdminLogin";
 import Login from "@/pages/Login";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
@@ -38,6 +39,7 @@ function Router() {
       <Route path="/livres/:handle" component={ProductDetail} />
       
       {/* Admin routes */}
+      <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin" component={() => <Admin tab="overview" />} />
       <Route path="/admin/produits" component={() => <Admin tab="products" />} />
       <Route path="/admin/categories" component={() => <Admin tab="categories" />} />

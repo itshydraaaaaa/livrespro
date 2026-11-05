@@ -209,7 +209,7 @@ export default function Login() {
                   <Input
                     type="email"
                     required
-                    placeholder="admin@liverspro.shop"
+                    placeholder="votre.email@exemple.tn"
                     value={loginEmail}
                     onChange={(e) => setLoginEmail(e.target.value)}
                     className="border-[#141E33]/20 bg-[#F6F1E7] pl-9 text-[#141E33] focus:border-[#BC3B2C]"
