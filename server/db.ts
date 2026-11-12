@@ -366,11 +366,18 @@ export async function deleteAuthor(id: number): Promise<void> {
 
 export async function listProducts(options?: any): Promise<FullProduct[]> {
   try {
-    const { data } = await sb()
+    let query = sb()
       .from("products")
-      .select("*, categories(*), product_images(*)")
-      .eq("status", "published")
+      .select("*, categories(*), product_images(*), product_authors(*, authors(*))")
       .order("featured", { ascending: false });
+
+    if (options?.status && options.status !== "all") {
+      query = query.eq("status", options.status);
+    } else if (!options || options.status === undefined) {
+      query = query.eq("status", "published");
+    }
+
+    const { data } = await query;
     return (data ?? []).map(normalizeSupabaseProduct);
   } catch {
     return [];
@@ -381,7 +388,7 @@ export async function getProductBySlug(slug: string): Promise<FullProduct | null
   try {
     const { data } = await sb()
       .from("products")
-      .select("*, categories(*), product_images(*)")
+      .select("*, categories(*), product_images(*), product_authors(*, authors(*))")
       .eq("slug", slug)
       .maybeSingle();
     if (!data) return null;
@@ -717,6 +724,12 @@ export async function saveContentSection(input: ContentSectionInput): Promise<nu
   if (input.id) {
     await sb().from("content_sections").update(row).eq("id", input.id);
     return input.id;
+  }
+  // Check if a section with this unique key already exists
+  const { data: existing } = await sb().from("content_sections").select("id").eq("key", input.key).maybeSingle();
+  if (existing) {
+    await sb().from("content_sections").update(row).eq("id", existing.id);
+    return existing.id;
   }
   const { data, error } = await sb().from("content_sections").insert([row]).select("id").single();
   if (error) throw new Error(error.message);

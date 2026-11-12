@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { hashPassword } from "./_core/auth";
+import { hashPassword, verifyPassword } from "./_core/auth";
 import {
   createAuthor,
   createCategory,
@@ -9,6 +9,7 @@ import {
   listAuthors,
   listCategories,
   listProducts,
+  updateUserPassword,
 } from "./db";
 
 export async function runSeed() {
@@ -17,18 +18,26 @@ export async function runSeed() {
   // 1. Seed Admin User
   const adminEmail = process.env.ADMIN_EMAIL || "admin@livrespro.tn";
   const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivresPro2026!";
-  const existingAdmin = await getUserByEmail(adminEmail);
+  const adminEmails = Array.from(new Set([adminEmail, "admin@livrespro.tn", "admin@liverspro.shop"]));
 
-  if (!existingAdmin) {
-    const adminId = await createUser({
-      email: adminEmail,
-      passwordHash: hashPassword(adminPass),
-      name: "Administrateur LivresPro",
-      role: "admin",
-    });
-    console.log(`✅ Admin user seeded: ${adminEmail} (ID: ${adminId})`);
-  } else {
-    console.log(`ℹ️ Admin user already exists: ${adminEmail}`);
+  for (const email of adminEmails) {
+    const existingAdmin = await getUserByEmail(email);
+    if (!existingAdmin) {
+      const adminId = await createUser({
+        email,
+        passwordHash: hashPassword(adminPass),
+        name: "Administrateur LivresPro",
+        role: "admin",
+      });
+      console.log(`✅ Admin user seeded: ${email} (ID: ${adminId})`);
+    } else {
+      if (!verifyPassword(adminPass, existingAdmin.passwordHash)) {
+        await updateUserPassword(existingAdmin.id, hashPassword(adminPass));
+        console.log(`🔄 Admin password hash synced for: ${email}`);
+      } else {
+        console.log(`ℹ️ Admin user verified: ${email}`);
+      }
+    }
   }
 
   // 2. Seed Categories

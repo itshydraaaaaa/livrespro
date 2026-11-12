@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -18,13 +18,11 @@ export default function AdminLogin() {
   const [loading, setLoading] = useState(false);
 
   // If already authenticated as admin, redirect to admin dashboard
-  if (isAuthenticated && user) {
-    if (user.role === "admin") {
+  useEffect(() => {
+    if (isAuthenticated && user?.role === "admin") {
       setLocation("/admin");
-    } else {
-      // Non-admin user trying to access admin login — show 403 inline
     }
-  }
+  }, [isAuthenticated, user, setLocation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +95,7 @@ export default function AdminLogin() {
               <Input
                 type="email"
                 required
-                placeholder="admin@liverspro.shop"
+                placeholder="admin@livrespro.tn"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="border-white/10 bg-white/[0.07] pl-9 text-white placeholder:text-white/30 focus:border-[#BC3B2C] focus:ring-0"
