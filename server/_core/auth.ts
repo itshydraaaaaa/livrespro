@@ -88,14 +88,20 @@ export async function verifySessionToken(token: string): Promise<AuthSession | n
 
 /**
  * Attach the HTTP-only session cookie to the response.
+ * When on liverspro.shop or www.liverspro.shop in production, sets domain to .liverspro.shop
+ * so sessions are seamlessly shared across both apex and www domains.
  */
-export function setSessionCookie(res: Response, token: string): void {
+export function setSessionCookie(res: Response, token: string, req?: Request): void {
   const isProd = process.env.NODE_ENV === "production";
+  const host = req?.headers?.host || "";
+  const isLiverspro = host.includes("liverspro.shop");
+
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "strict" : "lax",
+    sameSite: "lax",
     path: "/",
+    domain: isProd && isLiverspro ? ".liverspro.shop" : undefined,
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 }
@@ -103,9 +109,14 @@ export function setSessionCookie(res: Response, token: string): void {
 /**
  * Clear the session cookie from the response.
  */
-export function clearSessionCookie(res: Response): void {
+export function clearSessionCookie(res: Response, req?: Request): void {
+  const isProd = process.env.NODE_ENV === "production";
+  const host = req?.headers?.host || "";
+  const isLiverspro = host.includes("liverspro.shop");
+
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
     path: "/",
+    domain: isProd && isLiverspro ? ".liverspro.shop" : undefined,
   });
 }

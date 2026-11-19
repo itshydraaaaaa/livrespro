@@ -55,7 +55,7 @@ export const appRouter = router({
               role: "admin" as const,
             };
             const token = await createSessionToken(sessionUser);
-            setSessionCookie(ctx.res, token);
+            setSessionCookie(ctx.res, token, ctx.req);
             return { success: true, user: sessionUser };
           }
           throw new TRPCError({
@@ -74,7 +74,7 @@ export const appRouter = router({
               role: "admin" as const,
             };
             const token = await createSessionToken(sessionUser);
-            setSessionCookie(ctx.res, token);
+            setSessionCookie(ctx.res, token, ctx.req);
             return { success: true, user: sessionUser };
           }
 
@@ -108,7 +108,7 @@ export const appRouter = router({
         };
 
         const token = await createSessionToken(sessionUser);
-        setSessionCookie(ctx.res, token);
+        setSessionCookie(ctx.res, token, ctx.req);
         try {
           await updateLastSignedIn(user.id);
         } catch {}
@@ -168,7 +168,7 @@ export const appRouter = router({
         };
 
         const token = await createSessionToken(sessionUser);
-        setSessionCookie(ctx.res, token);
+        setSessionCookie(ctx.res, token, ctx.req);
 
         return {
           success: true,
@@ -220,7 +220,7 @@ export const appRouter = router({
         };
 
         const token = await createSessionToken(updatedUser);
-        setSessionCookie(ctx.res, token);
+        setSessionCookie(ctx.res, token, ctx.req);
 
         return {
           success: true,
@@ -287,7 +287,7 @@ export const appRouter = router({
         }
 
         await deleteUserAccount(ctx.user.id, ctx.user.email);
-        clearSessionCookie(ctx.res);
+        clearSessionCookie(ctx.res, ctx.req);
 
         return {
           success: true,
@@ -296,7 +296,7 @@ export const appRouter = router({
       }),
 
     logout: publicProcedure.mutation(({ ctx }) => {
-      clearSessionCookie(ctx.res);
+      clearSessionCookie(ctx.res, ctx.req);
       return {
         success: true,
       };

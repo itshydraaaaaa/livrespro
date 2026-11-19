@@ -318,21 +318,28 @@ async function verifySessionToken(token) {
     return null;
   }
 }
-function setSessionCookie(res, token) {
+function setSessionCookie(res, token, req) {
   const isProd = process.env.NODE_ENV === "production";
+  const host = req?.headers?.host || "";
+  const isLiverspro = host.includes("liverspro.shop");
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProd,
-    sameSite: isProd ? "strict" : "lax",
+    sameSite: "lax",
     path: "/",
+    domain: isProd && isLiverspro ? ".liverspro.shop" : void 0,
     maxAge: 30 * 24 * 60 * 60 * 1e3
     // 30 days
   });
 }
-function clearSessionCookie(res) {
+function clearSessionCookie(res, req) {
+  const isProd = process.env.NODE_ENV === "production";
+  const host = req?.headers?.host || "";
+  const isLiverspro = host.includes("liverspro.shop");
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
-    path: "/"
+    path: "/",
+    domain: isProd && isLiverspro ? ".liverspro.shop" : void 0
   });
 }
 
@@ -2221,7 +2228,7 @@ var appRouter = router({
             role: "admin"
           };
           const token2 = await createSessionToken(sessionUser2);
-          setSessionCookie(ctx.res, token2);
+          setSessionCookie(ctx.res, token2, ctx.req);
           return { success: true, user: sessionUser2 };
         }
         throw new TRPCError4({
@@ -2238,7 +2245,7 @@ var appRouter = router({
             role: "admin"
           };
           const token2 = await createSessionToken(sessionUser2);
-          setSessionCookie(ctx.res, token2);
+          setSessionCookie(ctx.res, token2, ctx.req);
           return { success: true, user: sessionUser2 };
         }
         throw new TRPCError4({
@@ -2268,7 +2275,7 @@ var appRouter = router({
         role: user.role
       };
       const token = await createSessionToken(sessionUser);
-      setSessionCookie(ctx.res, token);
+      setSessionCookie(ctx.res, token, ctx.req);
       try {
         await updateLastSignedIn(user.id);
       } catch {
@@ -2316,7 +2323,7 @@ var appRouter = router({
         role
       };
       const token = await createSessionToken(sessionUser);
-      setSessionCookie(ctx.res, token);
+      setSessionCookie(ctx.res, token, ctx.req);
       return {
         success: true,
         user: sessionUser
@@ -2361,7 +2368,7 @@ var appRouter = router({
         postalCode: input.postalCode?.trim() ?? ctx.user.postalCode ?? null
       };
       const token = await createSessionToken(updatedUser);
-      setSessionCookie(ctx.res, token);
+      setSessionCookie(ctx.res, token, ctx.req);
       return {
         success: true,
         user: updatedUser
@@ -2412,14 +2419,14 @@ var appRouter = router({
         });
       }
       await deleteUserAccount(ctx.user.id, ctx.user.email);
-      clearSessionCookie(ctx.res);
+      clearSessionCookie(ctx.res, ctx.req);
       return {
         success: true,
         message: "Votre compte et vos donn\xE9es associ\xE9es ont \xE9t\xE9 supprim\xE9s."
       };
     }),
     logout: publicProcedure.mutation(({ ctx }) => {
-      clearSessionCookie(ctx.res);
+      clearSessionCookie(ctx.res, ctx.req);
       return {
         success: true
       };

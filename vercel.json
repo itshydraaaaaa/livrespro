@@ -50,6 +50,52 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "livrespro.shop"
+        }
+      ],
+      "destination": "https://liverspro.shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.livrespro.shop"
+        }
+      ],
+      "destination": "https://liverspro.shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "livrespro.tn"
+        }
+      ],
+      "destination": "https://liverspro.shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.livrespro.tn"
+        }
+      ],
+      "destination": "https://liverspro.shop/:path*",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/health",
