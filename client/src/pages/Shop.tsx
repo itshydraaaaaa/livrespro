@@ -29,7 +29,7 @@ const itemVariants: Variants = {
 
 export default function Shop() {
   const prefersReduced = useReducedMotion();
-  const { data: products = [], isLoading, isError } = trpc.commerce.products.list.useQuery({ first: 24 });
+  const { data: products = [], isLoading, isError } = trpc.commerce.products.list.useQuery({ first: 500 });
   const [activeTag, setActiveTag] = useState("Tous les livres");
   const [searchQuery, setSearchQuery] = useState("");
   const [sortBy, setSortBy] = useState<"featured" | "price-asc" | "price-desc" | "title">("featured");
@@ -38,14 +38,15 @@ export default function Shop() {
     () =>
       Array.from(
         new Set([
-          "Marketing & marque",
-          "Management & leadership",
-          "Stratégie & innovation",
-          "Entrepreneuriat & croissance",
-          "Travail & productivité",
+          "Marketing & Vente",
+          "Entrepreneuriat & Startups",
+          "Management & Leadership",
+          "Finance & Investissement",
+          "Design, UX & Innovation",
+          "Développement Personnel & Efficacité",
           ...products.flatMap((product) => product.tags),
         ])
-      ).slice(0, 7),
+      ).filter(Boolean),
     [products]
   );
 
@@ -54,7 +55,11 @@ export default function Shop() {
 
     // Filter by tag
     if (activeTag !== "Tous les livres") {
-      result = result.filter((product) => product.tags.includes(activeTag));
+      result = result.filter((product) =>
+        product.tags.some(
+          (t) => t.trim().toLowerCase() === activeTag.trim().toLowerCase()
+        )
+      );
     }
 
     // Filter by search query

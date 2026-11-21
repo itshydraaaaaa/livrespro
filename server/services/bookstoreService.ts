@@ -156,7 +156,7 @@ export async function listStorefrontProducts(options?: {
     const rawProducts = await db.listProducts({
       categoryId,
       status: "published",
-      limit: options?.first ?? 50,
+      limit: options?.first ?? 500,
     });
 
     if (rawProducts.length > 0) {

@@ -34,11 +34,11 @@ export function ProductCard({ product, index = 0 }: ProductCardProps) {
         <p className="mb-2 text-[10px] font-extrabold uppercase tracking-[0.18em] text-[#BC3B2C]">
           {productKind}
         </p>
-        <h3 className="font-display text-[25px] leading-[1.05] text-[#141E33] transition-colors duration-300 group-hover:text-[#BC3B2C]">
+        <h3 dir="auto" className="font-display text-[22px] leading-[1.1] text-[#141E33] transition-colors duration-300 group-hover:text-[#BC3B2C]">
           {product.title}
         </h3>
         <div className="mt-3 flex items-center justify-between gap-3 text-sm text-[#5C574C]">
-          <span className="truncate">{product.vendor || "Édition indépendante"}</span>
+          <span dir="auto" className="truncate">{product.vendor || "Édition indépendante"}</span>
           <span className="shrink-0 font-bold text-[#141E33]">
             {formatMoney(product.priceRange.min)}
           </span>

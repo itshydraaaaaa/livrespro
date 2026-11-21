@@ -187,10 +187,10 @@ export default function ProductDetail() {
                 <span className="eyebrow text-[#BC3B2C]">{product.productType || "Livre business"}</span>
                 <span className="text-[10px] font-bold uppercase tracking-wider text-[#5C574C]">• Édition Officielle</span>
               </div>
-              <h1 className="mt-4 font-display text-[clamp(2.2rem,5vw,5.4rem)] leading-[0.93] sm:leading-[0.91] tracking-[-0.04em] text-[#141E33]">
+              <h1 dir="auto" className="mt-4 font-display text-[clamp(2.2rem,5vw,5.4rem)] leading-[0.93] sm:leading-[0.91] tracking-[-0.04em] text-[#141E33]">
                 {product.title}
               </h1>
-              {product.vendor ? <p className="mt-4 text-base font-semibold text-[#5C574C]">par {product.vendor}</p> : null}
+              {product.vendor ? <p dir="auto" className="mt-4 text-base font-semibold text-[#5C574C]">par {product.vendor}</p> : null}
               <div className="mt-6 flex items-baseline gap-3">
                 <p className="font-display text-3xl sm:text-4xl text-[#BC3B2C]">{formatMoney(product.priceRange.min)}</p>
                 <span className="text-xs font-semibold text-[#5C574C]">Paiement à la livraison inclus</span>
@@ -198,6 +198,7 @@ export default function ProductDetail() {
 
               <div className="my-7 h-px bg-[#141E33]/10" />
               <div
+                dir="auto"
                 className="prose prose-sm max-w-none text-[#5C574C] prose-p:leading-7"
                 dangerouslySetInnerHTML={{ __html: product.descriptionHtml || `<p>${product.description}</p>` }}
               />

@@ -1588,7 +1588,7 @@ async function listStorefrontProducts(options) {
     const rawProducts = await listProducts({
       categoryId,
       status: "published",
-      limit: options?.first ?? 50
+      limit: options?.first ?? 500
     });
     if (rawProducts.length > 0) {
       return rawProducts.map(normalizeDbProduct);
@@ -1719,7 +1719,7 @@ var commerceRouter = router({
   products: router({
     list: publicProcedure.input(
       z2.object({
-        first: z2.number().int().min(1).max(100).optional(),
+        first: z2.number().int().min(1).max(500).optional(),
         collectionHandle: z2.string().min(1).optional()
       }).optional()
     ).query(async ({ input }) => {

@@ -82,7 +82,7 @@
 
 @layer components {
   .container { width: 100%; margin-inline: auto; padding-inline: 1rem; }
-  .font-display { font-family: "DM Serif Display", ui-serif, Georgia, serif; }
+  .font-display { font-family: "DM Serif Display", "Traditional Arabic", "Amiri", "Noto Naskh Arabic", "Segoe UI", serif; }
   .font-modern { font-family: "Plus Jakarta Sans", "Manrope", sans-serif; }
   .eyebrow { @apply text-[10px] font-extrabold uppercase tracking-[0.22em] text-[#BC3B2C]; }
   .paper-surface { background-image: radial-gradient(rgba(20, 30, 51, 0.05) 0.7px, transparent 0.7px); background-size: 8px 8px; }
