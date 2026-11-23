@@ -206,7 +206,7 @@ kamel_book = {
     'price': '45.00',
     'compareAtPrice': '55.00',
     'currency': 'TND',
-    'publisher': 'Groupe MPBS / LivresPro',
+    'publisher': 'Groupe MPBS / LivrePro',
     'coverImage': '/books/solidarite-sociale-front.png',
     'backImage': '/books/solidarite-sociale-back.png',
     'categorySlug': 'management-strategie',

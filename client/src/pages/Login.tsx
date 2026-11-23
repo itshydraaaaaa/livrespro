@@ -93,7 +93,7 @@ export default function Login() {
       setSuccessMsg(
         isAdmin
           ? "Compte administrateur créé ! Redirection vers le tableau de bord..."
-          : "Compte client créé avec succès ! Bienvenue sur LivresPro.tn..."
+          : "Compte client créé avec succès ! Bienvenue sur LivrePro.shop..."
       );
       setTimeout(() => {
         setLocation(isAdmin ? "/admin" : "/mon-compte");
@@ -143,7 +143,7 @@ export default function Login() {
               {activeTab === "login" ? "Connexion" : "Créer un compte"}
             </h1>
             <p className="mt-2 text-xs text-[#5C574C]">
-              Accédez au tableau de bord, au suivi des commandes et à la gestion du catalogue LivresPro.tn.
+              Accédez au tableau de bord, au suivi des commandes et à la gestion du catalogue LivrePro.shop.
             </p>
           </div>
 

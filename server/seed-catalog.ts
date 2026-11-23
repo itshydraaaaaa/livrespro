@@ -76,7 +76,7 @@ function slugifyAuthor(name: string): string {
 }
 
 export async function runCatalogSeed() {
-  console.log("🚀 Starting LivresPro Catalog Seeding...");
+  console.log("🚀 Starting LivrePro Catalog Seeding...");
   const sb = getSupabaseAdmin();
   if (!sb) {
     throw new Error("Supabase is not configured!");
@@ -230,13 +230,13 @@ export async function runCatalogSeed() {
       currency: b.currency || "TND",
       stock_quantity: 50,
       availability_status: "in_stock",
-      publisher: b.publisher || "LivresPro",
+      publisher: b.publisher || "LivrePro",
       language: b.language || "العربية",
       cover_image: b.coverImage,
       category_id: categoryId,
       featured: b.featured ?? 0,
       status: "published",
-      seo_title: `${b.title} | LivresPro.tn`,
+      seo_title: `${b.title} | LivrePro.shop`,
       seo_description: b.shortDescription.slice(0, 160),
       metadata: {
         id_jalyss: b.id_jalyss,

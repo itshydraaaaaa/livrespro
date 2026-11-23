@@ -1,6 +1,6 @@
-# LivresPro.tn — Production Deployment Guide
+# LivrePro.shop — Production Deployment Guide
 
-This guide details the procedure for provisioning, configuring, and launching LivresPro.tn on a standard Linux VPS (Ubuntu 22.04 LTS).
+This guide details the procedure for provisioning, configuring, and launching LivrePro.shop on Vercel or a standard Linux VPS.
 
 ---
 
@@ -66,11 +66,11 @@ cd /var/www/livrespro
 ```env
 NODE_ENV=production
 PORT=3000
-BASE_URL=https://livrespro.tn
+BASE_URL=https://livrepro.shop
 DATABASE_URL=mysql://livrespro_user:StrongGeneratedPassword2026!@127.0.0.1:3306/livrespro_db
 JWT_SECRET=YOUR_64_CHARACTER_RANDOM_SECRET_KEY
-ADMIN_EMAIL=admin@livrespro.tn
-ADMIN_INITIAL_PASSWORD=ChooseYourInitialAdminPassword!
+ADMIN_EMAIL=admin@livrepro.shop
+ADMIN_INITIAL_PASSWORD=AdminLivrePro2026!
 ```
 
 3. Install dependencies and build:

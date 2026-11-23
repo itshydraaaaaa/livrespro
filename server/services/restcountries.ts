@@ -1,5 +1,5 @@
 /**
- * LivresPro.tn — RestCountries Integration Service
+ * LivrePro.shop — RestCountries Integration Service
  * Fetches and caches official country data for Tunisia (TN)
  * from https://api.restcountries.com/countries/v5/codes.alpha_2/TN
  */

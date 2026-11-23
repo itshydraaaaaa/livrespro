@@ -1,4 +1,4 @@
-# Liverspro.shop Robots configuration
+# LivrePro.shop Robots configuration
 User-agent: *
 Allow: /
 Allow: /librairie
@@ -15,4 +15,4 @@ Disallow: /mon-compte
 Disallow: /login
 
 # Sitemap location
-Sitemap: https://liverspro.shop/sitemap.xml
+Sitemap: https://livrepro.shop/sitemap.xml

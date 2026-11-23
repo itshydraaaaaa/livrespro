@@ -84,7 +84,7 @@ const adminMenu: DashboardMenuItem[] = [
 ];
 
 function frame(children: React.ReactNode) {
-  return <DashboardLayout menuItems={adminMenu} brandName="LivresPro · Admin">{children}</DashboardLayout>;
+  return <DashboardLayout menuItems={adminMenu} brandName="LivrePro · Admin">{children}</DashboardLayout>;
 }
 
 export default function Admin({ tab }: { tab: AdminTab }) {
@@ -116,7 +116,7 @@ export default function Admin({ tab }: { tab: AdminTab }) {
             Espace d’Administration
           </h1>
           <p className="mt-3 text-xs leading-6 text-[#5C574C]">
-            L’accès à cette section est strictement réservé aux administrateurs autorisés de LivresPro.tn. Veuillez vous connecter avec vos identifiants d’administration.
+            L’accès à cette section est strictement réservé aux administrateurs autorisés de LivrePro.shop. Veuillez vous connecter avec vos identifiants d’administration.
           </p>
 
           <div className="mt-6 flex flex-col gap-3">
@@ -351,7 +351,7 @@ function AdminWorkspace({ tab }: { tab: AdminTab }) {
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", `commandes-livrespro-${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute("download", `commandes-livrepro-${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -74,7 +74,7 @@ export default function DashboardLayout({
           </div>
           <div className="flex flex-col items-center gap-2">
             <h1 className="text-2xl font-bold font-display text-[#141E33]">
-              Administration LivresPro
+              Administration LivrePro
             </h1>
             <p className="text-xs text-[#5C574C] max-w-sm">
               Veuillez vous connecter avec vos identifiants administrateur pour accéder à l'ensemble des outils de gestion.

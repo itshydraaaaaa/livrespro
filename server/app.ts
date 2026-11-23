@@ -38,7 +38,7 @@ export function createExpressApp(): Express {
 
   // Health check endpoint
   app.get(["/api", "/api/health", "/health"], (_req, res) => {
-    res.json({ status: "ok", app: "livrespro", timestamp: new Date().toISOString() });
+    res.json({ status: "ok", app: "livrepro", timestamp: new Date().toISOString() });
   });
 
   // tRPC API middleware: handles both /api/trpc and /trpc (for Vercel rewrites)

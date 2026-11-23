@@ -56,10 +56,21 @@
       "has": [
         {
           "type": "host",
+          "value": "www.livrepro.shop"
+        }
+      ],
+      "destination": "https://livrepro.shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
           "value": "livrespro.shop"
         }
       ],
-      "destination": "https://liverspro.shop/:path*",
+      "destination": "https://livrepro.shop/:path*",
       "permanent": true
     },
     {
@@ -70,7 +81,29 @@
           "value": "www.livrespro.shop"
         }
       ],
-      "destination": "https://liverspro.shop/:path*",
+      "destination": "https://livrepro.shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "liverspro.shop"
+        }
+      ],
+      "destination": "https://livrepro.shop/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.liverspro.shop"
+        }
+      ],
+      "destination": "https://livrepro.shop/:path*",
       "permanent": true
     },
     {
@@ -81,7 +114,7 @@
           "value": "livrespro.tn"
         }
       ],
-      "destination": "https://liverspro.shop/:path*",
+      "destination": "https://livrepro.shop/:path*",
       "permanent": true
     },
     {
@@ -92,7 +125,7 @@
           "value": "www.livrespro.tn"
         }
       ],
-      "destination": "https://liverspro.shop/:path*",
+      "destination": "https://livrepro.shop/:path*",
       "permanent": true
     }
   ],

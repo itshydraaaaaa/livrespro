@@ -314,7 +314,7 @@ export function ProtectedBookTableOfContents({
             ctx.font = `600 ${Math.round(20 * dpr)}px system-ui, -apple-system, sans-serif`;
             ctx.fillStyle = "rgba(188, 59, 44, 0.05)";
             ctx.textAlign = "center";
-            ctx.fillText("LIVRESPRO.TN · LECTURE SÉCURISÉE · REPRODUCTION INTERDITE", 0, -60);
+            ctx.fillText("LIVREPRO.SHOP · LECTURE SÉCURISÉE · REPRODUCTION INTERDITE", 0, -60);
             ctx.fillText(`TUNISIA EDITION · ${bookTitle.toUpperCase()}`, 0, 40);
             ctx.restore();
             setLoading(false);
@@ -343,7 +343,7 @@ export function ProtectedBookTableOfContents({
       ctx.font = "600 22px system-ui, -apple-system, sans-serif";
       ctx.fillStyle = "rgba(188, 59, 44, 0.055)";
       ctx.textAlign = "center";
-      ctx.fillText("LIVRESPRO.TN · LECTURE PROTÉGÉE · REPRODUCTION INTERDITE", 0, -80);
+      ctx.fillText("LIVREPRO.SHOP · LECTURE PROTÉGÉE · REPRODUCTION INTERDITE", 0, -80);
       ctx.fillText("© 2026 GLOBAL MARKETING NEXUS · KOTLER · PFOERTSCH · KALLEL", 0, 20);
       ctx.restore();
 

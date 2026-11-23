@@ -73,7 +73,7 @@ export default function AdminLogin() {
             Administration
           </h1>
           <p className="mt-2 text-xs leading-5 text-white/50">
-            Espace exclusivement réservé aux administrateurs autorisés de Liverspro.shop.
+            Espace exclusivement réservé aux administrateurs autorisés de LivrePro.shop.
           </p>
         </div>
 
@@ -95,7 +95,7 @@ export default function AdminLogin() {
               <Input
                 type="email"
                 required
-                placeholder="admin@livrespro.tn"
+                placeholder="admin@livrepro.shop"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="border-white/10 bg-white/[0.07] pl-9 text-white placeholder:text-white/30 focus:border-[#BC3B2C] focus:ring-0"
@@ -137,7 +137,7 @@ export default function AdminLogin() {
       </div>
 
       <p className="mt-8 text-[10px] text-white/20">
-        © 2026 L'Atelier des Pages · Liverspro.shop
+        © 2026 L'Atelier des Pages · LivrePro.shop
       </p>
     </div>
   );

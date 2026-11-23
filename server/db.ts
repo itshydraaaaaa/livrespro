@@ -1,5 +1,5 @@
 ﻿/**
- * LivresPro.tn — Database Adapter Layer (Supabase Cloud)
+ * LivrePro.shop — Database Adapter Layer (Supabase Cloud)
  *
  * All data operations go directly to Supabase PostgreSQL.
  * No MySQL / local DB dependency in production.

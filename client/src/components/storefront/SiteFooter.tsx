@@ -50,14 +50,14 @@ export function SiteFooter() {
             className="mt-4 h-20 w-auto max-w-full object-contain object-left"
           />
           <p className="mt-3 text-xs leading-5 text-[#5C574C]">
-            Liverspro.shop — L'Atelier des Pages est une marque de la société BUSINESS SUCCESS.
+            LivrePro.shop — L'Atelier des Pages est une marque de la société BUSINESS SUCCESS.
           </p>
         </div>
       </div>
 
       <div className="container flex flex-col items-center justify-between gap-4 border-t border-white/10 py-5 text-[10px] font-bold uppercase tracking-[.14em] text-white/40 sm:flex-row">
         <div className="flex flex-wrap items-center gap-3">
-          <span>© 2026 L'Atelier des Pages · Tous droits réservés.</span>
+          <span>© 2026 L'Atelier des Pages · LivrePro.shop · Tous droits réservés.</span>
           <span>·</span>
           <span className="flex items-center gap-1.5 text-white/60">
             <span>🇹🇳</span>

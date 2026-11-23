@@ -297,7 +297,7 @@ export default function Account() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2.5">
                     <h1 className="font-display text-2xl font-bold sm:text-3xl text-white">
-                      {user.name || "Client LivresPro"}
+                      {user.name || "Client LivrePro"}
                     </h1>
                     {user.role === "admin" ? (
                       <Badge className="bg-[#BC3B2C] text-xs font-bold uppercase tracking-wider text-white border-none shadow-xs">
@@ -777,8 +777,8 @@ export default function Account() {
                 <div className="mt-4 space-y-2.5 text-xs">
                   <div className="flex items-center gap-2 text-[#141E33]">
                     <Mail className="h-4 w-4 text-[#BC3B2C]" />
-                    <a href="mailto:contact@liverspro.shop" className="font-semibold hover:underline">
-                      contact@liverspro.shop
+                    <a href="mailto:contact@livrepro.shop" className="font-semibold hover:underline">
+                      contact@livrepro.shop
                     </a>
                   </div>
                   <div className="flex items-center gap-2 text-[#141E33]">
@@ -883,7 +883,7 @@ export default function Account() {
 
               <div className="mt-6 space-y-4 text-xs text-[#5C574C]">
                 <p>
-                  Si vous décidez de supprimer votre compte LivresPro :
+                  Si vous décidez de supprimer votre compte LivrePro :
                 </p>
                 <ul className="list-disc pl-5 space-y-1.5 text-rose-950/80">
                   <li>Toutes vos coordonnées et sessions seront immédiatement effacées.</li>
@@ -891,7 +891,7 @@ export default function Account() {
                   <li>Les factures et bons de livraison existants déjà traités pour les livreurs resteront archivés selon la réglementation fiscale.</li>
                 </ul>
 
-                {user.role === "admin" && (user.email.toLowerCase().includes("admin@livrespro.tn") || user.email.toLowerCase().includes("admin@liverspro.shop")) ? (
+                {user.role === "admin" && (user.email.toLowerCase().includes("admin@livrepro.shop") || user.email.toLowerCase().includes("admin@livrespro.tn") || user.email.toLowerCase().includes("admin@liverspro.shop")) ? (
                   <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-amber-900">
                     <p className="font-bold flex items-center gap-2">
                       <AlertTriangle className="h-4 w-4" />

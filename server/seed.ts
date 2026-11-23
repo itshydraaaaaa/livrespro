@@ -13,12 +13,12 @@ import {
 } from "./db";
 
 export async function runSeed() {
-  console.log("🌱 Starting LivresPro.tn Database Seeding...");
+  console.log("🌱 Starting LivrePro.shop Database Seeding...");
 
   // 1. Seed Admin User
-  const adminEmail = process.env.ADMIN_EMAIL || "admin@livrespro.tn";
-  const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivresPro2026!";
-  const adminEmails = Array.from(new Set([adminEmail, "admin@livrespro.tn", "admin@liverspro.shop"]));
+  const adminEmail = process.env.ADMIN_EMAIL || "admin@livrepro.shop";
+  const adminPass = process.env.ADMIN_INITIAL_PASSWORD || "AdminLivrePro2026!";
+  const adminEmails = Array.from(new Set([adminEmail, "admin@livrepro.shop", "admin@livrespro.tn", "admin@liverspro.shop"]));
 
   for (const email of adminEmails) {
     const existingAdmin = await getUserByEmail(email);
@@ -26,7 +26,7 @@ export async function runSeed() {
       const adminId = await createUser({
         email,
         passwordHash: hashPassword(adminPass),
-        name: "Administrateur LivresPro",
+        name: "Administrateur LivrePro",
         role: "admin",
       });
       console.log(`✅ Admin user seeded: ${email} (ID: ${adminId})`);

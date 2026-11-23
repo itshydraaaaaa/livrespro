@@ -9,12 +9,13 @@ import {
   useState,
 } from "react";
 
-const CART_STORAGE_KEY = "livrespro:cart";
+const CART_STORAGE_KEY = "livrepro:cart";
+const LEGACY_CART_STORAGE_KEY = "livrespro:cart";
 
 function readStoredCart(): CartItem[] {
   if (typeof window === "undefined") return [];
   try {
-    const raw = window.localStorage.getItem(CART_STORAGE_KEY);
+    const raw = window.localStorage.getItem(CART_STORAGE_KEY) || window.localStorage.getItem(LEGACY_CART_STORAGE_KEY);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : [];

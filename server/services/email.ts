@@ -80,7 +80,7 @@ function buildEmailHtml(data: OrderEmailData, items: OrderEmailItem[]): string {
           <!-- Header -->
           <tr>
             <td style="background:#141E33;padding:28px 36px;text-align:center;">
-              <p style="margin:0 0 4px 0;color:#BC3B2C;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;">L'Atelier des Pages · Liverspro.shop</p>
+              <p style="margin:0 0 4px 0;color:#BC3B2C;font-size:11px;font-weight:800;letter-spacing:0.18em;text-transform:uppercase;">L'Atelier des Pages · LivrePro.shop</p>
               <h1 style="margin:0;color:#F6F1E7;font-size:22px;font-weight:700;">Commande Confirmée ✓</h1>
             </td>
           </tr>
@@ -185,7 +185,7 @@ function buildEmailHtml(data: OrderEmailData, items: OrderEmailItem[]): string {
                       <li>Notre équipe prépare votre commande sous 24 à 48 h.</li>
                       <li>Livraison Cash on Delivery (COD) partout en Tunisie.</li>
                       <li>Le paiement est effectué à la réception du colis.</li>
-                      <li>Pour toute question : <a href="mailto:contact@liverspro.shop" style="color:#2E7D32;">contact@liverspro.shop</a></li>
+                      <li>Pour toute question : <a href="mailto:contact@livrepro.shop" style="color:#2E7D32;">contact@livrepro.shop</a></li>
                     </ul>
                   </td>
                 </tr>
@@ -197,7 +197,7 @@ function buildEmailHtml(data: OrderEmailData, items: OrderEmailItem[]): string {
           <tr>
             <td style="background:#F6F1E7;padding:20px 36px;text-align:center;border-top:1px solid #e8e3d9;">
               <p style="margin:0;font-size:11px;color:#8C827A;">
-                © 2026 L'Atelier des Pages · Liverspro.shop · Une marque de BUSINESS SUCCESS<br/>
+                © 2026 L'Atelier des Pages · LivrePro.shop · Une marque de BUSINESS SUCCESS<br/>
                 Référence commande : <strong>${data.orderNumber}</strong>
               </p>
             </td>
@@ -217,7 +217,7 @@ function buildEmailText(data: OrderEmailData, items: OrderEmailItem[]): string {
     .join("\n");
 
   return `CONFIRMATION DE COMMANDE — ${data.orderNumber}
-L'Atelier des Pages · Liverspro.shop
+L'Atelier des Pages · LivrePro.shop
 
 Bonjour ${data.customerFirstName} ${data.customerLastName},
 
@@ -241,9 +241,9 @@ PROCHAINES ÉTAPES
 - Préparation sous 24-48 h
 - Livraison COD sur toute la Tunisie
 - Paiement à la réception du colis
-- Contact : contact@liverspro.shop
+- Contact : contact@livrepro.shop
 
-© 2026 L'Atelier des Pages · Liverspro.shop`;
+© 2026 L'Atelier des Pages · LivrePro.shop`;
 }
 
 /**
@@ -258,7 +258,7 @@ export async function sendOrderConfirmationEmail(
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey || !data.customerEmail) return;
 
-  const fromAddress = process.env.RESEND_FROM_EMAIL || "L'Atelier des Pages <noreply@liverspro.shop>";
+  const fromAddress = process.env.RESEND_FROM_EMAIL || "L'Atelier des Pages <noreply@livrepro.shop>";
 
   const payload = {
     from: fromAddress,

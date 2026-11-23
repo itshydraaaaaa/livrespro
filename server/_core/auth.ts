@@ -4,7 +4,7 @@ import type { Request, Response } from "express";
 import { COOKIE_NAME } from "@shared/const";
 import { ENV } from "./env";
 
-const JWT_SECRET = process.env.JWT_SECRET || "livrespro-development-secret-key-at-least-32-chars";
+const JWT_SECRET = process.env.JWT_SECRET || "livrepro-development-secret-key-at-least-32-chars";
 const secretKey = new TextEncoder().encode(JWT_SECRET);
 
 export type AuthSession = {
@@ -88,20 +88,20 @@ export async function verifySessionToken(token: string): Promise<AuthSession | n
 
 /**
  * Attach the HTTP-only session cookie to the response.
- * When on liverspro.shop or www.liverspro.shop in production, sets domain to .liverspro.shop
+ * When on livrepro.shop or www.livrepro.shop in production, sets domain to .livrepro.shop
  * so sessions are seamlessly shared across both apex and www domains.
  */
 export function setSessionCookie(res: Response, token: string, req?: Request): void {
   const isProd = process.env.NODE_ENV === "production";
   const host = req?.headers?.host || "";
-  const isLiverspro = host.includes("liverspro.shop");
+  const isLivrepro = host.includes("livrepro.shop") || host.includes("liverspro.shop") || host.includes("livrespro.shop");
 
   res.cookie(COOKIE_NAME, token, {
     httpOnly: true,
     secure: isProd,
     sameSite: "lax",
     path: "/",
-    domain: isProd && isLiverspro ? ".liverspro.shop" : undefined,
+    domain: isProd && isLivrepro ? (host.includes("livrepro.shop") ? ".livrepro.shop" : undefined) : undefined,
     maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
   });
 }
@@ -112,11 +112,11 @@ export function setSessionCookie(res: Response, token: string, req?: Request): v
 export function clearSessionCookie(res: Response, req?: Request): void {
   const isProd = process.env.NODE_ENV === "production";
   const host = req?.headers?.host || "";
-  const isLiverspro = host.includes("liverspro.shop");
+  const isLivrepro = host.includes("livrepro.shop") || host.includes("liverspro.shop") || host.includes("livrespro.shop");
 
   res.clearCookie(COOKIE_NAME, {
     httpOnly: true,
     path: "/",
-    domain: isProd && isLiverspro ? ".liverspro.shop" : undefined,
+    domain: isProd && isLivrepro ? (host.includes("livrepro.shop") ? ".livrepro.shop" : undefined) : undefined,
   });
 }
